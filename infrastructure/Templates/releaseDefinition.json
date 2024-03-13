@@ -1,0 +1,248 @@
+{
+  "id": 0,
+  "name": "New release pipeline",
+  "source": 2,
+  "comment": "",
+  "createdOn": "2024-02-02T20:05:36.311Z",
+  "createdBy": null,
+  "modifiedBy": null,
+  "modifiedOn": "2024-02-02T20:05:36.311Z",
+  "environments": [
+    {
+      "id": -2,
+      "name": "Stage 1",
+      "rank": 1,
+      "variables": {
+
+      },
+      "variableGroups": [
+
+      ],
+      "preDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 0
+          }
+        ],
+        "approvalOptions": {
+          "executionOrder": 1
+        }
+      },
+      "deployStep": {
+        "tasks": [
+
+        ],
+        "id": 0
+      },
+      "postDeployApprovals": {
+        "approvals": [
+          {
+            "rank": 1,
+            "isAutomated": true,
+            "isNotificationOn": false,
+            "id": 0
+          }
+        ],
+        "approvalOptions": {
+          "executionOrder": 2
+        }
+      },
+      "deployPhases": [
+        {
+          "deploymentInput": {
+            "parallelExecution": {
+              "parallelExecutionType": "none"
+            },
+            "agentSpecification": null,
+            "skipArtifactsDownload": false,
+            "artifactsDownloadInput": {
+
+            },
+            "queueId": 73,
+            "demands": [
+
+            ],
+            "enableAccessToken": false,
+            "timeoutInMinutes": 0,
+            "jobCancelTimeoutInMinutes": 1,
+            "condition": "succeeded()",
+            "overrideInputs": {
+
+            },
+            "dependencies": [
+
+            ]
+          },
+          "rank": 1,
+          "phaseType": 1,
+          "name": "Run on agent",
+          "refName": null,
+          "workflowTasks": [
+            {
+              "name": "Deploy Azure App Service",
+              "enabled": true,
+              "timeoutInMinutes": 0,
+              "inputs": {
+                "ConnectionType": "AzureRM",
+                "ConnectedServiceName": "$(Parameters.ConnectedServiceName)",
+                "PublishProfilePath": "$(System.DefaultWorkingDirectory)/**/*.pubxml",
+                "PublishProfilePassword": "",
+                "WebAppKind": "$(Parameters.WebAppKind)",
+                "WebAppName": "$(Parameters.WebAppName)",
+                "DeployToSlotOrASEFlag": "false",
+                "ResourceGroupName": "",
+                "SlotName": "production",
+                "DockerNamespace": "$(Parameters.DockerNamespace)",
+                "DockerRepository": "$(Parameters.DockerRepository)",
+                "DockerImageTag": "$(Build.BuildId)",
+                "VirtualApplication": "",
+                "RuntimeStack": "",
+                "RuntimeStackFunction": "",
+                "StartupCommand": "$(Parameters.StartupCommand)",
+                "ScriptType": "",
+                "InlineScript": "",
+                "ScriptPath": "",
+                "WebConfigParameters": "",
+                "AppSettings": "",
+                "ConfigurationSettings": "",
+                "UseWebDeploy": "false",
+                "DeploymentType": "webDeploy",
+                "TakeAppOfflineFlag": "true",
+                "SetParametersFile": "",
+                "RemoveAdditionalFilesFlag": "false",
+                "ExcludeFilesFromAppDataFlag": "false",
+                "AdditionalArguments": "",
+                "RenameFilesFlag": "true",
+                "XmlTransformation": "false",
+                "XmlVariableSubstitution": "false",
+                "JSONFiles": ""
+              },
+              "taskId": "497d490f-eea7-4f2b-ab94-48d9c1acdcb1",
+              "version": "4.*",
+              "definitionType": null,
+              "alwaysRun": false,
+              "continueOnError": false,
+              "overrideInputs": {
+
+              },
+              "condition": "succeeded()",
+              "environment": {
+
+              },
+              "retryCountOnTaskFailure": 0
+            }
+          ],
+          "phaseInputs": {
+            "phaseinput_artifactdownloadinput": {
+              "artifactsDownloadInput": {
+
+              },
+              "skipArtifactsDownload": false
+            }
+          }
+        }
+      ],
+      "runOptions": {
+
+      },
+      "environmentOptions": {
+        "emailNotificationType": "OnlyOnFailure",
+        "emailRecipients": "release.environment.owner;release.creator",
+        "skipArtifactsDownload": false,
+        "timeoutInMinutes": 0,
+        "enableAccessToken": false,
+        "publishDeploymentStatus": true,
+        "badgeEnabled": false,
+        "autoLinkWorkItems": false,
+        "pullRequestDeploymentEnabled": false
+      },
+      "demands": [
+
+      ],
+      "conditions": [
+        {
+          "conditionType": 1,
+          "name": "ReleaseStarted",
+          "value": "",
+          "result": null
+        }
+      ],
+      "executionPolicy": {
+        "concurrencyCount": 1,
+        "queueDepthCount": 0
+      },
+      "schedules": [
+
+      ],
+      "processParameters": {
+        "inputs": [],
+        "dataSourceBindings": [
+          {
+            "dataSourceName": "AzureRMWebAppNamesByAppType",
+            "parameters": {
+              "WebAppKind": "$(WebAppKind)"
+            },
+            "endpointId": "$(ConnectedServiceName)",
+            "target": "WebAppName"
+          }
+        ]
+      },
+      "properties": {
+        "LinkBoardsWorkItems": false,
+        "BoardsEnvironmentType": "unmapped"
+      },
+      "preDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": [
+
+        ]
+      },
+      "postDeploymentGates": {
+        "id": 0,
+        "gatesOptions": null,
+        "gates": [
+
+        ]
+      },
+      "environmentTriggers": [
+
+      ],
+      "owner": {
+
+      },
+      "retentionPolicy": {
+        "daysToKeep": 30,
+        "releasesToKeep": 3,
+        "retainBuild": true
+      }
+    }
+  ],
+  "artifacts": [
+
+  ],
+  "variables": {
+
+  },
+  "variableGroups": [
+
+  ],
+  "triggers": [
+
+  ],
+  "lastRelease": null,
+  "tags": [
+
+  ],
+  "path": "\\",
+  "properties": {
+    "DefinitionCreationSource": "ReleaseNew",
+    "IntegrateJiraWorkItems": "false",
+    "IntegrateBoardsWorkItems": false
+  },
+  "releaseNameFormat": "Release-$(rev:r)",
+  "description": ""
+}
