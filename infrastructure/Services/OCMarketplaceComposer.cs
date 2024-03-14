@@ -9,7 +9,6 @@ namespace OC_Accelerator.Services
     // TODO: rename this
     public class OCMarketplaceComposer
     {
-        private readonly string buyerID = "accelerator";
         private readonly IOrderCloudClient _oc;
         private readonly IAppSettings _appSettings;
         private readonly IgnoreErrorWrapper _ignoreErrorWrapper;
@@ -20,24 +19,25 @@ namespace OC_Accelerator.Services
             _appSettings = appSettings;
             _ignoreErrorWrapper = ignoreErrorWrapper;
         }
-        public async Task<Tuple<ApiClient, ApiClient>> CreateApiClientsAsync(TextWriter logger)
+
+        public async Task<Tuple<ApiClient, ApiClient>> CreateApiClientsAsync(TextWriter logger, string storefrontAppName, string adminAppName, string funcAppName)
         {
             // TODO: temporary
-            await CleanupAsync(logger);
+            await CleanupAsync(logger, storefrontAppName);
             ApiClient buyerApiClient = new ApiClient();
             ApiClient sellerApiClient = new ApiClient();
             try
             {
-                await logger.WriteLineAsync($"Creating Buyer {buyerID}");
-                await _oc.Buyers.CreateAsync(new Buyer()
+                await logger.WriteLineAsync($"Creating Buyer {storefrontAppName}");
+                var buyer = await _oc.Buyers.CreateAsync(new Buyer()
                 {
-                    ID = buyerID,
+                    ID = string.Join("-", storefrontAppName),
                     Active = true,
-                    Name = "OC Accelerator - Starter Buyer"
+                    Name = storefrontAppName
                 });
 
                 await logger.WriteLineAsync("Creating Default Context User");
-                var defaultContextUser = await _oc.Users.CreateAsync(buyerID, new User()
+                var defaultContextUser = await _oc.Users.CreateAsync(buyer.ID, new User()
                 {
                     Active = true,
                     Username = "DefaultContextUser",
@@ -51,7 +51,7 @@ namespace OC_Accelerator.Services
                 {
                     Active = true,
                     AccessTokenDuration = 600,
-                    AppName = "Buyer",
+                    AppName = storefrontAppName,
                     DefaultContextUserName = defaultContextUser.Username,
                     AllowAnyBuyer = true,
                     AllowAnySupplier = false,
@@ -65,7 +65,7 @@ namespace OC_Accelerator.Services
                 {
                     Active = true,
                     AccessTokenDuration = 600,
-                    AppName = "Seller",
+                    AppName = adminAppName,
                     DefaultContextUserName = null,
                     AllowAnyBuyer = false,
                     AllowAnySupplier = false,
@@ -80,7 +80,7 @@ namespace OC_Accelerator.Services
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 await logger.WriteLineAsync(ex.Message);
-                await CleanupAsync(logger);
+                await CleanupAsync(logger, storefrontAppName);
                 throw;
             }
         }
@@ -124,9 +124,11 @@ namespace OC_Accelerator.Services
             });
         }
 
-        public async Task CleanupAsync(TextWriter logger)
+        public async Task CleanupAsync(TextWriter logger, string storefrontAppName)
         {
             var webhooks = await _oc.Webhooks.ListAsync();
+            var buyers = await _oc.Buyers.ListAsync(search: storefrontAppName);
+            string buyerID = buyers.Items.FirstOrDefault()?.ID;
             foreach (var webhook in webhooks.Items)
             {
                 await _oc.Webhooks.DeleteAsync(webhook.ID);
@@ -144,8 +146,11 @@ namespace OC_Accelerator.Services
                 await _oc.ApiClients.DeleteAsync(apiClient.ID);
             }
 
-            await _ignoreErrorWrapper.Ignore404(() => _oc.Buyers.DeleteAsync(buyerID), logger);
-            await _ignoreErrorWrapper.Ignore404(() => _oc.Catalogs.DeleteAsync(buyerID), logger);
+            if (buyerID != null)
+            {
+                await _ignoreErrorWrapper.Ignore404(() => _oc.Buyers.DeleteAsync(buyerID), logger);
+                await _ignoreErrorWrapper.Ignore404(() => _oc.Catalogs.DeleteAsync(buyerID), logger);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@minLength(3)
+@minLength(3)
 @maxLength(10)
 @description('Provide a prefix for your resources')
 param prefix string = 'ocstart'
@@ -9,8 +9,14 @@ param location string = resourceGroup().location
 @description('Provide the API client ID representing the buyer')
 param buyerApiClientID string
 
+@description('Name of the directory that represents your buyer/storefront application')
+param buyerAppName string
+
 @description('Provide the API client ID representing the seller')
 param sellerApiClientID string
+
+@description('Name of the directory that represents your admin application')
+param adminAppName string
 
 @description('Provide the hash key value of webhooks, integration events, etc.')
 param hashKey string
@@ -24,6 +30,9 @@ param middlewareApiClientSecret string
 
 @description('Provide the OC API URL to your marketplace')
 param ocApiUrl string = 'https://sandboxapi.ordercloud.io'
+
+@description('Name of the directory that represents your functions application')
+param funcAppName string
 
 // Creates the storage account
 resource functionStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
@@ -118,24 +127,28 @@ resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 // Defines unique details for every web app/func app created
 param appDetails array = [
   {
-    name: '${prefix}-storefront-${uniqueString(resourceGroup().id)}'
+    name: '${prefix}-${buyerAppName}-${uniqueString(resourceGroup().id)}'
     kind: 'app'
     clientAffinityEnabled: true
+    zipPackageUri: ''
   }
   {
-    name: '${prefix}-admin-${uniqueString(resourceGroup().id)}'
+    name: '${prefix}-${adminAppName}-${uniqueString(resourceGroup().id)}'
     kind: 'app'
     clientAffinityEnabled: true
+    zipPackageUri: ''
   }
   {
     name: '${prefix}-middleware-${uniqueString(resourceGroup().id)}'
     kind: 'app'
     clientAffinityEnabled: true
+    zipPackageUri: ''
   }
   {
-    name: '${prefix}-funcapp-${uniqueString(resourceGroup().id)}'
+    name: '${prefix}-${funcAppName}-${uniqueString(resourceGroup().id)}'
     kind: 'functionapp'
     clientAffinityEnabled: false
+    zipPackageUri: ''
   }
 ]
 
@@ -255,3 +268,16 @@ resource webAppSlotSettings 'Microsoft.Web/sites/slots/config@2022-09-01' = [for
     ]
   }
 }]
+
+
+// resource appDeploys 'Microsoft.Web/sites/extensions@2021-03-01' = [for (app, i) in appDetails: {
+//   name: '${app.name}/deploy'
+//   properties: {
+//     packageUri: app.zipPackageUri
+//     type: 'zip'
+//     path: functionStorage
+//   } // The absolute path to deploy the artifact to. For example, "/home/site/deployments/tools/driver.jar", "/home/site/scripts/helper.sh".
+//   // I think this is the path of the storage account that gets created?
+// https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/frontdoor/front-door-quickstart-template-samples.md
+// Need to create an Azure Front Door to expose the storage account to requests? This will be the path for the app deploy? Or the packageUri?
+// }]

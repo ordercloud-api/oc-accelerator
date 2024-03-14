@@ -27,6 +27,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Services.Release.Client" Version="16.205.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="OrderCloud.SDK" Version="0.12.15" />
+    <PackageReference Include="Sharprompt" Version="2.4.5" />
   </ItemGroup>
 
   <ItemGroup>

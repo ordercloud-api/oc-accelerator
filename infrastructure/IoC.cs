@@ -35,6 +35,8 @@ namespace OC_Accelerator
             services.AddSingleton<OCMarketplaceComposer>();
             services.AddSingleton<IgnoreErrorWrapper>();
             services.AddSingleton<BuildBicepFile>();
+            services.AddSingleton<AzurePublisher>();
+            services.AddSingleton<IdentifyAppNames>();
             return services.BuildServiceProvider();
         }
 

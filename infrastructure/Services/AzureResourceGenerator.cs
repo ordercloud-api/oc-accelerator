@@ -18,7 +18,7 @@ public class AzureResourceGenerator
         _appSettings = appSettings;
     }
     
-    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, ApiClient buyerClient, ApiClient sellerClient)
+    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, ApiClient buyerClient, ApiClient sellerClient, string buyerAppName, string adminAppName, string funcAppName)
     {
         InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions()
         {
@@ -48,9 +48,17 @@ public class AzureResourceGenerator
                 {
                     value = buyerClient.ID
                 },
+                buyerAppName = new 
+                {
+                    value = buyerAppName
+                },
                 sellerApiClientID = new
                 {
                     value = sellerClient.ID
+                },
+                adminAppName = new
+                {
+                    value = adminAppName
                 },
                 middlewareApiClientID = new
                 {
@@ -67,6 +75,10 @@ public class AzureResourceGenerator
                 hashKey = new
                 {
                     value = _appSettings.ocHashKey
+                },
+                funcAppName = new
+                {
+                    value = funcAppName
                 }
             })
         };
