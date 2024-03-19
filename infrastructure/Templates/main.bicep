@@ -268,16 +268,3 @@ resource webAppSlotSettings 'Microsoft.Web/sites/slots/config@2022-09-01' = [for
     ]
   }
 }]
-
-
-// resource appDeploys 'Microsoft.Web/sites/extensions@2021-03-01' = [for (app, i) in appDetails: {
-//   name: '${app.name}/deploy'
-//   properties: {
-//     packageUri: app.zipPackageUri
-//     type: 'zip'
-//     path: functionStorage
-//   } // The absolute path to deploy the artifact to. For example, "/home/site/deployments/tools/driver.jar", "/home/site/scripts/helper.sh".
-//   // I think this is the path of the storage account that gets created?
-// https://github.com/MicrosoftDocs/azure-docs/blob/main/articles/frontdoor/front-door-quickstart-template-samples.md
-// Need to create an Azure Front Door to expose the storage account to requests? This will be the path for the app deploy? Or the packageUri?
-// }]
