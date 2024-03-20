@@ -22,7 +22,7 @@ namespace OC_Accelerator
             AzResourceGeneratorResponse armResponse = new AzResourceGeneratorResponse();
 
             var appNames = provider.GetService<IdentifyAppNames>().Run(logger);
-            bool isDebugging = true;
+            bool isDebugging = false;
 
             string? storefrontAppName;
             string? adminAppName;
@@ -44,8 +44,6 @@ namespace OC_Accelerator
                 adminAppName = "admin";
                 funcAppName = "functions";
             }
-           
-            // TODO: assert they are each unique
 
             provider.GetService<BuildBicepFile>()?.Run(logger, "../../../Templates/main.bicep");
             try
@@ -55,8 +53,9 @@ namespace OC_Accelerator
                 armResponse = await provider.GetService<AzureResourceGenerator>()?.RunAsync(logger, apiClients?.Item1, apiClients?.Item2, storefrontAppName, adminAppName, funcAppName);
                 await ocService.ConfigureWebhooksAsync(logger, armResponse.middlewareUrl, apiClients.Item1.ID);
                 await ocService.ConfigureOrderCheckoutIntegrationEvent(logger, armResponse.middlewareUrl);
-                await provider.GetService<DevOps>()?.Run(logger, armResponse);
-                await provider.GetService<AzurePublisher>().Publish(logger);
+                // TODO: post-MVP
+                // await provider.GetService<DevOps>()?.Run(logger, armResponse);
+                // await provider.GetService<AzurePublisher>().Publish(logger);
             }
             catch (Exception ex)
             {
