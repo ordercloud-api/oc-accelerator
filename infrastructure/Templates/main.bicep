@@ -21,13 +21,6 @@ param adminAppName string
 @description('Provide the hash key value of webhooks, integration events, etc.')
 param hashKey string
 
-@description('Provide the API client ID representing the middleware')
-param middlewareApiClientID string
-
-@description('Provide the client secret for the middleware API client') 
-@secure()
-param middlewareApiClientSecret string
-
 @description('Provide the OC API URL to your marketplace')
 param ocApiUrl string = 'https://sandboxapi.ordercloud.io'
 
@@ -63,16 +56,6 @@ param keyData array = [
     //   tag02_name: 'tag02_value'
     // }
     contentType: 'string'
-  }
-  {
-      key: 'OrderCloudSettings.MiddlewareClientID'
-      value: middlewareApiClientID
-      contentType: 'string'
-  }
-  {
-      key: 'OrderCloudSettings.MiddlewareClientSecret'
-      value: middlewareApiClientSecret
-      contentType: 'string'
   }
   {
     key: 'OrderCloudSettings.ApiUrl'
@@ -130,25 +113,16 @@ param appDetails array = [
     name: '${prefix}-${buyerAppName}-${uniqueString(resourceGroup().id)}'
     kind: 'app'
     clientAffinityEnabled: true
-    zipPackageUri: ''
   }
   {
     name: '${prefix}-${adminAppName}-${uniqueString(resourceGroup().id)}'
     kind: 'app'
     clientAffinityEnabled: true
-    zipPackageUri: ''
-  }
-  {
-    name: '${prefix}-middleware-${uniqueString(resourceGroup().id)}'
-    kind: 'app'
-    clientAffinityEnabled: true
-    zipPackageUri: ''
   }
   {
     name: '${prefix}-${funcAppName}-${uniqueString(resourceGroup().id)}'
     kind: 'functionapp'
     clientAffinityEnabled: false
-    zipPackageUri: ''
   }
 ]
 
@@ -207,9 +181,9 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: '${prefix}-kv-${uniqueString(resourceGroup().id)}'
   location: location
   properties: {
-    accessPolicies: [for i in range(0, 8): {
+    accessPolicies: [for i in range(0, 6): {
         tenantId: subscription().tenantId
-        objectId: i <= 3 ? webAppSlots[i].identity.principalId : webApps[i-4].identity.principalId
+        objectId: i <= 2 ? webAppSlots[i].identity.principalId : webApps[i-3].identity.principalId
         permissions: {
           keys: [
             'encrypt', 'decrypt', 'wrapKey', 'unwrapKey', 'sign', 'verify', 'get', 'list', 'create', 'update', 'import', 'delete', 'backup', 'restore', 'recover', 'purge'
@@ -236,13 +210,13 @@ resource appConfigurationConnectionKvRef 'Microsoft.KeyVault/vaults/secrets@2023
   name: 'appConfigConnectionString'
   properties: {
     value: appConfig.listKeys().value[0].connectionString
+    // for the function app, we want the storage account connection string
   }
 }
 
-// Configure app settings
-resource webAppSettings 'Microsoft.Web/sites/config@2022-09-01' = [for (app, i) in appDetails: {
+// Configure app settings for web apps
+resource webAppSettings 'Microsoft.Web/sites/config@2022-09-01' = [for (app, i) in appDetails: if (app.kind != 'functionapp') {
   parent: webApps[i]
-
   name: 'web'
   properties: {
     appSettings: [
@@ -254,10 +228,9 @@ resource webAppSettings 'Microsoft.Web/sites/config@2022-09-01' = [for (app, i) 
   }
 }]
 
-// Configure slot settings
-resource webAppSlotSettings 'Microsoft.Web/sites/slots/config@2022-09-01' = [for (app, i) in appDetails: {
+// Configure slot settings for web apps
+resource webAppSlotSettings 'Microsoft.Web/sites/slots/config@2022-09-01' = [for (app, i) in appDetails: if (app.kind != 'functionapp') {
   parent: webAppSlots[i]
-
   name: 'web'
   properties: {
     appSettings: [

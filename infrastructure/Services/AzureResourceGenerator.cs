@@ -60,14 +60,6 @@ public class AzureResourceGenerator
                 {
                     value = adminAppName
                 },
-                middlewareApiClientID = new
-                {
-                    value = _appSettings.ocMiddlewareClientId
-                },
-                middlewareApiClientSecret = new
-                {
-                    value = _appSettings.ocMiddlewareClientSecret
-                },
                 ocApiUrl = new
                 {
                     value = _appSettings.ocApiUrl
