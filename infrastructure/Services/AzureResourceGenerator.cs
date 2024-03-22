@@ -19,7 +19,13 @@ public class AzureResourceGenerator
         _appSettings = appSettings;
     }
     
-    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, ApiClient storefrontClient, ApiClient adminClient, string storefrontAppName, string adminAppName, string funcAppName)
+    /// <summary>
+    /// Authenticates to Azure via interactive browser prompt, selects the Azure subscription and resource group provided in appSettings.json, creates an app service plan, two web apps, one functions app, warmup slots for each app, a key vault, app configurations, and a storage account.
+    /// Writes to .env.local files for both Storefront and Admin apps with populated environment variables to run each application on your local server
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, string storefrontClientID, string adminClientID, string storefrontAppName, string adminAppName, string funcAppName)
     {
         InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions()
         {
@@ -45,17 +51,17 @@ public class AzureResourceGenerator
                 {
                     value = prefix
                 },
-                buyerApiClientID = new
+                storefrontApiClientID = new
                 {
-                    value = storefrontClient.ID
+                    value = storefrontClientID
                 },
-                buyerAppName = new 
+                storefrontAppName = new 
                 {
                     value = storefrontAppName
                 },
-                sellerApiClientID = new
+                adminApiClientID = new
                 {
-                    value = adminClient.ID
+                    value = adminClientID
                 },
                 adminAppName = new
                 {
@@ -89,7 +95,7 @@ public class AzureResourceGenerator
 
             foreach (var webApp in new[] {storefrontAppName, adminAppName})
             {
-                var apiClientID = webApp == adminAppName ? adminClient.ID : storefrontClient.ID;
+                var apiClientID = webApp == adminAppName ? adminClientID : storefrontClientID;
                 // WRITE TO THE .ENV.LOCAL FILES
                 string appName = $"VITE_APP_NAME=\"{webApp}\"";
                 string appConfig = "VITE_APP_CONFIG_BASE=\"/\""; 

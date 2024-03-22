@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using OC_Accelerator.Helpers;
 using OC_Accelerator.Models;
@@ -18,18 +18,17 @@ namespace OC_Accelerator
             var services = new ServiceCollection();
             var provider = IoC.RegisterServices(services);
 
-            Tuple<ApiClient, ApiClient> apiClients = new Tuple<ApiClient, ApiClient>(null, null);
+            Tuple<string, string> apiClientIDs = new Tuple<string, string>(null, null);
             AzResourceGeneratorResponse armResponse = new AzResourceGeneratorResponse();
 
-            var appNames = provider.GetService<IdentifyAppNames>().Run(logger);
-            bool isDebugging = false;
-
+            bool isDebugging = true;
             string? storefrontAppName;
             string? adminAppName;
             string? funcAppName;
 
             if (!isDebugging)
             {
+                var appNames = Directory.GetDirectories("../../../../apps").Select(Path.GetFileName).ToList();
                 storefrontAppName = Prompt.Select("Which directory represents your buyer/storefront application?", appNames);
                 Console.WriteLine($"Selected {storefrontAppName} as your buyer/storefront application");
                 adminAppName = Prompt.Select("Which directory represents your admin application?", appNames);
@@ -49,8 +48,8 @@ namespace OC_Accelerator
             try
             {
                 var ocService = provider.GetService<OCMarketplaceComposer>();
-                apiClients = await ocService.CreateApiClientsAsync(logger, storefrontAppName, adminAppName, funcAppName);
-                armResponse = await provider.GetService<AzureResourceGenerator>()?.RunAsync(logger, apiClients?.Item1, apiClients?.Item2, storefrontAppName, adminAppName, funcAppName);
+                apiClientIDs = await ocService.CreateApiClientsAsync(logger, storefrontAppName, adminAppName);
+                armResponse = await provider.GetService<AzureResourceGenerator>()?.RunAsync(logger, apiClientIDs?.Item1, apiClientIDs?.Item2, storefrontAppName, adminAppName, funcAppName);
                 // TODO: BROKEN
                 // await ocService.ConfigureWebhooksAsync(logger, armResponse.middlewareUrl, apiClients.Item1.ID);
                 //await ocService.ConfigureOrderCheckoutIntegrationEvent(logger, armResponse.middlewareUrl);

@@ -24,8 +24,8 @@ namespace OC_Accelerator
             {
                 AuthUrl = settings.ocApiUrl,
                 ApiUrl = settings.ocApiUrl,
-                ClientId = settings.ocMiddlewareClientId,
-                ClientSecret = settings.ocMiddlewareClientSecret,
+                ClientId = settings.ocFunctionsClientId,
+                ClientSecret = settings.ocFunctionsClientSecret,
                 Roles = new[] {
                     ApiRole.FullAccess
                 }
@@ -37,6 +37,7 @@ namespace OC_Accelerator
             services.AddSingleton<BuildBicepFile>();
             services.AddSingleton<AzurePublisher>();
             services.AddSingleton<IdentifyAppNames>();
+            services.AddSingleton<WriteEnvVariables>();
             return services.BuildServiceProvider();
         }
 

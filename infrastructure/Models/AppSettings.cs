@@ -11,10 +11,12 @@ namespace OC_Accelerator.Models
         string tenantId { get; }
         string subscriptionId { get; }
         string resourceGroup { get; }
-        string ocMiddlewareClientId { get; }
-        string ocMiddlewareClientSecret { get; }
+        string ocFunctionsClientId { get; }
+        string ocFunctionsClientSecret { get; }
         string ocApiUrl { get; }
         string ocHashKey { get; }
+        string? ocStorefrontClientId { get; }
+        string? ocAdminClientId { get; }
         string devOpsPersonalAccessToken { get; }
         string azureGitHubServiceConnectionId { get; }
         string azureResourceManagerServiceConnectionId { get; }
@@ -31,10 +33,12 @@ namespace OC_Accelerator.Models
         public string devOpsPersonalAccessToken { get; set; }
         public string azureGitHubServiceConnectionId { get; set; }
         public string azureResourceManagerServiceConnectionId { get; set; }
-        public string ocMiddlewareClientId { get; set; }
-        public string ocMiddlewareClientSecret { get; set; }
+        public string ocFunctionsClientId { get; set; }
+        public string ocFunctionsClientSecret { get; set; }
         public string ocApiUrl { get; set; }
         public string ocHashKey { get; set; }
+        public string? ocStorefrontClientId { get; set; }
+        public string? ocAdminClientId { get; set; }
         public string azureDevOpsProjectID { get; set; }
         public string appServiceTaskID { get; set;  }
     }

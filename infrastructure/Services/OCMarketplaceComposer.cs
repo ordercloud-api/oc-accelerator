@@ -20,61 +20,77 @@ namespace OC_Accelerator.Services
             _ignoreErrorWrapper = ignoreErrorWrapper;
         }
 
-        public async Task<Tuple<ApiClient, ApiClient>> CreateApiClientsAsync(TextWriter logger, string storefrontAppName, string adminAppName, string funcAppName)
+        /// <summary>
+        /// Creates API Clients for both the Storefront and Admin applications if either of their respective API ClientIDs are NOT included in appSettings.json
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="storefrontAppName"></param>
+        /// <param name="adminAppName"></param>
+        /// <returns>a string Tuple representing the Storefront API Client ID (Item1) and the Admin API Client ID (Item2)</returns>
+        public async Task<Tuple<string, string>> CreateApiClientsAsync(TextWriter logger, string storefrontAppName, string adminAppName)
         {
             // TODO: temporary
             await CleanupAsync(logger, storefrontAppName);
-            ApiClient buyerApiClient = new ApiClient();
-            ApiClient sellerApiClient = new ApiClient();
+            string storefrontApiClientID = _appSettings.ocStorefrontClientId;
+            string adminApiClientID = _appSettings.ocAdminClientId;
             try
             {
-                await logger.WriteLineAsync($"Creating Buyer {storefrontAppName}");
-                var buyer = await _oc.Buyers.CreateAsync(new Buyer()
+                if (_appSettings.ocStorefrontClientId == null)
                 {
-                    ID = string.Join("-", storefrontAppName),
-                    Active = true,
-                    Name = storefrontAppName
-                });
+                    await logger.WriteLineAsync($"Creating Buyer {storefrontAppName}");
+                    var buyer = await _oc.Buyers.CreateAsync(new Buyer()
+                    {
+                        ID = string.Join("-", storefrontAppName),
+                        Active = true,
+                        Name = storefrontAppName
+                    });
 
-                await logger.WriteLineAsync("Creating Default Context User");
-                var defaultContextUser = await _oc.Users.CreateAsync(buyer.ID, new User()
+                    await logger.WriteLineAsync("Creating Default Context User");
+                    var defaultContextUser = await _oc.Users.CreateAsync(buyer.ID, new User()
+                    {
+                        Active = true,
+                        Username = "DefaultContextUser",
+                        FirstName = "Anonymous",
+                        LastName = "User",
+                        Email = "test@test.com"
+                    });
+
+                    await logger.WriteLineAsync($"Creating Buyer API Client with Default Context User {defaultContextUser.Username}");
+                    var storefrontApiClient = new ApiClient
+                    {
+                        Active = true,
+                        AccessTokenDuration = 600,
+                        AppName = storefrontAppName,
+                        DefaultContextUserName = defaultContextUser.Username,
+                        AllowAnyBuyer = true,
+                        AllowAnySupplier = false,
+                        AllowSeller = false,
+                        IsAnonBuyer = false,
+                    };
+                    storefrontApiClient = await _oc.ApiClients.CreateAsync(storefrontApiClient);
+                    storefrontApiClientID = storefrontApiClient.ID;
+                }
+
+                if (_appSettings.ocAdminClientId == null)
                 {
-                    Active = true,
-                    Username = "DefaultContextUser",
-                    FirstName = "Anonymous",
-                    LastName = "User",
-                    Email = "test@test.com"
-                });
+                    await logger.WriteLineAsync("Creating Seller API Client");
+                    var adminApiClient = new ApiClient
+                    {
+                        Active = true,
+                        AccessTokenDuration = 600,
+                        AppName = adminAppName,
+                        DefaultContextUserName = null,
+                        AllowAnyBuyer = false,
+                        AllowAnySupplier = false,
+                        AllowSeller = true,
+                        IsAnonBuyer = false,
+                    };
+                    adminApiClient = await _oc.ApiClients.CreateAsync(adminApiClient);
+                    adminApiClientID = adminApiClient.ID;
 
-                await logger.WriteLineAsync($"Creating Buyer API Client with Default Context User {defaultContextUser.Username}");
-                buyerApiClient = new ApiClient
-                {
-                    Active = true,
-                    AccessTokenDuration = 600,
-                    AppName = storefrontAppName,
-                    DefaultContextUserName = defaultContextUser.Username,
-                    AllowAnyBuyer = true,
-                    AllowAnySupplier = false,
-                    AllowSeller = false,
-                    IsAnonBuyer = false,
-                };
-                buyerApiClient = await _oc.ApiClients.CreateAsync(buyerApiClient);
+                }
 
-                await logger.WriteLineAsync("Creating Seller API Client");
-                sellerApiClient = new ApiClient
-                {
-                    Active = true,
-                    AccessTokenDuration = 600,
-                    AppName = adminAppName,
-                    DefaultContextUserName = null,
-                    AllowAnyBuyer = false,
-                    AllowAnySupplier = false,
-                    AllowSeller = true,
-                    IsAnonBuyer = false,
-                };
-                sellerApiClient = await _oc.ApiClients.CreateAsync(sellerApiClient);
-
-                return Tuple.Create(buyerApiClient, sellerApiClient);
+                return Tuple.Create(storefrontApiClientID, adminApiClientID);
             }
             catch (OrderCloudException ex)
             {
@@ -85,20 +101,20 @@ namespace OC_Accelerator.Services
             }
         }
 
-        public async Task ConfigureOrderCheckoutIntegrationEvent(TextWriter logger, string middlewareUrl)
+        public async Task ConfigureOrderCheckoutIntegrationEvent(TextWriter logger, string hostedAppUrl)
         {
             await logger.WriteLineAsync("Creating OrderCheckout Integration Event");
             await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent
             {
                 EventType = IntegrationEventType.OrderCheckout,
-                CustomImplementationUrl = $"{middlewareUrl}/api/integrationevent",
+                CustomImplementationUrl = $"{hostedAppUrl}/api/integrationevent",
                 Name = "Order Checkout Integration Event",
                 HashKey = _appSettings.ocHashKey
             });
         }
 
 
-        public async Task ConfigureWebhooksAsync(TextWriter logger, string middlewareUrl, string buyerApiClientID)
+        public async Task ConfigureWebhooksAsync(TextWriter logger, string hostedAppUrl, string storefrontApiClientID)
         {
             await logger.WriteLineAsync("Creating Webhook");
             var webhookRoutes = new List<WebhookRoute>()
@@ -113,12 +129,12 @@ namespace OC_Accelerator.Services
             {
                 Name = "Validate Address",
                 Description = "Pre-webhook to validate a buyer address before it's created",
-                Url = $"{middlewareUrl}/api/webhook/createaddress",
+                Url = $"{hostedAppUrl}/api/webhook/createaddress",
                 HashKey = _appSettings.ocHashKey,
                 ElevatedRoles = null,
                 ConfigData = null,
                 BeforeProcessRequest = true,
-                ApiClientIDs = new List<string>() { buyerApiClientID },
+                ApiClientIDs = new List<string>() { storefrontApiClientID },
                 WebhookRoutes = webhookRoutes,
                 DeliveryConfigID = null
             });
@@ -140,7 +156,7 @@ namespace OC_Accelerator.Services
                 await _oc.IntegrationEvents.DeleteAsync(ie.ID);
             }
 
-            var apiClients = await _oc.ApiClients.ListAsync(filters: new { ID = $"!{_appSettings.ocMiddlewareClientId}"});
+            var apiClients = await _oc.ApiClients.ListAsync(filters: new { ID = $"!{_appSettings.ocFunctionsClientId}"});
             foreach (var apiClient in apiClients.Items)
             {
                 await _oc.ApiClients.DeleteAsync(apiClient.ID);

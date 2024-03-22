@@ -7,13 +7,13 @@ param prefix string = 'ocstart'
 param location string = resourceGroup().location
 
 @description('Provide the API client ID representing the buyer')
-param buyerApiClientID string
+param storefrontApiClientID string
 
 @description('Name of the directory that represents your buyer/storefront application')
-param buyerAppName string
+param storefrontAppName string
 
 @description('Provide the API client ID representing the seller')
-param sellerApiClientID string
+param adminApiClientID string
 
 @description('Name of the directory that represents your admin application')
 param adminAppName string
@@ -39,8 +39,8 @@ resource functionStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 
 param keyData array = [
   {
-    key: 'OrderCloudSettings.BuyerApiClientID'
-    value: buyerApiClientID
+    key: 'OrderCloudSettings.StorefrontApiClientID'
+    value: storefrontApiClientID
     // tag: {
     //   tag01_name: 'tag01_value'
     //   tag02_name: 'tag02_value'
@@ -48,8 +48,8 @@ param keyData array = [
     contentType: 'string'
   }
   {
-    key: 'OrderCloudSettings.SellerApiClientID'
-    value: sellerApiClientID
+    key: 'OrderCloudSettings.AdminApiClientID'
+    value: adminApiClientID
     //label: 'key02_label01'
     // tag: {
     //   tag01_name: 'tag01_value'
@@ -110,7 +110,7 @@ resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 // Defines unique details for every web app/func app created
 param appDetails array = [
   {
-    name: '${prefix}-${buyerAppName}-${uniqueString(resourceGroup().id)}'
+    name: '${prefix}-${storefrontAppName}-${uniqueString(resourceGroup().id)}'
     kind: 'app'
     clientAffinityEnabled: true
   }
@@ -122,7 +122,7 @@ param appDetails array = [
   {
     name: '${prefix}-${funcAppName}-${uniqueString(resourceGroup().id)}'
     kind: 'functionapp'
-    clientAffinityEnabled: false
+    clientAffinityEnabled: true
   }
 ]
 
@@ -249,3 +249,32 @@ resource webAppSlotSettings 'Microsoft.Web/sites/slots/config@2022-09-01' = [for
     ]
   }
 }]
+
+// // Configure slot settings for web apps
+// resource azFunctionSlotSettings 'Microsoft.Web/sites/slots/config@2022-09-01' = {
+//   parent: webAppSlots[2]
+//   name: 'web'
+//   properties: {
+//     appSettings: [
+//       {
+//         name: 'AppConfigurationConnectionString'
+//         value: '@Microsoft.KeyVault(SecretUri=${appConfigurationConnectionKvRef.properties.secretUri})'
+//       }
+//     ]
+//   }
+// }
+
+
+// // Configure app settings for web apps
+// resource azFunctionSettings 'Microsoft.Web/sites/config@2022-09-01' = {
+//   parent: webApps[2]
+//   name: 'web'
+//   properties: {
+//     appSettings: [
+//       {
+//         name: 'AppConfigurationConnectionString'
+//         value: '@Microsoft.KeyVault(SecretUri=${appConfigurationConnectionKvRef.properties.secretUri})'
+//       }
+//     ]
+//   }
+// }
