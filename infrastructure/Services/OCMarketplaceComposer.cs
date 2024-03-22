@@ -101,6 +101,12 @@ namespace OC_Accelerator.Services
             }
         }
 
+        /// <summary>
+        /// Creates the Order Checkout Integration Event in OrderCloud, configured to your Azure functions app
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="hostedAppUrl"></param>
+        /// <returns></returns>
         public async Task ConfigureOrderCheckoutIntegrationEvent(TextWriter logger, string hostedAppUrl)
         {
             await logger.WriteLineAsync("Creating OrderCheckout Integration Event");
@@ -113,7 +119,13 @@ namespace OC_Accelerator.Services
             });
         }
 
-
+        /// <summary>
+        /// Creates a sample Webhook in OrderCloud, configured to your Azure functions app
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="hostedAppUrl"></param>
+        /// <param name="storefrontApiClientID"></param>
+        /// <returns></returns>
         public async Task ConfigureWebhooksAsync(TextWriter logger, string hostedAppUrl, string storefrontApiClientID)
         {
             await logger.WriteLineAsync("Creating Webhook");
@@ -140,6 +152,12 @@ namespace OC_Accelerator.Services
             });
         }
 
+        /// <summary>
+        /// THIS IS TEMPORARY
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="storefrontAppName"></param>
+        /// <returns></returns>
         public async Task CleanupAsync(TextWriter logger, string storefrontAppName)
         {
             var webhooks = await _oc.Webhooks.ListAsync();

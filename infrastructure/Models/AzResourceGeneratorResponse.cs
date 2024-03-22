@@ -9,7 +9,7 @@ namespace OC_Accelerator.Models
     public class AzResourceGeneratorResponse
     {
         public string appConfigConnectionString { get; set; }
-        public string middlewareAppName { get; set; }
-        public string middlewareUrl { get; set; }
+        public string azFuncAppName { get; set; }
+        public string azFuncAppUrl { get; set; }
     }
 }

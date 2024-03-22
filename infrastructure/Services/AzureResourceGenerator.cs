@@ -8,15 +8,18 @@ using System.Text;
 using OrderCloud.SDK;
 using Azure.ResourceManager.AppConfiguration;
 using System.IO;
+using OC_Accelerator.Helpers;
 
 public class AzureResourceGenerator
 {
     private readonly Random _random = new();
     private readonly IAppSettings _appSettings;
+    private readonly WriteEnvVariables _writeEnvVariables;
 
-    public AzureResourceGenerator(IAppSettings appSettings)
+    public AzureResourceGenerator(IAppSettings appSettings, WriteEnvVariables writeEnvVariables)
     {
         _appSettings = appSettings;
+        _writeEnvVariables = writeEnvVariables;
     }
     
     /// <summary>
@@ -93,31 +96,24 @@ public class AzureResourceGenerator
             var resourceNames = results.Select(r => $"{r.Data.Name} ({r.Data.ResourceType.Type})");
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
 
-            foreach (var webApp in new[] {storefrontAppName, adminAppName})
-            {
-                var apiClientID = webApp == adminAppName ? adminClientID : storefrontClientID;
-                // WRITE TO THE .ENV.LOCAL FILES
-                string appName = $"VITE_APP_NAME=\"{webApp}\"";
-                string appConfig = "VITE_APP_CONFIG_BASE=\"/\""; 
-                string baseApiUrl = $"VITE_APP_ORDERCLOUD_BASE_API_URL=\"{_appSettings.ocApiUrl}\"";
-                string clientID = $"VITE_APP_ORDERCLOUD_CLIENT_ID=\"{apiClientID}\"";
-                string scope = $"VITE_APP_ORDERCLOUD_SCOPE=\"{webApp}\""; // TODO: fix
-                string customScope = $"VITE_APP_ORDERCLOUD_CUSTOM_SCOPE=\"{webApp}\""; // TODO: fix
-                string allowAnon = "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS=\"true\"";
-                File.WriteAllText($"../../../../apps/{webApp}/.env", string.Join(Environment.NewLine, new { appName, appConfig, baseApiUrl, clientID, scope, customScope, allowAnon }));
-            }
-
-            var middlewareAppService = results.FirstOrDefault(r => r.Data.Name.Contains($"{prefix}-middleware") && r.Data.ResourceType.Type != "sites/slots");
+            var funcApp = results.FirstOrDefault(r => r.Data.Kind == "functionapp" && r.Data.ResourceType.Type != "sites/slots");
             var appConfigResource = results.FirstOrDefault(r => r.Data.ResourceType.Type == "configurationStores");
 
             AppConfigurationStoreResource appConfigurationStore = client.GetAppConfigurationStoreResource(appConfigResource.Id);
-            var keys = appConfigurationStore.GetKeys();
+            var connectionString = appConfigurationStore.GetKeys().FirstOrDefault().ConnectionString;
+
+            foreach (var webApp in new[] { storefrontAppName, adminAppName })
+            {
+                // TODO: shouldn't the connection string get populated in one of these?
+                var apiClientID = webApp == adminAppName ? adminClientID : storefrontClientID;
+                _writeEnvVariables.Run(webApp, apiClientID);
+            }
 
             return new AzResourceGeneratorResponse()
             {
-                middlewareAppName = middlewareAppService?.Data.Name ?? string.Empty,
-                middlewareUrl = $"https://{middlewareAppService?.Data.Name}.azurewebsites.net", // TODO: fix this
-                appConfigConnectionString = keys.FirstOrDefault().ConnectionString,
+                azFuncAppName = funcApp?.Data.Name ?? string.Empty,
+                azFuncAppUrl = $"https://{funcApp?.Data.Name}.azurewebsites.net", // TODO: fix this
+                appConfigConnectionString = connectionString,
             };
         }
         catch (Exception ex)

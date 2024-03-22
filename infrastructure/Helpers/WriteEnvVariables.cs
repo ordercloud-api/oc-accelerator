@@ -16,8 +16,12 @@ namespace OC_Accelerator.Helpers
             _appSettings = appSettings;
         }
 
-        public void Run(string webAppName, string apiClientID)
+        public void Run(string webAppName, string? apiClientID)
         {
+            if (string.IsNullOrEmpty(apiClientID))
+            {
+                // TODO: how do we decide which API Client to use from app settings?
+            }
             string appName = $"VITE_APP_NAME=\"{webAppName}\"";
             string appConfig = "VITE_APP_CONFIG_BASE=\"/\"";
             string baseApiUrl = $"VITE_APP_ORDERCLOUD_BASE_API_URL=\"{_appSettings.ocApiUrl}\"";
