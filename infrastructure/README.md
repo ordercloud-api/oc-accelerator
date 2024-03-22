@@ -2,7 +2,7 @@
 Aimed to get developers
 
 ## Getting Started
-Create an `appSettings.json` file in the root of this project.
+Create an `appSettings.json` file in the root of this directory.
 
 If you haven't already, create an account in [OrderCloud Portal](https://portal.ordercloud.io/). Once you've created an account, create a new Marketplace. 
 Access the API Console for your marketplace you just created by selecting "API Console" on the left navigation bar, and selecting a context when you get to the console.
@@ -20,6 +20,11 @@ Create a Subscription, and a Resource Group within that Subscription in Azure po
 1. Create a [Resource Group](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal#create-resource-groups).
 1. Populate `subscriptionId`, `tenantId` (Parent management group), and `resourceGroup` in your appSettings.json file.
 
+Install Powershell and Azure CLI
+1. [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.4)
+1. [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (this is needed to compile a .bicep file into an ARM template JSON file)
+
+### Ignore for now (post-MVP)
 Log in to Azure DevOps
 1. Create a Personal Access Token with [SCOPES]
 1. Create a GitHub Service Connection

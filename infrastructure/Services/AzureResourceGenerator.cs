@@ -7,6 +7,7 @@ using OC_Accelerator.Models;
 using System.Text;
 using OrderCloud.SDK;
 using Azure.ResourceManager.AppConfiguration;
+using System.IO;
 
 public class AzureResourceGenerator
 {
@@ -18,7 +19,7 @@ public class AzureResourceGenerator
         _appSettings = appSettings;
     }
     
-    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, ApiClient buyerClient, ApiClient sellerClient, string buyerAppName, string adminAppName, string funcAppName)
+    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, ApiClient storefrontClient, ApiClient adminClient, string storefrontAppName, string adminAppName, string funcAppName)
     {
         InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions()
         {
@@ -46,15 +47,15 @@ public class AzureResourceGenerator
                 },
                 buyerApiClientID = new
                 {
-                    value = buyerClient.ID
+                    value = storefrontClient.ID
                 },
                 buyerAppName = new 
                 {
-                    value = buyerAppName
+                    value = storefrontAppName
                 },
                 sellerApiClientID = new
                 {
-                    value = sellerClient.ID
+                    value = adminClient.ID
                 },
                 adminAppName = new
                 {
@@ -85,6 +86,20 @@ public class AzureResourceGenerator
             var results = resourceGroup.GetGenericResources();
             var resourceNames = results.Select(r => $"{r.Data.Name} ({r.Data.ResourceType.Type})");
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
+
+            foreach (var webApp in new[] {storefrontAppName, adminAppName})
+            {
+                var apiClientID = webApp == adminAppName ? adminClient.ID : storefrontClient.ID;
+                // WRITE TO THE .ENV.LOCAL FILES
+                string appName = $"VITE_APP_NAME=\"{webApp}\"";
+                string appConfig = "VITE_APP_CONFIG_BASE=\"/\""; 
+                string baseApiUrl = $"VITE_APP_ORDERCLOUD_BASE_API_URL=\"{_appSettings.ocApiUrl}\"";
+                string clientID = $"VITE_APP_ORDERCLOUD_CLIENT_ID=\"{apiClientID}\"";
+                string scope = $"VITE_APP_ORDERCLOUD_SCOPE=\"{webApp}\""; // TODO: fix
+                string customScope = $"VITE_APP_ORDERCLOUD_CUSTOM_SCOPE=\"{webApp}\""; // TODO: fix
+                string allowAnon = "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS=\"true\"";
+                File.WriteAllText($"../../../../apps/{webApp}/.env", string.Join(Environment.NewLine, new { appName, appConfig, baseApiUrl, clientID, scope, customScope, allowAnon }));
+            }
 
             var middlewareAppService = results.FirstOrDefault(r => r.Data.Name.Contains($"{prefix}-middleware") && r.Data.ResourceType.Type != "sites/slots");
             var appConfigResource = results.FirstOrDefault(r => r.Data.ResourceType.Type == "configurationStores");

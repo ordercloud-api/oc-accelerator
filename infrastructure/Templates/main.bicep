@@ -224,6 +224,14 @@ resource webAppSettings 'Microsoft.Web/sites/config@2022-09-01' = [for (app, i) 
         name: 'AppConfigurationConnectionString'
         value: '@Microsoft.KeyVault(SecretUri=${appConfigurationConnectionKvRef.properties.secretUri})'
       }
+      {
+        name: 'VITE_APP_NAME'
+        value: app.name
+      }
+      {
+        name: 'VITE_APP_CONFIG_BASE'
+        value: '/'
+      }
     ]
   }
 }]

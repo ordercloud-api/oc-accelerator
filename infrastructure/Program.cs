@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using OC_Accelerator.Helpers;
 using OC_Accelerator.Models;
@@ -51,8 +51,9 @@ namespace OC_Accelerator
                 var ocService = provider.GetService<OCMarketplaceComposer>();
                 apiClients = await ocService.CreateApiClientsAsync(logger, storefrontAppName, adminAppName, funcAppName);
                 armResponse = await provider.GetService<AzureResourceGenerator>()?.RunAsync(logger, apiClients?.Item1, apiClients?.Item2, storefrontAppName, adminAppName, funcAppName);
-                await ocService.ConfigureWebhooksAsync(logger, armResponse.middlewareUrl, apiClients.Item1.ID);
-                await ocService.ConfigureOrderCheckoutIntegrationEvent(logger, armResponse.middlewareUrl);
+                // TODO: BROKEN
+                // await ocService.ConfigureWebhooksAsync(logger, armResponse.middlewareUrl, apiClients.Item1.ID);
+                //await ocService.ConfigureOrderCheckoutIntegrationEvent(logger, armResponse.middlewareUrl);
                 // TODO: post-MVP
                 // await provider.GetService<DevOps>()?.Run(logger, armResponse);
                 // await provider.GetService<AzurePublisher>().Publish(logger);
