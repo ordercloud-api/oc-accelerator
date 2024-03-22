@@ -122,7 +122,7 @@ namespace OC_Accelerator.Services
             {
                 AllowOverride = true,
                 IsSecret = false,
-                Value = arm.middlewareAppName
+                Value = arm.azFuncAppName
             };
 
             buildDefinition.Variables.Add("appConfigConnectionString", connectionStringVariable);
@@ -235,7 +235,7 @@ namespace OC_Accelerator.Services
             var appServiceNameInput = new TaskInputDefinitionBase()
             {
                 Name = "WebAppName",
-                DefaultValue = arm.middlewareAppName,
+                DefaultValue = arm.azFuncAppName,
                 Label = "App service name",
                 Required = true,
                 InputType = "pickList",
