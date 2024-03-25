@@ -30,7 +30,7 @@ namespace OC_Accelerator.Services
         public async Task<Tuple<string, string>> CreateApiClientsAsync(TextWriter logger, string storefrontAppName, string adminAppName)
         {
             // TODO: temporary
-            await CleanupAsync(logger, storefrontAppName);
+            //await CleanupAsync(logger, storefrontAppName);
             string storefrontApiClientID = _appSettings.ocStorefrontClientId;
             string adminApiClientID = _appSettings.ocAdminClientId;
             try
@@ -96,7 +96,7 @@ namespace OC_Accelerator.Services
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 await logger.WriteLineAsync(ex.Message);
-                await CleanupAsync(logger, storefrontAppName);
+                // await CleanupAsync(logger, storefrontAppName);
                 throw;
             }
         }
