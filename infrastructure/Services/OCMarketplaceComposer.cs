@@ -30,12 +30,16 @@ namespace OC_Accelerator.Services
         public async Task<Tuple<string, string>> CreateApiClientsAsync(TextWriter logger, string storefrontAppName, string adminAppName)
         {
             // TODO: temporary
-            //await CleanupAsync(logger, storefrontAppName);
+            //if (_appSettings.ocStorefrontClientId == null && _appSettings.ocAdminClientId == null)
+            //{
+            //    await CleanupAsync(logger, storefrontAppName);
+            //}
+            
             string storefrontApiClientID = _appSettings.ocStorefrontClientId;
             string adminApiClientID = _appSettings.ocAdminClientId;
             try
             {
-                if (_appSettings.ocStorefrontClientId == null)
+                if (storefrontApiClientID == null)
                 {
                     await logger.WriteLineAsync($"Creating Buyer {storefrontAppName}");
                     var buyer = await _oc.Buyers.CreateAsync(new Buyer()
@@ -71,7 +75,7 @@ namespace OC_Accelerator.Services
                     storefrontApiClientID = storefrontApiClient.ID;
                 }
 
-                if (_appSettings.ocAdminClientId == null)
+                if (adminApiClientID == null)
                 {
                     await logger.WriteLineAsync("Creating Seller API Client");
                     var adminApiClient = new ApiClient
