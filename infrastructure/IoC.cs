@@ -38,6 +38,7 @@ namespace OC_Accelerator
             services.AddSingleton<AzurePublisher>();
             services.AddSingleton<IdentifyAppNames>();
             services.AddSingleton<WriteEnvVariables>();
+            services.AddSingleton<WriteAzSettings>();
             return services.BuildServiceProvider();
         }
 

@@ -15,11 +15,13 @@ public class AzureResourceGenerator
     private readonly Random _random = new();
     private readonly IAppSettings _appSettings;
     private readonly WriteEnvVariables _writeEnvVariables;
+    private readonly WriteAzSettings _writeAzSettings;
 
-    public AzureResourceGenerator(IAppSettings appSettings, WriteEnvVariables writeEnvVariables)
+    public AzureResourceGenerator(IAppSettings appSettings, WriteEnvVariables writeEnvVariables, WriteAzSettings writeAzSettings)
     {
         _appSettings = appSettings;
         _writeEnvVariables = writeEnvVariables;
+        _writeAzSettings = writeAzSettings;
     }
     
     /// <summary>
@@ -106,7 +108,9 @@ public class AzureResourceGenerator
             {
                 // TODO: shouldn't the connection string get populated in one of these?
                 var apiClientID = webApp == adminAppName ? adminClientID : storefrontClientID;
+                var targetAzResource = results.FirstOrDefault(r => r.Data.Name.Contains(webApp));
                 _writeEnvVariables.Run(webApp, apiClientID);
+                _writeAzSettings.Run(targetAzResource.Id, webApp);
             }
 
             return new AzResourceGeneratorResponse()

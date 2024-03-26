@@ -18,18 +18,14 @@ namespace OC_Accelerator.Helpers
 
         public void Run(string webAppName, string? apiClientID)
         {
-            if (string.IsNullOrEmpty(apiClientID))
-            {
-                // TODO: how do we decide which API Client to use from app settings?
-            }
-            string appName = $"VITE_APP_NAME=\"{webAppName}\"";
-            string appConfig = "VITE_APP_CONFIG_BASE=\"/\"";
-            string baseApiUrl = $"VITE_APP_ORDERCLOUD_BASE_API_URL=\"{_appSettings.ocApiUrl}\"";
-            string clientID = $"VITE_APP_ORDERCLOUD_CLIENT_ID=\"{apiClientID}\"";
-            string scope = $"VITE_APP_ORDERCLOUD_SCOPE=\"{webAppName}\""; // TODO: fix
-            string customScope = $"VITE_APP_ORDERCLOUD_CUSTOM_SCOPE=\"{webAppName}\""; // TODO: fix
-            string allowAnon = "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS=\"true\"";
-            File.WriteAllText($"../../../../apps/{webAppName}/.env", string.Join(Environment.NewLine, new { appName, appConfig, baseApiUrl, clientID, scope, customScope, allowAnon }));
+            string content = $"VITE_APP_NAME=\"{webAppName}\"" +
+                             $"VITE_APP_CONFIG_BASE=\"/\"" +
+                             $"VITE_APP_ORDERCLOUD_BASE_API_URL=\"{_appSettings.ocApiUrl}\"" +
+                             $"VITE_APP_ORDERCLOUD_CLIENT_ID=\"{apiClientID}\"" +
+                             $"VITE_APP_ORDERCLOUD_SCOPE=\"{webAppName}\"" + // TODO: fix
+                             $"VITE_APP_ORDERCLOUD_CUSTOM_SCOPE=\"{webAppName}\"" + // TODO: fix
+                             "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS=\"true\"";
+            File.WriteAllText($"../../../../apps/{webAppName}/.env.local", content);
         }
     }
 }
