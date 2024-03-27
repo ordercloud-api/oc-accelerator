@@ -5,9 +5,6 @@ using Azure.ResourceManager;
 using Azure;
 using OC_Accelerator.Models;
 using System.Text;
-using OrderCloud.SDK;
-using Azure.ResourceManager.AppConfiguration;
-using System.IO;
 using OC_Accelerator.Helpers;
 
 public class AzureResourceGenerator
@@ -30,7 +27,7 @@ public class AzureResourceGenerator
     /// </summary>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, string storefrontClientID, string adminClientID, string storefrontAppName, string adminAppName, string funcAppName)
+    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, string storefrontClientID, string adminClientID, string storefrontDirName, string adminDirName, string funcAppName)
     {
         InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions()
         {
@@ -58,11 +55,11 @@ public class AzureResourceGenerator
                 },
                 storefrontAppName = new
                 {
-                    value = storefrontAppName
+                    value = storefrontDirName
                 },
                 adminAppName = new
                 {
-                    value = adminAppName
+                    value = adminDirName
                 },
                 funcAppName = new
                 {
@@ -82,17 +79,19 @@ public class AzureResourceGenerator
             var resourceNames = results.Select(r => $"{r.Data.Name} ({r.Data.ResourceType.Type})");
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
 
-            var funcApp = results.FirstOrDefault(r => r.Data.Kind == "functionapp" && r.Data.ResourceType.Type != "sites/slots");
-            // TODO: write to the settings json file for the funApp
+            
 
-            foreach (var webApp in new[] { storefrontAppName, adminAppName })
+            foreach (var directory in new[] { storefrontDirName, adminDirName })
             {
-                // TODO: shouldn't the connection string get populated in one of these?
-                var apiClientID = webApp == adminAppName ? adminClientID : storefrontClientID;
-                var targetAzResource = results.FirstOrDefault(r => r.Data.Name.Contains(webApp));
-                _writeEnvVariables.Run(webApp, apiClientID);
-                _writeAzSettings.Run(targetAzResource.Id, webApp);
+                var apiClientID = directory == adminDirName ? adminClientID : storefrontClientID;
+                var targetAzResource = results.FirstOrDefault(r => r.Data.Name.Contains(directory));
+                _writeEnvVariables.Run(directory, apiClientID);
+                _writeAzSettings.WriteWebAppSettings(targetAzResource.Id, directory);
             }
+
+            var funcApp = results.FirstOrDefault(r => r.Data.Kind == "functionapp");
+
+            _writeAzSettings.WriteFunctionAppSettings(funcApp.Id, funcAppName);
 
             return new AzResourceGeneratorResponse()
             {
