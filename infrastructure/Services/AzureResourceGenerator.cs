@@ -75,6 +75,7 @@ public class AzureResourceGenerator
             await logger.WriteLineAsync("Creating Azure Resources - This can take a few minutes");
             await resourceGroup.GetArmDeployments().CreateOrUpdateAsync(WaitUntil.Completed, "accelerator", armDeploymentContent);
 
+            // TODO: what if someone already has Azure resources? Need to make sure we're grabbing the ones that were just created
             var results = resourceGroup.GetGenericResources();
             var resourceNames = results.Select(r => $"{r.Data.Name} ({r.Data.ResourceType.Type})");
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
