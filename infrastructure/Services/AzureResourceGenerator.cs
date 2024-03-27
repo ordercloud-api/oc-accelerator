@@ -1,4 +1,4 @@
-﻿using Azure.Identity;
+using Azure.Identity;
 using Azure.ResourceManager.Resources.Models;
 using Azure.ResourceManager.Resources;
 using Azure.ResourceManager;
@@ -56,29 +56,13 @@ public class AzureResourceGenerator
                 {
                     value = prefix
                 },
-                storefrontApiClientID = new
-                {
-                    value = storefrontClientID
-                },
-                storefrontAppName = new 
+                storefrontAppName = new
                 {
                     value = storefrontAppName
-                },
-                adminApiClientID = new
-                {
-                    value = adminClientID
                 },
                 adminAppName = new
                 {
                     value = adminAppName
-                },
-                ocApiUrl = new
-                {
-                    value = _appSettings.ocApiUrl
-                },
-                hashKey = new
-                {
-                    value = _appSettings.ocHashKey
                 },
                 funcAppName = new
                 {
@@ -99,10 +83,7 @@ public class AzureResourceGenerator
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
 
             var funcApp = results.FirstOrDefault(r => r.Data.Kind == "functionapp" && r.Data.ResourceType.Type != "sites/slots");
-            var appConfigResource = results.FirstOrDefault(r => r.Data.ResourceType.Type == "configurationStores");
-
-            AppConfigurationStoreResource appConfigurationStore = client.GetAppConfigurationStoreResource(appConfigResource.Id);
-            var connectionString = appConfigurationStore.GetKeys().FirstOrDefault().ConnectionString;
+            // TODO: write to the settings json file for the funApp
 
             foreach (var webApp in new[] { storefrontAppName, adminAppName })
             {
@@ -117,7 +98,6 @@ public class AzureResourceGenerator
             {
                 azFuncAppName = funcApp?.Data.Name ?? string.Empty,
                 azFuncAppUrl = $"https://{funcApp?.Data.Name}.azurewebsites.net", // TODO: fix this
-                appConfigConnectionString = connectionString,
             };
         }
         catch (Exception ex)

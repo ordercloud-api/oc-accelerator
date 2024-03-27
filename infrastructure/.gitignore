@@ -2,7 +2,7 @@
 # http://stackoverflow.com/questions/34784/mercurial-setup-for-visual-studio-2008-projects
 
 appSettings.json
-Templates/main.json
+Templates/*.json
 
 syntax: glob
 *.orig

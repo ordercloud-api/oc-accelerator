@@ -115,7 +115,7 @@ namespace OC_Accelerator.Services
             {
                 AllowOverride = true,
                 IsSecret = true,
-                Value = arm.appConfigConnectionString
+                Value = ""
             };
 
             var appServiceNameVariable = new BuildDefinitionVariable()
