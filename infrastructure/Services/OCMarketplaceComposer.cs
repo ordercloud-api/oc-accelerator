@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using OC_Accelerator.Models;
 using OrderCloud.SDK;
 using System.Runtime;
@@ -24,10 +24,10 @@ namespace OC_Accelerator.Services
         /// Creates API Clients for both the Storefront and Admin applications if either of their respective API ClientIDs are NOT included in appSettings.json
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="storefrontAppName"></param>
-        /// <param name="adminAppName"></param>
+        /// <param name="storefrontDirectory"></param>
+        /// <param name="adminDirectory"></param>
         /// <returns>a string Tuple representing the Storefront API Client ID (Item1) and the Admin API Client ID (Item2)</returns>
-        public async Task<Tuple<string, string>> CreateApiClientsAsync(TextWriter logger, string storefrontAppName, string adminAppName)
+        public async Task<Tuple<string, string>> CreateApiClientsAsync(TextWriter logger, string storefrontDirectory, string adminDirectory)
         {
             // TODO: temporary
             //if (_appSettings.ocStorefrontClientId == null && _appSettings.ocAdminClientId == null)
@@ -41,12 +41,12 @@ namespace OC_Accelerator.Services
             {
                 if (storefrontApiClientID == null)
                 {
-                    await logger.WriteLineAsync($"Creating Buyer {storefrontAppName}");
+                    await logger.WriteLineAsync($"Creating Buyer {storefrontDirectory}");
                     var buyer = await _oc.Buyers.CreateAsync(new Buyer()
                     {
-                        ID = string.Join("-", storefrontAppName),
+                        ID = string.Join("-", storefrontDirectory),
                         Active = true,
-                        Name = storefrontAppName
+                        Name = storefrontDirectory
                     });
 
                     await logger.WriteLineAsync("Creating Default Context User");
@@ -64,7 +64,7 @@ namespace OC_Accelerator.Services
                     {
                         Active = true,
                         AccessTokenDuration = 600,
-                        AppName = storefrontAppName,
+                        AppName = storefrontDirectory,
                         DefaultContextUserName = defaultContextUser.Username,
                         AllowAnyBuyer = true,
                         AllowAnySupplier = false,
@@ -82,7 +82,7 @@ namespace OC_Accelerator.Services
                     {
                         Active = true,
                         AccessTokenDuration = 600,
-                        AppName = adminAppName,
+                        AppName = adminDirectory,
                         DefaultContextUserName = null,
                         AllowAnyBuyer = false,
                         AllowAnySupplier = false,
@@ -100,7 +100,7 @@ namespace OC_Accelerator.Services
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 await logger.WriteLineAsync(ex.Message);
-                // await CleanupAsync(logger, storefrontAppName);
+                // await CleanupAsync(logger, storefrontDirectory);
                 throw;
             }
         }
@@ -160,25 +160,25 @@ namespace OC_Accelerator.Services
         /// THIS IS TEMPORARY
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="storefrontAppName"></param>
+        /// <param name="storefrontDirectory"></param>
         /// <returns></returns>
-        public async Task CleanupAsync(TextWriter logger, string storefrontAppName)
+        public async Task CleanupAsync(TextWriter logger, string storefrontDirectory, string adminDirectory)
         {
             var webhooks = await _oc.Webhooks.ListAsync();
-            var buyers = await _oc.Buyers.ListAsync(search: storefrontAppName);
+            var buyers = await _oc.Buyers.ListAsync(search: storefrontDirectory);
             string buyerID = buyers.Items.FirstOrDefault()?.ID;
             foreach (var webhook in webhooks.Items)
             {
                 await _oc.Webhooks.DeleteAsync(webhook.ID);
             }
 
-            var integreationEvents = await _oc.IntegrationEvents.ListAsync();
-            foreach (var ie in integreationEvents.Items)
+            var integrationEvents = await _oc.IntegrationEvents.ListAsync();
+            foreach (var ie in integrationEvents.Items)
             {
                 await _oc.IntegrationEvents.DeleteAsync(ie.ID);
             }
 
-            var apiClients = await _oc.ApiClients.ListAsync(filters: new { ID = $"!{_appSettings.ocFunctionsClientId}"});
+            var apiClients = await _oc.ApiClients.ListAsync(filters: new { ID = $"!{_appSettings.ocFunctionsClientId}", Name = $"{storefrontDirectory}|{adminDirectory}"});
             foreach (var apiClient in apiClients.Items)
             {
                 await _oc.ApiClients.DeleteAsync(apiClient.ID);
