@@ -41,6 +41,14 @@ public class AzureResourceGenerator
         ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(_appSettings.resourceGroup);
 
         var template = File.ReadAllText("../../../Templates/main.json");
+        var adminAppConfig = new List<AppConfigFormat>
+        {
+            new()
+            {
+                name = "WEBSITE_NODE_DEFAULT_VERSION",
+                value = "~20"
+            }
+        };
 
         // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
         var prefix = GenerateRandomString(6, lowerCase: true);
@@ -64,6 +72,10 @@ public class AzureResourceGenerator
                 funcAppName = new
                 {
                     value = funcAppName
+                },
+                adminAppConfig = new
+                {
+                    value = adminAppConfig
                 }
             })
         };
@@ -125,5 +137,11 @@ public class AzureResourceGenerator
         }
 
         return lowerCase ? builder.ToString().ToLower() : builder.ToString();
+    }
+
+    public class AppConfigFormat
+    {
+        public string name { get; set; }
+        public dynamic value { get; set; }
     }
 }

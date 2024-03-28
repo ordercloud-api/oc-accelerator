@@ -1,4 +1,4 @@
-﻿@minLength(3)
+@minLength(3)
 @maxLength(10)
 @description('Provide a prefix for your resources (hyphens will be removed)')
 param prefix string = 'ocstart'
@@ -14,6 +14,8 @@ param storefrontAppName string
 
 @description('Provide the azure region to deploy to')
 param location string = resourceGroup().location
+
+param adminAppConfig array
 
 // TODO: parameterize this
 // Creates the app service plan
@@ -90,12 +92,10 @@ resource adminWebApp 'Microsoft.Web/sites@2018-11-01' = {
   tags: {}
   properties: {
     siteConfig: {
-      appSettings: [
-        {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~20'
-        }
-      ]
+      appSettings: [for setting in adminAppConfig: {
+        name: setting.name
+        value: setting.value
+      } ]
       minTlsVersion: '1.2'
       nodeVersion: '~20'
       alwaysOn: true
