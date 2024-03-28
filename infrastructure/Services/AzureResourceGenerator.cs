@@ -51,7 +51,7 @@ public class AzureResourceGenerator
             {
                 prefix = new
                 {
-                    value = prefix
+                    value = prefix.Replace("-", string.Empty).Replace(" ", string.Empty)
                 },
                 storefrontAppName = new
                 {
@@ -69,18 +69,16 @@ public class AzureResourceGenerator
         };
 
         var armDeploymentContent = new ArmDeploymentContent(properties);
-
+        var filters = $"substringof('{prefix}', name)";
         try
         {
             await logger.WriteLineAsync("Creating Azure Resources - This can take a few minutes");
+            // TODO: parameterize the deployment name?
             await resourceGroup.GetArmDeployments().CreateOrUpdateAsync(WaitUntil.Completed, "accelerator", armDeploymentContent);
-
-            // TODO: what if someone already has Azure resources? Need to make sure we're grabbing the ones that were just created
-            var results = resourceGroup.GetGenericResources();
+            
+            var results = resourceGroup.GetGenericResources(filter: filters);
             var resourceNames = results.Select(r => $"{r.Data.Name} ({r.Data.ResourceType.Type})");
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
-
-            
 
             foreach (var directory in new[] { storefrontDirName, adminDirName })
             {
@@ -102,6 +100,12 @@ public class AzureResourceGenerator
         }
         catch (Exception ex)
         {
+            var results = resourceGroup.GetGenericResources(filter: filters);
+            foreach (var resource in results)
+            {
+                // TODO: we should probably confirm which resources to delete
+                await resource.DeleteAsync(WaitUntil.Completed);
+            }
             throw new Exception(ex.Message);
         }
     }

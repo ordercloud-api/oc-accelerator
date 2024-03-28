@@ -1,6 +1,6 @@
 ﻿@minLength(3)
 @maxLength(10)
-@description('Provide a prefix for your resources')
+@description('Provide a prefix for your resources (hyphens will be removed)')
 param prefix string = 'ocstart'
 
 @description('Name of the directory that represents your functions application')
