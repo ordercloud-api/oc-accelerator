@@ -104,7 +104,7 @@ public class AzureResourceGenerator
             // find the storage account
             var genericStorageResource = results.FirstOrDefault(r => r.Data.ResourceType.Type == "storageAccounts");
             var storageAccount = client.GetStorageAccountResource(genericStorageResource.Id);
-            var whatIsThis = client.GetStoragePrivateEndpointConnectionResource(genericStorageResource.Id);
+            
             //var keys = storageAccount.GetCo();
 
             var funcAppConfig = new List<AzAppConfig>()
@@ -123,6 +123,7 @@ public class AzureResourceGenerator
                 {
                     name = "AzureWebJobsStorage",
                     value = ""
+                    //value = $"DefaultEndpointsProtocol=https;AccountName=${storageAccount.Data.Name};AccountKey=${storageAccount.GetKeys().FirstOrDefault().Value};EndpointSuffix=${environment().suffixes.storage}"
                 },
             };
             

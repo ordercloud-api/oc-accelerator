@@ -50,7 +50,9 @@ resource functionStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
 resource functionApp 'Microsoft.Web/sites@2018-11-01' = {
   name: '${prefix}-${funcAppName}-${uniqueString(resourceGroup().id)}'
   location: location
-  tags: {}
+  tags: {
+    acceleratorApp: 'functions'
+  }
   kind: 'functionapp'
   properties: {
     siteConfig: {
@@ -94,7 +96,9 @@ resource adminWebApp 'Microsoft.Web/sites@2018-11-01' = {
   name: '${prefix}-${adminAppName}-${uniqueString(resourceGroup().id)}'
   kind: 'app'
   location: location
-  tags: {}
+  tags: {
+    acceleratorApp: 'admin'
+  }
   properties: {
     siteConfig: {
       appSettings: [for setting in adminAppConfig: {
@@ -117,7 +121,9 @@ resource storefrontWebApp 'Microsoft.Web/sites@2018-11-01' = {
   name: '${prefix}-${storefrontAppName}-${uniqueString(resourceGroup().id)}'
   kind: 'app'
   location: location
-  tags: {}
+  tags: {
+    acceleratorApp: 'storefront'
+  }
   properties: {
     siteConfig: {
       appSettings: [for setting in storefrontAppConfig: {
