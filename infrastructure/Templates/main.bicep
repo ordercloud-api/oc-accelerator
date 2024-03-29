@@ -15,7 +15,12 @@ param storefrontAppName string
 @description('Provide the azure region to deploy to')
 param location string = resourceGroup().location
 
+param funcAppConfig array
+
 param adminAppConfig array
+
+param storefrontAppConfig array
+
 
 // TODO: parameterize this
 // Creates the app service plan
@@ -115,12 +120,10 @@ resource storefrontWebApp 'Microsoft.Web/sites@2018-11-01' = {
   tags: {}
   properties: {
     siteConfig: {
-      appSettings: [
-        {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~20'
-        }
-      ]
+      appSettings: [for setting in storefrontAppConfig: {
+        name: setting.name
+        value: setting.value
+      } ]
       minTlsVersion: '1.2'
       nodeVersion: '~20'
       alwaysOn: true

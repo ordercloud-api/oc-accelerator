@@ -16,23 +16,68 @@ namespace OC_Accelerator.Helpers
             _appSettings = appSettings;
         }
 
-        public void Run(string webAppName, string? apiClientID)
+        public List<AzAppConfig> Run(string directory, string? clientId)
         {
-            if (apiClientID != null)
+            var appConfigList = new List<AzAppConfig>();
+            if (clientId != null)
             {
-                string content = $"VITE_APP_NAME=\"{webAppName}\"" + Environment.NewLine +
-                                 "VITE_APP_CONFIG_BASE=\"/\"" + Environment.NewLine +
-                                 $"VITE_APP_ORDERCLOUD_BASE_API_URL=\"{_appSettings.ocApiUrl}\"" + Environment.NewLine +
-                                 $"VITE_APP_ORDERCLOUD_CLIENT_ID=\"{apiClientID}\"" + Environment.NewLine +
-                                 $"VITE_APP_ORDERCLOUD_SCOPE=\"{webAppName}\"" + Environment.NewLine + // TODO: fix
-                                 $"VITE_APP_ORDERCLOUD_CUSTOM_SCOPE=\"{webAppName}\"" + Environment.NewLine + // TODO: fix
-                                 "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS=\"true\"";
-                File.WriteAllText($"../../../../apps/{webAppName}/.env.local", content);
+                appConfigList = ConstructAppConfig(directory, clientId);
+                var stringifiedAppConfigs = new List<string>();
+                foreach (var appConfig in appConfigList)
+                {
+                    stringifiedAppConfigs.Add($"{appConfig.name}=\"{appConfig.value}\"");
+                }
+                string content = string.Join(Environment.NewLine, stringifiedAppConfigs);
+                File.WriteAllText($"../../../../apps/{directory}/.env.local", content);
             }
             else
             {
-                throw new Exception("Must provide an apiClientID");
+                throw new Exception("Must provide an API Client ID");
             }
+
+            return appConfigList;
+        }
+
+        private List<AzAppConfig> ConstructAppConfig(string directory, string clientId)
+        {
+            return new List<AzAppConfig>
+            {
+                new()
+                {
+                    name = "VITE_APP_NAME",
+                    value = directory
+                },
+                new()
+                {
+                    name = "VITE_APP_CONFIG_BASE",
+                    value = "/"
+                },
+                new()
+                {
+                    name = "VITE_APP_ORDERCLOUD_BASE_API_URL",
+                    value = _appSettings.ocApiUrl
+                },
+                new()
+                {
+                    name = "VITE_APP_ORDERCLOUD_CLIENT_ID",
+                    value = clientId
+                },
+                new()
+                {
+                    name = "VITE_APP_ORDERCLOUD_SCOPE",
+                    value = ""
+                },
+                new()
+                {
+                    name = "VITE_APP_ORDERCLOUD_CUSTOM_SCOPE",
+                    value = ""
+                },
+                new()
+                {
+                    name = "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS",
+                    value = ""
+                }
+            };
         }
     }
 }

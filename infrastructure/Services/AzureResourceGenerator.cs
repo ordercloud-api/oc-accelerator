@@ -6,6 +6,7 @@ using Azure;
 using OC_Accelerator.Models;
 using System.Text;
 using OC_Accelerator.Helpers;
+using Sharprompt;
 
 public class AzureResourceGenerator
 {
@@ -40,21 +41,23 @@ public class AzureResourceGenerator
         SubscriptionResource subscription = await subscriptions.GetAsync(_appSettings.subscriptionId);
         ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(_appSettings.resourceGroup);
 
-        var template = File.ReadAllText("../../../Templates/main.json");
-        var adminAppConfig = new List<AppConfigFormat>
+        var nodeDefaultVersion = new AzAppConfig()
         {
-            new()
-            {
-                name = "WEBSITE_NODE_DEFAULT_VERSION",
-                value = "~20"
-            }
+            name = "WEBSITE_NODE_DEFAULT_VERSION",
+            value = "~20"
         };
+
+        var adminAppConfig = _writeEnvVariables.Run(adminDirName, adminClientID);
+        adminAppConfig.Add(nodeDefaultVersion);
+
+        var storefrontAppConfig = _writeEnvVariables.Run(storefrontDirName, storefrontClientID);
+        storefrontAppConfig.Add(nodeDefaultVersion);
 
         // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
         var prefix = GenerateRandomString(6, lowerCase: true);
         var properties = new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
         {
-            Template = BinaryData.FromString(template),
+            Template = BinaryData.FromString(File.ReadAllText("../../../Templates/main.json")),
             Parameters = BinaryData.FromObjectAsJson(new
             {
                 prefix = new
@@ -76,6 +79,10 @@ public class AzureResourceGenerator
                 adminAppConfig = new
                 {
                     value = adminAppConfig
+                },
+                storefrontAppConfig = new
+                {
+                    value = storefrontAppConfig
                 }
             })
         };
@@ -92,17 +99,43 @@ public class AzureResourceGenerator
             var resourceNames = results.Select(r => $"{r.Data.Name} ({r.Data.ResourceType.Type})");
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
 
-            foreach (var directory in new[] { storefrontDirName, adminDirName })
+            // find the storage account
+            var funcAppConfig = new List<AzAppConfig>()
             {
-                var apiClientID = directory == adminDirName ? adminClientID : storefrontClientID;
-                var targetAzResource = results.FirstOrDefault(r => r.Data.Name.Contains(directory));
-                _writeEnvVariables.Run(directory, apiClientID);
-                _writeAzSettings.WriteWebAppSettings(targetAzResource.Id, directory);
-            }
+                new()
+                {
+                    name = "FUNCTIONS_EXTENSION_VERSION",
+                    value = "~4"
+                },
+                new()
+                {
+                    name = "FUNCTIONS_WORKER_RUNTIME",
+                    value = "~4"
+                },
+                new()
+                {
+                    name = "AzureWebJobsStorage",
+                    value = "~4"
+                },
+            };
+            
+            funcAppConfig.Add(nodeDefaultVersion);
 
             var funcApp = results.FirstOrDefault(r => r.Data.Kind == "functionapp");
 
+
+
             _writeAzSettings.WriteFunctionAppSettings(funcApp.Id, funcAppName);
+
+
+
+            foreach (var directory in new[] { storefrontDirName, adminDirName })
+            {
+                var targetAzResource = results.FirstOrDefault(r => r.Data.Name.Contains(directory));
+                _writeAzSettings.WriteWebAppSettings(targetAzResource.Id, directory);
+            }
+
+
 
             return new AzResourceGeneratorResponse()
             {
@@ -139,9 +172,4 @@ public class AzureResourceGenerator
         return lowerCase ? builder.ToString().ToLower() : builder.ToString();
     }
 
-    public class AppConfigFormat
-    {
-        public string name { get; set; }
-        public dynamic value { get; set; }
-    }
 }

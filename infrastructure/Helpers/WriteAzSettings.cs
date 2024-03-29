@@ -12,16 +12,14 @@ namespace OC_Accelerator.Helpers
 {
     public class WriteAzSettings
     {
-        public void WriteWebAppSettings(string resourceId, string fileName)
+        public void WriteWebAppSettings(string resourceId, string directory)
         {
             var contents = new JObject();
+            Directory.CreateDirectory($"../../../../apps/{directory}/.vscode");
 
-            var directory = $"../../../../apps/{fileName}/.vscode";
-            Directory.CreateDirectory(directory);
-
-            if (File.Exists($"../../../../apps/{fileName}/.vscode/settings.json"))
+            if (File.Exists($"../../../../apps/{directory}/.vscode/settings.json"))
             {
-                string stringifiedContents = File.ReadAllText($"../../../../apps/{fileName}/.vscode/settings.json");
+                string stringifiedContents = File.ReadAllText($"../../../../apps/{directory}/.vscode/settings.json");
                 contents = JsonConvert.DeserializeObject<JObject>(stringifiedContents);
                 contents["appService.defaultWebAppToDeploy"] = resourceId;
             }
@@ -32,20 +30,19 @@ namespace OC_Accelerator.Helpers
                 contents["appService.preDeployTask"] = "build";
             }
 
-            File.WriteAllText($"../../../../apps/{fileName}/.vscode/settings.json",
+            File.WriteAllText($"../../../../apps/{directory}/.vscode/settings.json",
                 JsonConvert.SerializeObject(contents));
         }
 
-        public void WriteFunctionAppSettings(string resourceId, string fileName)
+        public void WriteFunctionAppSettings(string resourceId, string directory)
         {
             var contents = new JObject();
 
-            var directory = $"../../../../apps/{fileName}/.vscode";
-            Directory.CreateDirectory(directory);
+            Directory.CreateDirectory($"../../../../apps/{directory}/.vscode");
 
-            if (File.Exists($"../../../../apps/{fileName}/.vscode/settings.json"))
+            if (File.Exists($"../../../../apps/{directory}/.vscode/settings.json"))
             {
-                string stringifiedContents = File.ReadAllText($"../../../../apps/{fileName}/.vscode/settings.json");
+                string stringifiedContents = File.ReadAllText($"../../../../apps/{directory}/.vscode/settings.json");
                 contents = JsonConvert.DeserializeObject<JObject>(stringifiedContents);
                 contents["azureFunctions.defaultFunctionAppToDeploy"] = resourceId;
             }
@@ -61,7 +58,7 @@ namespace OC_Accelerator.Helpers
                 contents["azureFunctions.defaultFunctionAppToDeploy"] = resourceId;
             }
 
-            File.WriteAllText($"../../../../apps/{fileName}/.vscode/settings.json",
+            File.WriteAllText($"../../../../apps/{directory}/.vscode/settings.json",
                 JsonConvert.SerializeObject(contents));
         }
     }
