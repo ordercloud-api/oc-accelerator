@@ -5,6 +5,7 @@ using Azure.ResourceManager;
 using Azure;
 using OC_Accelerator.Models;
 using System.Text;
+using Azure.ResourceManager.Storage;
 using OC_Accelerator.Helpers;
 using Sharprompt;
 
@@ -30,17 +31,6 @@ public class AzureResourceGenerator
     /// <exception cref="Exception"></exception>
     public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, string storefrontClientID, string adminClientID, string storefrontDirName, string adminDirName, string funcAppName)
     {
-        InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions()
-        {
-            TenantId = _appSettings.tenantId
-        };
-        await logger.WriteLineAsync("Authenticate to Azure via web browser prompt");
-        InteractiveBrowserCredential credential = new InteractiveBrowserCredential(credentialOpts);
-        ArmClient client = new ArmClient(credential, _appSettings.subscriptionId);
-        SubscriptionCollection subscriptions = client.GetSubscriptions();
-        SubscriptionResource subscription = await subscriptions.GetAsync(_appSettings.subscriptionId);
-        ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(_appSettings.resourceGroup);
-
         var nodeDefaultVersion = new AzAppConfig()
         {
             name = "WEBSITE_NODE_DEFAULT_VERSION",
@@ -52,6 +42,18 @@ public class AzureResourceGenerator
 
         var storefrontAppConfig = _writeEnvVariables.Run(storefrontDirName, storefrontClientID);
         storefrontAppConfig.Add(nodeDefaultVersion);
+
+
+        InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions()
+        {
+            TenantId = _appSettings.tenantId
+        };
+        await logger.WriteLineAsync("Authenticate to Azure via web browser prompt");
+        InteractiveBrowserCredential credential = new InteractiveBrowserCredential(credentialOpts);
+        ArmClient client = new ArmClient(credential, _appSettings.subscriptionId);
+        SubscriptionCollection subscriptions = client.GetSubscriptions();
+        SubscriptionResource subscription = await subscriptions.GetAsync(_appSettings.subscriptionId);
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(_appSettings.resourceGroup);
 
         // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
         var prefix = GenerateRandomString(6, lowerCase: true);
@@ -100,6 +102,11 @@ public class AzureResourceGenerator
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
 
             // find the storage account
+            var genericStorageResource = results.FirstOrDefault(r => r.Data.ResourceType.Type == "storageAccounts");
+            var storageAccount = client.GetStorageAccountResource(genericStorageResource.Id);
+            var whatIsThis = client.GetStoragePrivateEndpointConnectionResource(genericStorageResource.Id);
+            //var keys = storageAccount.GetCo();
+
             var funcAppConfig = new List<AzAppConfig>()
             {
                 new()
@@ -115,7 +122,7 @@ public class AzureResourceGenerator
                 new()
                 {
                     name = "AzureWebJobsStorage",
-                    value = "~4"
+                    value = ""
                 },
             };
             
@@ -143,14 +150,25 @@ public class AzureResourceGenerator
                 azFuncAppUrl = $"https://{funcApp?.Data.Name}.azurewebsites.net", // TODO: fix this
             };
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
             var results = resourceGroup.GetGenericResources(filter: filters);
-            foreach (var resource in results)
+            if (results.Any())
             {
-                // TODO: we should probably confirm which resources to delete
-                await resource.DeleteAsync(WaitUntil.Completed);
+                bool delete = Prompt.Confirm("Delete resources created in Azure?");
+                if (delete)
+                {
+                    var resourceNames = results.Select(r => r.Data.Name);
+                    var selectedResources = Prompt.MultiSelect("Select which resources to delete", resourceNames);
+                    foreach (var resource in results.Where(r => selectedResources.Contains(r.Data.Name)))
+                    {
+                        // TODO: we should probably confirm which resources to delete
+                        await resource.DeleteAsync(WaitUntil.Completed);
+                    }
+                }
+
             }
+
             throw new Exception(ex.Message);
         }
     }

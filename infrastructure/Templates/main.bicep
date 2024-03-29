@@ -15,7 +15,7 @@ param storefrontAppName string
 @description('Provide the azure region to deploy to')
 param location string = resourceGroup().location
 
-param funcAppConfig array
+// param funcAppConfig array
 
 param adminAppConfig array
 
