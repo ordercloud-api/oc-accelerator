@@ -31,19 +31,21 @@ namespace OC_Accelerator
 
             while (action == null)
             {
-                Console.WriteLine("s = seed Azure infrastructure");
+                Console.WriteLine("i = seed Azure infrastructure");
                 Console.WriteLine("v = write to local environment variables");
+                Console.WriteLine("s = write to Azure .vscode/settings.json");
                 var key = Console.ReadKey().Key;
 
                 action =
-                    (key == ConsoleKey.S) ? "seed" :
+                    (key == ConsoleKey.I) ? "infrastructure" :
                     (key == ConsoleKey.V) ? "variables" :
+                    (key == ConsoleKey.S) ? "azureSettings" :
                     null;
 
                 Console.WriteLine();
 
 
-                if (action == "seed")
+                if (action == "infrastructure")
                 {
                     if (!isDebugging)
                     {
@@ -63,7 +65,9 @@ namespace OC_Accelerator
                         funcDirectory = "functions";
                     }
 
-                    provider.GetService<BuildBicepFile>()?.Run(logger, "../../../Templates/main.bicep");
+                    var bicepFileHelper = provider.GetService<BuildBicepFile>();
+                    bicepFileHelper?.Run(logger, "../../../Templates/main.bicep");
+                    bicepFileHelper?.Run(logger, "../../../Templates/functionApp.bicep");
                     var ocService = provider.GetService<OCMarketplaceComposer>();
                     try
                     {
@@ -91,27 +95,42 @@ namespace OC_Accelerator
                     }
                 }
 
-
-                if (action == "variables")
+                if (action == "variables" || action == "azSettings")
                 {
-                    var envVarService = provider.GetService<WriteEnvVariables>();
                     var directories = Directory.GetDirectories("../../../../apps").Select(Path.GetFileName).ToList();
                     directories.Add("All");
-                    var selectedDirectory = Prompt.Select("Which directory would you like to populate .env.local settings for?", directories);
+                    var selectedDirectory =
+                        Prompt.Select("Which directory would you like to populate .env.local settings for?",
+                            directories);
+                    
                     if (selectedDirectory != "All")
                     {
-                        directories.Remove("All");
-                        selectedDirectory = Prompt.Select("Which application does this directory represent?",
-                            new List<string>() { "functions", "admin", "storefront" });
-                        var apiClientId = selectedDirectory switch
+                        // APP TYPE MAY NOT ALWAYS EQUAL DIRECTORY NAME
+                        var appTypes = new List<string>() { "admin", "storefront" };
+                        if (action == "azSettings") appTypes.Add("functions");
+                        var appType = Prompt.Select("Which application does this directory represent?", appTypes);
+                        var apiClientId = appType switch
                         {
                             "functions" => appSettings.ocFunctionsClientId,
                             "admin" => appSettings.ocAdminClientId,
                             "storefront" => appSettings.ocStorefrontClientId,
                             _ => throw new Exception("not sure what youre doing")
                         };
-                        if (apiClientId == null) throw new Exception($"Must provide API clientID for {selectedDirectory}");
-                        envVarService.Run(selectedDirectory, apiClientId);
+                        if (apiClientId == null) throw new Exception($"Must provide API clientID for {appType}");
+                        if (action == "variables")
+                        {
+                            provider.GetService<WriteEnvVariables>().Run(selectedDirectory, apiClientId, appType);
+                        }
+                        else
+                        {
+                            var azSettingsService = provider.GetService<WriteAzSettings>();
+                            if (appType != "functions")
+                                azSettingsService.WriteWebAppSettings("", selectedDirectory);
+                            else
+                                azSettingsService.WriteFunctionAppSettings("", selectedDirectory);
+                        }
+                    
+
                     }
                     else
                     {
@@ -120,17 +139,34 @@ namespace OC_Accelerator
                         Console.WriteLine($"Selected {storefrontDirectory} as your buyer/storefront application");
                         adminDirectory = Prompt.Select("Which directory represents your admin application?", directories);
                         Console.WriteLine($"Selected {adminDirectory} as your admin application");
-                        funcDirectory = Prompt.Select("Which directory represents your functions application?", directories);
-                        Console.WriteLine($"Selected {funcDirectory} as your functions application");
+                        
+                        if (action == "azSettings")
+                        {
+                            funcDirectory = Prompt.Select("Which directory represents your functions application?", directories);
+                            Console.WriteLine($"Selected {funcDirectory} as your functions application");
+                        }
                         Prompt.Confirm("Everything look good?", defaultValue: true);
 
-                        foreach (var appName in directories.Where(a => a is not null && a != funcDirectory))
+                        foreach (var appName in directories)
                         {
                             var apiClientId = appName == adminDirectory
                                 ? appSettings.ocAdminClientId
                                 : appSettings.ocStorefrontClientId;
                             if (apiClientId == null) throw new Exception($"Must provide API clientID for {appName}");
-                            envVarService.Run(appName, apiClientId);
+                            var appType = appName == adminDirectory ? "admin" : "storefront";
+
+                            if (action == "azSettings")
+                            {
+                                var azSettingsService = provider.GetService<WriteAzSettings>();
+                                if (appType != "functions")
+                                    azSettingsService.WriteWebAppSettings("", selectedDirectory);
+                                else
+                                    azSettingsService.WriteFunctionAppSettings("", selectedDirectory);
+                            }
+                            else
+                            {
+                                provider.GetService<WriteEnvVariables>().Run(appName, apiClientId, appType);
+                            }
                         }
                     }
                 }
