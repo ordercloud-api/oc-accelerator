@@ -8,7 +8,7 @@ namespace OC_Accelerator.Models
 {
     public interface IAppSettings
     {
-        string tenantId { get; }
+        string? tenantId { get; }
         string subscriptionId { get; }
         string resourceGroup { get; }
         string ocFunctionsClientId { get; }
@@ -16,7 +16,10 @@ namespace OC_Accelerator.Models
         string ocApiUrl { get; }
         string ocHashKey { get; }
         string? ocStorefrontClientId { get; }
+        string? ocStorefrontScope { get; }
         string? ocAdminClientId { get; }
+        string? ocAdminScope { get; }
+
         string devOpsPersonalAccessToken { get; }
         string azureGitHubServiceConnectionId { get; }
         string azureResourceManagerServiceConnectionId { get; }
@@ -38,7 +41,9 @@ namespace OC_Accelerator.Models
         public string ocApiUrl { get; set; }
         public string ocHashKey { get; set; }
         public string? ocStorefrontClientId { get; set; }
+        public string? ocStorefrontScope { get; set; }
         public string? ocAdminClientId { get; set; }
+        public string? ocAdminScope { get; set; }
         public string azureDevOpsProjectID { get; set; }
         public string appServiceTaskID { get; set;  }
     }
