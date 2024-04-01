@@ -1,10 +1,7 @@
-@minLength(3)
+﻿@minLength(3)
 @maxLength(10)
 @description('Provide a prefix for your resources (hyphens will be removed)')
 param prefix string = 'ocstart'
-
-@description('Name of the directory that represents your functions application')
-param funcAppName string
 
 @description('Name of the directory that represents your admin application')
 param adminAppName string
@@ -15,14 +12,14 @@ param storefrontAppName string
 @description('Provide the azure region to deploy to')
 param location string = resourceGroup().location
 
-// param funcAppConfig array
-
 param adminAppConfig array
 
 param storefrontAppConfig array
 
+param storageSkuName string
 
-// TODO: parameterize this
+param storageKind string
+
 // Creates the app service plan
 resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: '${prefix}-appplan-${uniqueString(resourceGroup().id)}'
@@ -41,54 +38,9 @@ resource functionStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: '${prefix}${uniqueString(resourceGroup().id)}'
   location: location
   sku: {
-    name: 'Standard_LRS'
+    name: storageSkuName
   }
-  kind: 'StorageV2'
-}
-
-// Creates the functions application
-resource functionApp 'Microsoft.Web/sites@2018-11-01' = {
-  name: '${prefix}-${funcAppName}-${uniqueString(resourceGroup().id)}'
-  location: location
-  tags: {
-    acceleratorApp: 'functions'
-  }
-  kind: 'functionapp'
-  properties: {
-    siteConfig: {
-      appSettings: [
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'node'
-        }
-        {
-          name: 'WEBSITE_NODE_DEFAULT_VERSION'
-          value: '~20'
-        }
-        {
-          name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${functionStorage.name};AccountKey=${functionStorage.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
-        }
-      ]
-      cors: {
-        allowedOrigins: [
-          'https://portal.azure.com'
-        ]
-      }
-      use32BitWorkerProcess: false
-      ftpsState: 'Disabled'
-      alwaysOn: true
-      netFrameworkVersion: 'v6.0'
-    }
-    clientAffinityEnabled: false
-    httpsOnly: true
-    serverFarmId: appPlan.id
-  }
-  dependsOn: []
+  kind: storageKind
 }
 
 // Creates the admin web application
@@ -142,16 +94,16 @@ resource storefrontWebApp 'Microsoft.Web/sites@2018-11-01' = {
 }
 
 // each web/function app needs this, iterate over the three?
-resource funcApp_scm 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = {
-  parent: functionApp
+resource adminApp_scm 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = {
+  parent: adminWebApp
   name: 'scm'
   properties: {
     allow: false
   }
 }
 
-resource funcApp_ftp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = {
-  parent: functionApp
+resource adminApp_ftp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = {
+  parent: adminWebApp
   name: 'ftp'
   properties: {
     allow: false
