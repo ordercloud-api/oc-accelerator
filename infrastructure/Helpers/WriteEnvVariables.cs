@@ -16,12 +16,13 @@ namespace OC_Accelerator.Helpers
             _appSettings = appSettings;
         }
 
-        public List<AzAppConfig> Run(string directory, string? clientId)
+        // TODO: not a fan of this appType parameter but I need to know which app settings to use for which config
+        public List<AzAppConfig> Run(string directory, string? clientId, string appType)
         {
             var appConfigList = new List<AzAppConfig>();
             if (clientId != null)
             {
-                appConfigList = ConstructAppConfig(directory, clientId);
+                appConfigList = ConstructAppConfig(directory, clientId, appType);
                 var stringifiedAppConfigs = new List<string>();
                 foreach (var appConfig in appConfigList)
                 {
@@ -38,7 +39,7 @@ namespace OC_Accelerator.Helpers
             return appConfigList;
         }
 
-        private List<AzAppConfig> ConstructAppConfig(string directory, string clientId)
+        private List<AzAppConfig> ConstructAppConfig(string directory, string clientId, string appType)
         {
             return new List<AzAppConfig>
             {
@@ -65,17 +66,17 @@ namespace OC_Accelerator.Helpers
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_SCOPE",
-                    value = ""
+                    value = appType == "storefront" ? _appSettings.ocStorefrontScope : _appSettings.ocAdminScope
                 },
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_CUSTOM_SCOPE",
-                    value = ""
+                    value = appType == "storefront" ? _appSettings.ocStorefrontScope : _appSettings.ocAdminScope // TODO: this should be an app setting
                 },
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS",
-                    value = ""
+                    value = appType == "storefront" ? "true" : null // TODO: this should be an app settings
                 }
             };
         }
