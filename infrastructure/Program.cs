@@ -114,7 +114,7 @@ namespace OC_Accelerator
                             "functions" => appSettings.ocFunctionsClientId,
                             "admin" => appSettings.ocAdminClientId,
                             "storefront" => appSettings.ocStorefrontClientId,
-                            _ => throw new Exception("not sure what youre doing")
+                            _ => throw new Exception("not sure what you're doing")
                         };
                         if (apiClientId == null) throw new Exception($"Must provide API clientID for {appType}");
                         if (action == "variables")
@@ -129,8 +129,6 @@ namespace OC_Accelerator
                             else
                                 azSettingsService.WriteFunctionAppSettings("", selectedDirectory);
                         }
-                    
-
                     }
                     else
                     {

@@ -39,6 +39,7 @@ namespace OC_Accelerator
             services.AddSingleton<IdentifyAppNames>();
             services.AddSingleton<WriteEnvVariables>();
             services.AddSingleton<WriteAzSettings>();
+            services.AddSingleton<AzurePlanOptions>();
             return services.BuildServiceProvider();
         }
 

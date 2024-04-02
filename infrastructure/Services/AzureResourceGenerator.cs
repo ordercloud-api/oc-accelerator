@@ -16,12 +16,14 @@ public class AzureResourceGenerator
     private readonly IAppSettings _appSettings;
     private readonly WriteEnvVariables _writeEnvVariables;
     private readonly WriteAzSettings _writeAzSettings;
+    private readonly AzurePlanOptions _azPlanOptions;
 
-    public AzureResourceGenerator(IAppSettings appSettings, WriteEnvVariables writeEnvVariables, WriteAzSettings writeAzSettings)
+    public AzureResourceGenerator(IAppSettings appSettings, WriteEnvVariables writeEnvVariables, WriteAzSettings writeAzSettings, AzurePlanOptions azPlanOptions)
     {
         _appSettings = appSettings;
         _writeEnvVariables = writeEnvVariables;
         _writeAzSettings = writeAzSettings;
+        _azPlanOptions = azPlanOptions;
     }
     
     /// <summary>
@@ -60,11 +62,11 @@ public class AzureResourceGenerator
         // Build up parameters for ARM template
         var prefix = GenerateRandomString(6, lowerCase: true); // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
 
-        var storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function)", GetAzureStorageSkuValues());
+        var storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function)", _azPlanOptions.GetAzureStorageSkuValues());
         var storageKind =
             Prompt.Select(
                 "Select the desired storage type for your Azure Storage Account (required to create an Azure Function)",
-                GetAzureStorageKindValues(storageSku));
+                _azPlanOptions.GetAzureStorageKindValues(storageSku));
 
         if (storageSku == null || storageKind == null)
         {
@@ -234,31 +236,5 @@ public class AzureResourceGenerator
         }
 
         return lowerCase ? builder.ToString().ToLower() : builder.ToString();
-    }
-
-    private List<string> GetAzureStorageSkuValues()
-    {
-        return new List<string>
-        {
-            "Premium_LRS",
-            "Premium_ZRS",
-            "Standard_GRS",
-            "Standard_GZRS",
-            "Standard_LRS",
-            "Standard_RAGRS",
-            "Standard_RAGZRS",
-            "Standard_ZRS",
-        };
-    }
-
-    private List<string> GetAzureStorageKindValues(string storageSku)
-    {
-        var list = new List<string> { "Storage", "StorageV2" };
-        if (new List<string> { "Standard_LRS", "Standard_GRS", "Standard_RAGRS" }.Contains(storageSku))
-            list.Add("BlobStorage");
-        else if (storageSku == "Premium_LRS")
-            list.AddRange(new List<string> {"FileStorage", "BlockBlobStorage"});
-
-        return list;
     }
 }
