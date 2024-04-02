@@ -39,7 +39,7 @@ namespace OC_Accelerator.Services
             string adminApiClientID = _appSettings.ocAdminClientId;
             try
             {
-                if (storefrontApiClientID == null)
+                if (storefrontApiClientID.IsNullOrEmpty())
                 {
                     await logger.WriteLineAsync($"Creating Buyer {storefrontDirectory}");
                     var buyer = await _oc.Buyers.CreateAsync(new Buyer()
@@ -75,7 +75,7 @@ namespace OC_Accelerator.Services
                     storefrontApiClientID = storefrontApiClient.ID;
                 }
 
-                if (adminApiClientID == null)
+                if (adminApiClientID.IsNullOrEmpty())
                 {
                     await logger.WriteLineAsync("Creating Seller API Client");
                     var adminApiClient = new ApiClient
@@ -114,13 +114,21 @@ namespace OC_Accelerator.Services
         public async Task ConfigureOrderCheckoutIntegrationEvent(TextWriter logger, string hostedAppUrl)
         {
             await logger.WriteLineAsync("Creating OrderCheckout Integration Event");
-            await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent
+            try
             {
-                EventType = IntegrationEventType.OrderCheckout,
-                CustomImplementationUrl = $"{hostedAppUrl}/api/integrationevent",
-                Name = "Order Checkout Integration Event",
-                HashKey = _appSettings.ocHashKey
-            });
+                await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent
+                {
+                    EventType = IntegrationEventType.OrderCheckout,
+                    CustomImplementationUrl = $"{hostedAppUrl}/api/integrationevent",
+                    Name = "Order Checkout Integration Event",
+                    HashKey = _appSettings.ocHashKey
+                });
+            }
+            catch (OrderCloudException ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
         }
 
         /// <summary>
@@ -141,19 +149,28 @@ namespace OC_Accelerator.Services
                     Verb = "POST"
                 }
             };
-            await _oc.Webhooks.CreateAsync(new Webhook
+            try
             {
-                Name = "Validate Address",
-                Description = "Pre-webhook to validate a buyer address before it's created",
-                Url = $"{hostedAppUrl}/api/webhook/createaddress",
-                HashKey = _appSettings.ocHashKey,
-                ElevatedRoles = null,
-                ConfigData = null,
-                BeforeProcessRequest = true,
-                ApiClientIDs = new List<string>() { storefrontApiClientID },
-                WebhookRoutes = webhookRoutes,
-                DeliveryConfigID = null
-            });
+                await _oc.Webhooks.CreateAsync(new Webhook
+                {
+                    Name = "Validate Address",
+                    Description = "Pre-webhook to validate a buyer address before it's created",
+                    Url = $"{hostedAppUrl}/api/webhook/createaddress",
+                    HashKey = _appSettings.ocHashKey,
+                    ElevatedRoles = null,
+                    ConfigData = null,
+                    BeforeProcessRequest = true,
+                    ApiClientIDs = new List<string>() { storefrontApiClientID },
+                    WebhookRoutes = webhookRoutes,
+                    DeliveryConfigID = null
+                });
+            }
+            catch (OrderCloudException ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+
         }
 
         /// <summary>

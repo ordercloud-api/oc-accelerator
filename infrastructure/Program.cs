@@ -105,7 +105,7 @@ namespace OC_Accelerator
                     
                     if (selectedDirectory != "All")
                     {
-                        // APP TYPE MAY NOT ALWAYS EQUAL DIRECTORY NAME
+                        // REMEMBER: APP TYPE MAY NOT ALWAYS EQUAL DIRECTORY NAME
                         var appTypes = new List<string>() { "admin", "storefront" };
                         if (action == "azSettings") appTypes.Add("functions");
                         var appType = Prompt.Select("Which application does this directory represent?", appTypes);

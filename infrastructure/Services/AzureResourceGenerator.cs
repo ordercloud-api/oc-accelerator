@@ -117,8 +117,9 @@ public class AzureResourceGenerator
 
             // Find the storage account
             var genericStorageResource = results.FirstOrDefault(r => r.Data.ResourceType.Type == "storageAccounts");
-            var storageAccount = client.GetStorageAccountResource(genericStorageResource.Id);
-            
+            var storageAccount = (await resourceGroup.GetStorageAccountAsync(genericStorageResource?.Data.Name)).Value;
+            var storageAccountKey = storageAccount?.GetKeys()?.FirstOrDefault()?.Value;
+
             var appPlan = results.FirstOrDefault(r => r.Data.ResourceType.Type == "serverFarms");
 
             var funcAppConfig = new List<AzAppConfig>()
@@ -135,8 +136,8 @@ public class AzureResourceGenerator
                 },
                 new()
                 {
-                    name = "AzureWebJobsStorage",
-                    value = $"DefaultEndpointsProtocol=https;AccountName=${storageAccount.Data.Name};AccountKey=${storageAccount.GetKeys().FirstOrDefault().Value};EndpointSuffix=http://core.windows.net/"
+                    name = "AzureWebJobsStorage", 
+                    value = $"DefaultEndpointsProtocol=https;AccountName=${storageAccount.Data.Name};AccountKey=${storageAccountKey};EndpointSuffix=http://core.windows.net/"
                 },
                 nodeDefaultVersion
             };
@@ -157,7 +158,7 @@ public class AzureResourceGenerator
                 },
                 appPlanId = new
                 {
-                    value = appPlan.Id
+                    value = appPlan.Id.ToString()
                 }
             };
 

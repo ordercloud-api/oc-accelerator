@@ -25,6 +25,9 @@ Install Powershell and Azure CLI
 1. [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.4)
 1. [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (this is needed to compile a .bicep file into an ARM template JSON file)
 
+Install Azure App Service extension in VS Code
+- This will be necessary in order to publish your code to a web application created via accelerator tool
+
 ### Ignore for now (post-MVP)
 Log in to Azure DevOps
 1. Create a Personal Access Token with [SCOPES]
