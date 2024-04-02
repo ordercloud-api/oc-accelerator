@@ -107,7 +107,7 @@ public class AzureResourceGenerator
                 {
                     value = storageKind
                 },
-                appSkuName = new
+                appPlanSkuName = new
                 {
                     value = appPlanSku
                 }
