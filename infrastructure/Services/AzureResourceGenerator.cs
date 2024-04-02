@@ -132,7 +132,7 @@ public class AzureResourceGenerator
                 new()
                 {
                     name = "FUNCTIONS_WORKER_RUNTIME",
-                    value = "~4"
+                    value = "node"
                 },
                 new()
                 {
