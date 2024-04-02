@@ -25,6 +25,7 @@ namespace OC_Accelerator.Helpers
 
         public List<string> GetAzureStorageKindValues(string storageSku)
         {
+            // https://learn.microsoft.com/en-us/rest/api/storagerp/srp_sku_types
             var list = new List<string> { "Storage", "StorageV2" };
             if (new List<string> { "Standard_LRS", "Standard_GRS", "Standard_RAGRS" }.Contains(storageSku))
                 list.Add("BlobStorage");
@@ -43,6 +44,7 @@ namespace OC_Accelerator.Helpers
                 "B3",
                 "P0v3",
                 "P1v3",
+                "P1v2", // is this one valid?
                 "P1mv3",
                 "P2v3",
                 "P2mv3",

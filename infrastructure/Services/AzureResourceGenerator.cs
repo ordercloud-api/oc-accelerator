@@ -62,6 +62,7 @@ public class AzureResourceGenerator
         // Build up parameters for ARM template
         var prefix = GenerateRandomString(6, lowerCase: true); // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
 
+        var appPlanSku = Prompt.Select("Select the desired SKU for your Azure App Service Plan", _azPlanOptions.GetAzureAppPlanSkuValues());
         var storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function)", _azPlanOptions.GetAzureStorageSkuValues());
         var storageKind =
             Prompt.Select(
@@ -105,6 +106,10 @@ public class AzureResourceGenerator
                 storageKind = new
                 {
                     value = storageKind
+                },
+                appSkuName = new
+                {
+                    value = appPlanSku
                 }
             };
 

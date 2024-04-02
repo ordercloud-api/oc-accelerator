@@ -20,16 +20,19 @@ param storageSkuName string
 
 param storageKind string
 
+param appPlanSkuName string
+
 // Creates the app service plan
 resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: '${prefix}-appplan-${uniqueString(resourceGroup().id)}'
   location: location
   sku: {
-    name: 'P1v2'
-    tier: 'PremiumV2'
-    size: 'P1v2'
-    family: 'Pv2'
-    capacity: 1
+    name: appPlanSkuName
+    // ARE ANY OF THESE NECESSARY?
+    // tier: 'PremiumV2' 
+    // size: 'P1v2'
+    // family: 'Pv2'
+    // capacity: 1
   }
 }
 
