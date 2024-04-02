@@ -69,9 +69,9 @@ public class AzureResourceGenerator
                 "Select the desired storage type for your Azure Storage Account (required to create an Azure Function)",
                 _azPlanOptions.GetAzureStorageKindValues(storageSku));
 
-        if (storageSku == null || storageKind == null)
+        if (appPlanSku == null || storageSku == null || storageKind == null)
         {
-            throw new Exception("Must select a SKU and storage type for your Azure Storage Account");
+            throw new Exception("Must select a SKU for the App Service Plan, as well as a SKU and storage type for your Storage Account");
         }
 
         var filters = $"substringof('{prefix}', name)";
