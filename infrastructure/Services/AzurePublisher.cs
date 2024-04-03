@@ -15,7 +15,7 @@ namespace OC_Accelerator.Services
 
         }
 
-        public async Task Publish(TextWriter logger)
+        public void Publish(TextWriter logger)
         {
             // TODO: this probably needs to happen before azure resource generator is called
             var processStartInfo = new ProcessStartInfo();

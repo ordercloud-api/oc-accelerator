@@ -30,7 +30,7 @@ namespace OC_Accelerator
                     ApiRole.FullAccess
                 }
             }));
-            services.AddSingleton<AzureResourceGenerator>();
+            services.AddSingleton<AzureResourceService>();
             services.AddSingleton<DevOps>();
             services.AddSingleton<OCMarketplaceComposer>();
             services.AddSingleton<IgnoreErrorWrapper>();

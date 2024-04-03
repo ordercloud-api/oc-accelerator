@@ -5,12 +5,14 @@ using Azure.ResourceManager;
 using Azure;
 using OC_Accelerator.Models;
 using System.Text;
+using Azure.Core;
 using Azure.ResourceManager.Storage;
 using OC_Accelerator.Helpers;
 using Sharprompt;
 using Azure.ResourceManager.Storage.Models;
+using Microsoft.Extensions.Logging;
 
-public class AzureResourceGenerator
+public class AzureResourceService
 {
     private readonly Random _random = new();
     private readonly IAppSettings _appSettings;
@@ -18,7 +20,7 @@ public class AzureResourceGenerator
     private readonly WriteAzSettings _writeAzSettings;
     private readonly AzurePlanOptions _azPlanOptions;
 
-    public AzureResourceGenerator(IAppSettings appSettings, WriteEnvVariables writeEnvVariables, WriteAzSettings writeAzSettings, AzurePlanOptions azPlanOptions)
+    public AzureResourceService(IAppSettings appSettings, WriteEnvVariables writeEnvVariables, WriteAzSettings writeAzSettings, AzurePlanOptions azPlanOptions)
     {
         _appSettings = appSettings;
         _writeEnvVariables = writeEnvVariables;
@@ -32,7 +34,7 @@ public class AzureResourceGenerator
     /// </summary>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public async Task<AzResourceGeneratorResponse> RunAsync(TextWriter logger, string storefrontClientID, string adminClientID, string storefrontDirName, string adminDirName, string funcAppName)
+    public async Task<AzResourceGeneratorResponse> CreateAsync(TextWriter logger, string storefrontClientID, string adminClientID, string storefrontDirName, string adminDirName, string funcAppName)
     {
         var nodeDefaultVersion = new AzAppConfig()
         {
@@ -41,23 +43,14 @@ public class AzureResourceGenerator
         };
 
         // Write to .env.local files for both admin and storefront directories
-        var adminAppConfig = _writeEnvVariables.Run(adminDirName, adminClientID, "admin");
+        var adminAppConfig = _writeEnvVariables.Run(adminDirName, adminClientID, ApplicationType.Admin);
         adminAppConfig.Add(nodeDefaultVersion);
 
-        var storefrontAppConfig = _writeEnvVariables.Run(storefrontDirName, storefrontClientID, "storefront");
+        var storefrontAppConfig = _writeEnvVariables.Run(storefrontDirName, storefrontClientID, ApplicationType.Storefront);
         storefrontAppConfig.Add(nodeDefaultVersion);
 
         // Authenticate to Azure
-        InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions();
-        if (_appSettings.tenantId != null)
-            credentialOpts.TenantId = _appSettings.tenantId;
-
-        await logger.WriteLineAsync("Authenticate to Azure via web browser prompt");
-        InteractiveBrowserCredential credential = new InteractiveBrowserCredential(credentialOpts);
-        ArmClient client = new ArmClient(credential, _appSettings.subscriptionId);
-        SubscriptionCollection subscriptions = client.GetSubscriptions();
-        SubscriptionResource subscription = await subscriptions.GetAsync(_appSettings.subscriptionId);
-        ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(_appSettings.resourceGroup);
+        ResourceGroupResource resourceGroup = await AuthenticateToAzureAsync(logger);
         
         // Build up parameters for ARM template
         var prefix = GenerateRandomString(6, lowerCase: true); // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
@@ -214,6 +207,32 @@ public class AzureResourceGenerator
 
             throw new Exception(ex.Message);
         }
+    }
+
+    public async Task<Pageable<GenericResource>> ListAsync(TextWriter logger)
+    {
+        var resourceGroup = await AuthenticateToAzureAsync(logger);
+        return resourceGroup.GetGenericResources();
+    }
+
+    private async Task<ResourceGroupResource> AuthenticateToAzureAsync(TextWriter logger)
+    {
+        // Authenticate to Azure
+        InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions();
+        if (_appSettings.tenantId != null)
+            credentialOpts.TenantId = _appSettings.tenantId;
+
+        await logger.WriteLineAsync("Authenticate to Azure via web browser prompt");
+        InteractiveBrowserCredential credential = new InteractiveBrowserCredential(credentialOpts);
+        //var token = await credential.GetTokenAsync(new TokenRequestContext()
+        //{
+
+        //});
+        ArmClient client = new ArmClient(credential, _appSettings.subscriptionId);
+        SubscriptionCollection subscriptions = client.GetSubscriptions();
+        SubscriptionResource subscription = await subscriptions.GetAsync(_appSettings.subscriptionId);
+        ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(_appSettings.resourceGroup);
+        return resourceGroup;
     }
 
     private ArmDeploymentContent BuildArmDeployment(string armTemplateFile, object parameters)

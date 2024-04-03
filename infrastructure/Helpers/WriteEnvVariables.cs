@@ -16,8 +16,7 @@ namespace OC_Accelerator.Helpers
             _appSettings = appSettings;
         }
 
-        // TODO: not a fan of this appType parameter but I need to know which app settings to use for which config
-        public List<AzAppConfig> Run(string directory, string? clientId, string appType)
+        public List<AzAppConfig> Run(string directory, string? clientId, ApplicationType appType)
         {
             var appConfigList = new List<AzAppConfig>();
             if (clientId != null)
@@ -39,7 +38,7 @@ namespace OC_Accelerator.Helpers
             return appConfigList;
         }
 
-        private List<AzAppConfig> ConstructAppConfig(string directory, string clientId, string appType)
+        private List<AzAppConfig> ConstructAppConfig(string directory, string clientId, ApplicationType appType)
         {
             return new List<AzAppConfig>
             {
@@ -71,19 +70,19 @@ namespace OC_Accelerator.Helpers
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_CUSTOM_SCOPE",
-                    value = appType == "storefront" ? _appSettings.ocStorefrontCustomScope : _appSettings.ocAdminCustomScope
+                    value = appType == ApplicationType.Storefront ? _appSettings.ocStorefrontCustomScope : _appSettings.ocAdminCustomScope
                 },
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS",
-                    value = appType == "storefront" ? _appSettings.ocStorefrontAllowAnon : string.Empty
+                    value = appType == ApplicationType.Storefront ? _appSettings.ocStorefrontAllowAnon : string.Empty
                 }
             };
         }
 
-        private string? DetermineRoles(string appType)
+        private string? DetermineRoles(ApplicationType appType)
         {
-            if (appType == "storefront")
+            if (appType == ApplicationType.Storefront)
             {
                 // TODO: is this the right way to think about this?
                 // If there are no roles specified for storefront, but they have anon shopping enabled, set roles to Shopper so anon auth can happen

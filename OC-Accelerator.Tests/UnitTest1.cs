@@ -36,8 +36,8 @@ namespace OC_Accelerator.Tests
         [Test, Ignore("broken")]
         public void Test1()
         {
-            var azResourceGenerator = new Mock<AzureResourceGenerator>();
-            azResourceGenerator.Setup(a => a.RunAsync(Console.Out, "storefrontClientId", "adminClientId",
+            var azResourceGenerator = new Mock<AzureResourceService>();
+            azResourceGenerator.Setup(a => a.CreateAsync(Console.Out, "storefrontClientId", "adminClientId",
                     "storefront", "admin", "functions"))
                 .Returns(Task.FromResult(new AzResourceGeneratorResponse(){azFuncAppName = "functions", azFuncAppUrl = "azurefunction.net"}));
         }
