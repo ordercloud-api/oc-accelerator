@@ -5,6 +5,8 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OC-Accelerator", "OC-Accelerator.csproj", "{9EB7F835-C01F-4BDD-99E6-E9E371E3581E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OC-Accelerator.Tests", "..\OC-Accelerator.Tests\OC-Accelerator.Tests.csproj", "{0A93789B-44FD-4188-AF3E-5DA4448BDB13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{9EB7F835-C01F-4BDD-99E6-E9E371E3581E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EB7F835-C01F-4BDD-99E6-E9E371E3581E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EB7F835-C01F-4BDD-99E6-E9E371E3581E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A93789B-44FD-4188-AF3E-5DA4448BDB13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A93789B-44FD-4188-AF3E-5DA4448BDB13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A93789B-44FD-4188-AF3E-5DA4448BDB13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A93789B-44FD-4188-AF3E-5DA4448BDB13}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

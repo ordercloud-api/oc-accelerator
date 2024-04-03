@@ -16,11 +16,13 @@ param adminAppConfig array
 
 param storefrontAppConfig array
 
+param appPlanSkuName string
+
 param storageSkuName string
 
 param storageKind string
 
-param appPlanSkuName string
+
 
 // Creates the app service plan
 resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
