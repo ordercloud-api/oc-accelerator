@@ -174,6 +174,7 @@ namespace OC_Accelerator
                         string targetAzureResourceName = null;
                         do
                         {
+                            // TODO: Abstract this to a new method - this is also used above
                             // Select the name of the Azure Resource that represents the current directory in the iteration
                             targetAzureResourceName = Prompt.Select($"Which Azure Resource represents {directory}",
                                 azureResourceNames);
