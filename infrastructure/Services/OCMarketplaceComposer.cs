@@ -51,6 +51,7 @@ namespace OC_Accelerator.Services
                     await logger.WriteLineAsync($"Creating Security Profile for {storefrontDirectory}");
                     var buyerSecurityProfile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
                     {
+                        ID = string.Join("-", storefrontDirectory),
                         Name = $"{storefrontDirectory} Security Profile",
                         Roles = ConvertOcApiRoles(_appSettings.ocStorefrontScope, true),
                         CustomRoles = _appSettings.ocStorefrontCustomScope?.Split(" ").ToList() ?? new List<string>()
@@ -96,6 +97,7 @@ namespace OC_Accelerator.Services
                     await logger.WriteLineAsync($"Creating Security Profile for {adminDirectory}");
                     var adminSecurityProfile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
                     {
+                        ID = string.Join("-", adminDirectory),
                         Name = $"{adminDirectory} Security Profile",
                         Roles = ConvertOcApiRoles(_appSettings.ocAdminScope, false),
                         CustomRoles = _appSettings.ocAdminCustomScope?.Split(" ").ToList() ?? new List<string>()
