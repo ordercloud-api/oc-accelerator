@@ -1,7 +1,5 @@
-using Newtonsoft.Json;
 using OC_Accelerator.Models;
 using OrderCloud.SDK;
-using System.Runtime;
 using Microsoft.TeamFoundation.Common;
 using OC_Accelerator.Helpers;
 
@@ -50,15 +48,32 @@ namespace OC_Accelerator.Services
                         Name = storefrontDirectory
                     });
 
-                    await logger.WriteLineAsync("Creating Default Context User");
-                    var defaultContextUser = await _oc.Users.CreateAsync(buyer.ID, new User()
+                    await logger.WriteLineAsync($"Creating Security Profile for {storefrontDirectory}");
+                    var buyerSecurityProfile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
                     {
-                        Active = true,
-                        Username = "DefaultContextUser",
-                        FirstName = "Anonymous",
-                        LastName = "User",
-                        Email = "test@test.com"
+                        Name = $"{storefrontDirectory} Security Profile",
+                        Roles = ConvertOcApiRoles(_appSettings.ocStorefrontScope, true),
+                        CustomRoles = _appSettings.ocStorefrontCustomScope?.Split(" ").ToList() ?? new List<string>()
                     });
+                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+                    {
+                        BuyerID = buyer.ID,
+                        SecurityProfileID = buyerSecurityProfile.ID
+                    });
+
+                    var defaultContextUser = new User();
+                    if (_appSettings.ocStorefrontAllowAnon == true)
+                    {
+                        await logger.WriteLineAsync("Creating Default Context User for anonymous shopping");
+                        defaultContextUser = await _oc.Users.CreateAsync(buyer.ID, new User()
+                        {
+                            Active = true,
+                            Username = "DefaultContextUser",
+                            FirstName = "Anonymous",
+                            LastName = "User",
+                            Email = "test@test.com"
+                        });
+                    }
 
                     await logger.WriteLineAsync($"Creating Buyer API Client with Default Context User {defaultContextUser.Username}");
                     var storefrontApiClient = new ApiClient
@@ -78,6 +93,19 @@ namespace OC_Accelerator.Services
 
                 if (adminApiClientID.IsNullOrEmpty())
                 {
+                    await logger.WriteLineAsync($"Creating Security Profile for {adminDirectory}");
+                    var adminSecurityProfile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
+                    {
+                        Name = $"{adminDirectory} Security Profile",
+                        Roles = ConvertOcApiRoles(_appSettings.ocAdminScope, false),
+                        CustomRoles = _appSettings.ocAdminCustomScope?.Split(" ").ToList() ?? new List<string>()
+                    });
+
+                    await _oc.SecurityProfiles.SaveAssignmentAsync(new SecurityProfileAssignment()
+                    {
+                        SecurityProfileID = adminSecurityProfile.ID
+                    });
+
                     await logger.WriteLineAsync("Creating Seller API Client");
                     var adminApiClient = new ApiClient
                     {
@@ -196,7 +224,7 @@ namespace OC_Accelerator.Services
                 await _oc.IntegrationEvents.DeleteAsync(ie.ID);
             }
 
-            var apiClients = await _oc.ApiClients.ListAsync(filters: new { ID = $"!{_appSettings.ocFunctionsClientId}", Name = $"{storefrontDirectory}|{adminDirectory}"});
+            var apiClients = await _oc.ApiClients.ListAsync(filters: new { ID = $"!{_appSettings.ocFunctionsClientId}", Name = $"{storefrontDirectory}|{adminDirectory}" });
             foreach (var apiClient in apiClients.Items)
             {
                 await _oc.ApiClients.DeleteAsync(apiClient.ID);
@@ -207,6 +235,16 @@ namespace OC_Accelerator.Services
                 await _ignoreErrorWrapper.Ignore404(() => _oc.Buyers.DeleteAsync(buyerID), logger);
                 await _ignoreErrorWrapper.Ignore404(() => _oc.Catalogs.DeleteAsync(buyerID), logger);
             }
+        }
+
+        private List<ApiRole> ConvertOcApiRoles(string? roles, bool isStorefront)
+        {
+            if (roles.IsNullOrEmpty())
+                return isStorefront ? new List<ApiRole> { ApiRole.Shopper } : new List<ApiRole>();
+
+            var rolesList = roles.Split(" ");
+            return rolesList.Where(x => Enum.TryParse(typeof(ApiRole), x, false, out var role))
+                .Select(x => (ApiRole)Enum.Parse(typeof(ApiRole), x)).ToList();
         }
     }
 }

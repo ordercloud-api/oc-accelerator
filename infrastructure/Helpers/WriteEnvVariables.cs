@@ -66,19 +66,33 @@ namespace OC_Accelerator.Helpers
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_SCOPE",
-                    value = appType == "storefront" ? _appSettings.ocStorefrontScope : _appSettings.ocAdminScope
+                    value = DetermineRoles(appType) ?? string.Empty
                 },
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_CUSTOM_SCOPE",
-                    value = appType == "storefront" ? _appSettings.ocStorefrontScope : _appSettings.ocAdminScope // TODO: this should be an app setting
+                    value = appType == "storefront" ? _appSettings.ocStorefrontCustomScope : _appSettings.ocAdminCustomScope
                 },
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS",
-                    value = appType == "storefront" ? "true" : null // TODO: this should be an app settings
+                    value = appType == "storefront" ? _appSettings.ocStorefrontAllowAnon : string.Empty
                 }
             };
+        }
+
+        private string? DetermineRoles(string appType)
+        {
+            if (appType == "storefront")
+            {
+                // TODO: is this the right way to think about this?
+                // If there are no roles specified for storefront, but they have anon shopping enabled, set roles to Shopper so anon auth can happen
+                if (string.IsNullOrEmpty(_appSettings.ocStorefrontScope))
+                    return _appSettings.ocStorefrontAllowAnon == true ? "Shopper" : string.Empty;
+                
+                return _appSettings.ocStorefrontScope;
+            }
+            return _appSettings.ocAdminScope;
         }
     }
 }
