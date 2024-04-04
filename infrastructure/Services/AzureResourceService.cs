@@ -239,7 +239,7 @@ public class AzureResourceService
     {
         var properties = new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
         {
-            Template = BinaryData.FromString(File.ReadAllText($"../../../Templates/{armTemplateFile}.json")),
+            Template = BinaryData.FromString(File.ReadAllText($"../../../Templates/Bicep/{armTemplateFile}.json")),
             Parameters = BinaryData.FromObjectAsJson(parameters)
         };
 

@@ -1,11 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Reflection;
+using Azure;
+using Azure.ResourceManager.Resources;
 using Microsoft.Extensions.DependencyInjection;
 using OC_Accelerator.Helpers;
 using OC_Accelerator.Models;
 using OC_Accelerator.Services;
 using Sharprompt;
+using Action = OC_Accelerator.Models.Action;
 
 namespace OC_Accelerator
 {
@@ -59,13 +62,11 @@ namespace OC_Accelerator
                 }
 
                 var bicepFileHelper = provider.GetService<BuildBicepFile>();
-                // TODO: just compile all the files in /Tempaltes/BICEP
-                bicepFileHelper?.Run(logger, "../../../Templates/main.bicep");
-                bicepFileHelper?.Run(logger, "../../../Templates/functionApp.bicep");
+                bicepFileHelper?.Run(logger);
                 var ocService = provider.GetService<OCMarketplaceComposer>();
                 try
                 {
-                    apiClientIDs = await ocService.CreateApiClientsAsync(logger, storefrontDirectory, adminDirectory);
+                    apiClientIDs = await ocService?.CreateApiClientsAsync(logger, storefrontDirectory, adminDirectory);
                     armResponse = await provider.GetService<AzureResourceService>()?.CreateAsync(logger, apiClientIDs?.Item1, apiClientIDs?.Item2, storefrontDirectory, adminDirectory, funcDirectory);
                     await ocService.ConfigureWebhooksAsync(logger, armResponse.azFuncAppUrl, apiClientIDs.Item1);
                     await ocService.ConfigureOrderCheckoutIntegrationEvent(logger, armResponse.azFuncAppUrl);
@@ -93,9 +94,10 @@ namespace OC_Accelerator
             {
                 var directories = Directory.GetDirectories("../../../../apps").Select(Path.GetFileName).ToList();
                 directories.Add("All");
-                var actionDescription = action.GetType().GetMember(action.ToString())
-                    .First()
-                    .GetCustomAttribute<DisplayAttribute>()
+                var actionDescription = action.GetType()?
+                    .GetMember(action.ToString())?
+                    .First()?
+                    .GetCustomAttribute<DisplayAttribute>()?
                     .GetName();
                 var selectedDirectory = Prompt.Select($"Which directory would you like to {actionDescription} for?", directories);
                 
@@ -117,30 +119,17 @@ namespace OC_Accelerator
                     if (action == Action.EnvVar)
                     {
                         // TODO: Do we want to allow writing to env variables for Azure Functions? 
-                        provider.GetService<WriteEnvVariables>().Run(selectedDirectory, apiClientId, appType);
+                        provider.GetService<WriteEnvVariables>()?.Run(selectedDirectory, apiClientId, appType);
                     } 
                     else 
                     {
                         var azSettingsService = provider.GetService<WriteAzSettings>();
-                        bool azConfirmation = false;
-                        
-                        var azureResources = await provider.GetService<AzureResourceService>().ListAsync(Console.Out);
-                        var azureResourceNames = azureResources.Select(r => r.Data.Name).ToList();
-                        string targetAzureResourceName = null;
-                        do
-                        {
-                            // Select the name of the Azure Resource that represents the current directory in the iteration
-                            targetAzureResourceName = Prompt.Select($"Which Azure Resource represents {selectedDirectory}",
-                                azureResourceNames);
-                            azConfirmation = Prompt.Confirm($"Confirm: {targetAzureResourceName} represents {selectedDirectory}",
-                                defaultValue: true);
-                        } while (!azConfirmation);
-                        var targetAzureResource =
-                            azureResources.FirstOrDefault(r => r.Data.Name == targetAzureResourceName);
+                        var azureResources = await provider.GetService<AzureResourceService>()?.ListAsync(Console.Out);
+                        var targetAzureResource = GetAzureResource(azureResources, selectedDirectory);
                         if (appType != ApplicationType.Functions)
-                            azSettingsService.WriteWebAppSettings(targetAzureResource.Id.ToString(), selectedDirectory);
+                            azSettingsService?.WriteWebAppSettings(targetAzureResource.Id.ToString(), selectedDirectory);
                         else
-                            azSettingsService.WriteFunctionAppSettings(targetAzureResource.Id.ToString(), selectedDirectory);
+                            azSettingsService?.WriteFunctionAppSettings(targetAzureResource.Id.ToString(), selectedDirectory);
                     }
                 }
                 else
@@ -164,30 +153,13 @@ namespace OC_Accelerator
                         dirConfirmation = Prompt.Confirm("Everything look good?", defaultValue: true);
                     } while (!dirConfirmation);
 
-                    // List all Azure Resources
-                    var azureResources = await provider.GetService<AzureResourceService>().ListAsync(Console.Out);
-                    var azureResourceNames = azureResources.Select(r => r.Data.Name).ToList();
+                    // List all Azure Resources only if action is Environment Variables
+                    Pageable<GenericResource> azureResources = null;
+                    if (action == Action.EnvVar)
+                        azureResources = await provider.GetService<AzureResourceService>()?.ListAsync(Console.Out);
 
                     foreach (var directory in directories)
                     {
-                        bool azConfirmation = false;
-                        string targetAzureResourceName = null;
-                        do
-                        {
-                            // TODO: Abstract this to a new method - this is also used above
-                            // Select the name of the Azure Resource that represents the current directory in the iteration
-                            targetAzureResourceName = Prompt.Select($"Which Azure Resource represents {directory}",
-                                azureResourceNames);
-                            azConfirmation = Prompt.Confirm($"Confirm: {targetAzureResourceName} represents {directory}",
-                                defaultValue: true);
-                        } while (!azConfirmation);
-
-                        azureResourceNames.Remove(targetAzureResourceName);
-
-                        // Find the Azure Resource that matches the name selected above
-                        var targetAzureResource =
-                            azureResources.FirstOrDefault(r => r.Data.Name == targetAzureResourceName);
-
                         bool isAdmin = directory == adminDirectory;
                         bool isFunctions = directory == funcDirectory;
 
@@ -201,11 +173,12 @@ namespace OC_Accelerator
 
                         if (action == Action.EnvVar)
                         {
+                            var targetAzureResource = GetAzureResource(azureResources, directory);
                             var azSettingsService = provider.GetService<WriteAzSettings>();
                             if (appType != ApplicationType.Functions)
-                                azSettingsService.WriteWebAppSettings(targetAzureResource.Id.ToString(), selectedDirectory);
+                                azSettingsService?.WriteWebAppSettings(targetAzureResource.Id.ToString(), selectedDirectory);
                             else
-                                azSettingsService.WriteFunctionAppSettings(targetAzureResource.Id.ToString(), selectedDirectory);
+                                azSettingsService?.WriteFunctionAppSettings(targetAzureResource.Id.ToString(), selectedDirectory);
                         }
                         else
                         {
@@ -216,14 +189,20 @@ namespace OC_Accelerator
             }
         }
 
-        public enum Action
+        private static GenericResource GetAzureResource(Pageable<GenericResource> azureResources, string directory)
         {
-            [Display(Name = "Seed Azure Infrastructure")]
-            Seed,
-            [Display(Name = "Set local environment variables")]
-            EnvVar,
-            [Display(Name = "Populate Azure .vscode/settings.json")]
-            Settings
+            bool azConfirmation = false;
+            var azureResourceNames = azureResources.Select(r => r.Data.Name).ToList();
+            string targetAzureResourceName;
+            do
+            {
+                // Select the name of the Azure Resource that represents the current directory in the iteration
+                targetAzureResourceName = Prompt.Select($"Which Azure Resource represents {directory}",
+                    azureResourceNames);
+                azConfirmation = Prompt.Confirm($"Confirm: {targetAzureResourceName} represents {directory}",
+                    defaultValue: true);
+            } while (!azConfirmation);
+            return azureResources.FirstOrDefault(r => r.Data.Name == targetAzureResourceName);
         }
     }
 }
