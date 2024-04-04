@@ -9,7 +9,6 @@ using Azure.ResourceManager.Storage;
 using Azure.ResourceManager.AppService;
 using OC_Accelerator.Helpers;
 using Sharprompt;
-using static OrderCloud.SDK.WebhookPayloads;
 
 public class AzureResourceService
 {
@@ -49,17 +48,7 @@ public class AzureResourceService
         storefrontAppConfig.Add(nodeDefaultVersion);
 
         // Authenticate to Azure
-        //ResourceGroupResource resourceGroup = await AuthenticateToAzureAsync(logger);
-        InteractiveBrowserCredentialOptions credentialOpts = new InteractiveBrowserCredentialOptions();
-        if (_appSettings.tenantId != null)
-            credentialOpts.TenantId = _appSettings.tenantId;
-
-        await logger.WriteLineAsync("Authenticate to Azure via web browser prompt");
-        InteractiveBrowserCredential credential = new InteractiveBrowserCredential(credentialOpts);
-        ArmClient client = new ArmClient(credential, _appSettings.subscriptionId);
-        SubscriptionCollection subscriptions = client.GetSubscriptions();
-        SubscriptionResource subscription = await subscriptions.GetAsync(_appSettings.subscriptionId);
-        ResourceGroupResource resourceGroup = await subscription.GetResourceGroupAsync(_appSettings.resourceGroup);
+        ResourceGroupResource resourceGroup = await AuthenticateToAzureAsync(logger);
 
         // Build up parameters for ARM template
         var prefix = GenerateRandomString(6, lowerCase: true); // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
@@ -220,25 +209,8 @@ public class AzureResourceService
         await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
 
         var funcApp = results.FirstOrDefault(r => r.Data.Kind == "functionapp");
-        ArmApplicationResource functionsAppResource = await resourceGroup.GetArmApplicationAsync(funcApp.Data.Name);
-
-        var webSitesEnumerator = subscription.GetWebSitesAsync().GetAsyncEnumerator();
-        // TODO: Temporary! Trying to get the azure function resource to access the Endpoint value for the return object below 
-        try
-        {
-            while (await webSitesEnumerator.MoveNextAsync())
-            {
-                var webSite = webSitesEnumerator.Current;
-
-                Console.WriteLine($"Web App Name ........ {webSite.Data.Name}");
-                Console.WriteLine($"Default Host Name ... {webSite.Data.DefaultHostName}\n");
-            }
-        }
-        finally
-        {
-            await webSitesEnumerator.DisposeAsync();
-        }
-
+        // Get the actual Azure Functions website resource because the generic resource doens't have Data.DefaultHostName
+        var functionAppResource = resourceGroup.GetWebSite(funcApp.Data.Name).Value;
 
         try
         {
@@ -264,8 +236,7 @@ public class AzureResourceService
         return new AzResourceGeneratorResponse()
         {
             azFuncAppName = funcApp?.Data.Name ?? string.Empty,
-            azFuncAppUrl = $"https://{funcApp?.Data.Name}.azurewebsites.net", // TODO: fix this
-            //azFuncAppUrl = functionsAppResource.Endpoint
+            azFuncAppUrl = $"https://{functionAppResource.Data.DefaultHostName}", // TODO: can we assume HTTPS?
         };
     }
 
