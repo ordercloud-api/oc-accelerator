@@ -8,6 +8,7 @@ namespace OC_Accelerator.Models
 {
     public interface IAppSettings
     {
+        string? azureResourcePrefix { get; } // TODO: this shouldn't be nullable but make it so for testing and rely on random string prefix
         string? tenantId { get; }
         string subscriptionId { get; }
         string resourceGroup { get; }
@@ -33,6 +34,7 @@ namespace OC_Accelerator.Models
     }
     public class AppSettings : IAppSettings
     {
+        public string? azureResourcePrefix { get; set; }
         public string subscriptionId { get; set; }
         public string resourceGroup { get; set; }
         public string? tenantId { get; set; }

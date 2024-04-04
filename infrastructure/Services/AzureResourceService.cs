@@ -51,16 +51,25 @@ public class AzureResourceService
         ResourceGroupResource resourceGroup = await AuthenticateToAzureAsync(logger);
 
         // Build up parameters for ARM template
-        var prefix = GenerateRandomString(6, lowerCase: true); // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
+        var prefix = /*_appSettings.azureResourcePrefix ??*/ GenerateRandomString(6, lowerCase: true); // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
 
-        var appPlanSku = Prompt.Select("Select the desired SKU for your Azure App Service Plan", _azPlanOptions.GetAzureAppPlanSkuValues());
-        var storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function)", _azPlanOptions.GetAzureStorageSkuValues());
-        var storageKind =
-            Prompt.Select(
-                "Select the desired storage type for your Azure Storage Account (required to create an Azure Function)",
-                _azPlanOptions.GetAzureStorageKindValues(storageSku));
+        string appPlanSku;
+        string storageSku;
+        string storageType;
 
-        if (appPlanSku == null || storageSku == null || storageKind == null)
+        bool confirmTierSelections = false;
+        do
+        {
+            appPlanSku = Prompt.Select("Select the desired SKU for your Azure App Service Plan", _azPlanOptions.GetAzureAppPlanSkuValues());
+            storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function)", _azPlanOptions.GetAzureStorageSkuValues());
+            storageType =
+                Prompt.Select(
+                    "Select the desired storage type for your Azure Storage Account (required to create an Azure Function)",
+                    _azPlanOptions.GetAzureStorageKindValues(storageSku));
+            confirmTierSelections = Prompt.Confirm("Everything look good?", defaultValue: true);
+        } while (!confirmTierSelections);
+
+        if (appPlanSku == null || storageSku == null || storageType == null)
         {
             throw new Exception("Must select a SKU for the App Service Plan, as well as a SKU and storage type for your Storage Account");
         }
@@ -93,9 +102,9 @@ public class AzureResourceService
             {
                 value = storageSku
             },
-            storageKind = new
+            storageType = new
             {
-                value = storageKind
+                value = storageType
             },
             appPlanSkuName = new
             {
@@ -108,7 +117,7 @@ public class AzureResourceService
         // Create deployment in Azure
         try
         {
-            await resourceGroup.GetArmDeployments().CreateOrUpdateAsync(WaitUntil.Completed, prefix, armDeploymentContent);
+            await resourceGroup.GetArmDeployments().CreateOrUpdateAsync(WaitUntil.Completed, $"{prefix}Deployment", armDeploymentContent);
         }
         catch (Exception ex)
         {
@@ -193,7 +202,7 @@ public class AzureResourceService
         await logger.WriteLineAsync("Creating Azure Functions Resource - This can take a few minutes");
         try
         {
-            await resourceGroup.GetArmDeployments().CreateOrUpdateAsync(WaitUntil.Completed, $"{prefix}func", funcArmDeploymentContent);
+            await resourceGroup.GetArmDeployments().CreateOrUpdateAsync(WaitUntil.Completed, $"{prefix}FuncDeployment", funcArmDeploymentContent);
         }
         catch (Exception ex)
         {

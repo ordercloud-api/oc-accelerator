@@ -20,7 +20,7 @@ param appPlanSkuName string
 
 param storageSkuName string
 
-param storageKind string
+param storageType string
 
 
 
@@ -45,7 +45,7 @@ resource functionStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   sku: {
     name: storageSkuName
   }
-  kind: storageKind
+  kind: storageType
 }
 
 // Creates the admin web application
