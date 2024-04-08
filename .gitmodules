@@ -1,6 +1,3 @@
-[submodule "apps/admin"]
-	path = apps/admin
-	url = https://ordercloud.visualstudio.com/OC-Platform/_git/OC-Accelerator.Admin
 [submodule "apps/functions"]
 	path = apps/functions
 	url = https://ordercloud.visualstudio.com/OC-Platform/_git/OC-Accelerator.Functions
