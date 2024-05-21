@@ -1,5 +1,5 @@
 # OC-Accelerator
-This is it!
+A tool for automating infrastructure and devops enabling developers to quickly set up the processes necessary to build their own marketplace. The Accelerator creates OrderCloud API Clients configured for Storefront, Admin, and Integrations applications and provisions the Azure resources necessary for hosting each of those applications. With the OrderCloud and Azure resources created, the tool will create and populate .env.local files for each your applications to speed up your local development set up, and will also create and populate the .vscode/settings.json files to simplify the ability to publish your applications right from VS Code.  
 
 ## Getting Started with Seeding the Infrastructure
 Create an `appSettings.json` file in the root of the /Infrastructure directory.
