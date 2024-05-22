@@ -78,8 +78,6 @@ namespace OC_Accelerator
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     await logger.WriteLineAsync(ex.Message);
-                    await provider.GetService<OCMarketplaceComposer>()
-                        ?.CleanupAsync(logger, storefrontDirectory, adminDirectory);
                 }
                 finally
                 {

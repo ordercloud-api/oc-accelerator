@@ -28,12 +28,6 @@ namespace OC_Accelerator.Services
         /// <returns>a string Tuple representing the Storefront API Client ID (Item1) and the Admin API Client ID (Item2)</returns>
         public async Task<Tuple<string, string>> CreateApiClientsAsync(TextWriter logger, string storefrontDirectory, string adminDirectory)
         {
-            // TODO: temporary
-            //if (_appSettings.ocStorefrontClientId == null && _appSettings.ocAdminClientId == null)
-            //{
-            //    await CleanupAsync(logger, storefrontAppName);
-            //}
-            
             string storefrontApiClientID = _appSettings.ocStorefrontClientId;
             string adminApiClientID = _appSettings.ocAdminClientId;
             try
@@ -202,41 +196,6 @@ namespace OC_Accelerator.Services
                 throw;
             }
 
-        }
-
-        /// <summary>
-        /// THIS IS TEMPORARY
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="storefrontDirectory"></param>
-        /// <returns></returns>
-        public async Task CleanupAsync(TextWriter logger, string storefrontDirectory, string adminDirectory)
-        {
-            var webhooks = await _oc.Webhooks.ListAsync();
-            var buyers = await _oc.Buyers.ListAsync(search: storefrontDirectory);
-            string buyerID = buyers.Items.FirstOrDefault()?.ID;
-            foreach (var webhook in webhooks.Items)
-            {
-                await _oc.Webhooks.DeleteAsync(webhook.ID);
-            }
-
-            var integrationEvents = await _oc.IntegrationEvents.ListAsync();
-            foreach (var ie in integrationEvents.Items)
-            {
-                await _oc.IntegrationEvents.DeleteAsync(ie.ID);
-            }
-
-            var apiClients = await _oc.ApiClients.ListAsync(filters: new { ID = $"!{_appSettings.ocFunctionsClientId}", Name = $"{storefrontDirectory}|{adminDirectory}" });
-            foreach (var apiClient in apiClients.Items)
-            {
-                await _oc.ApiClients.DeleteAsync(apiClient.ID);
-            }
-
-            if (buyerID != null)
-            {
-                await _ignoreErrorWrapper.Ignore404(() => _oc.Buyers.DeleteAsync(buyerID), logger);
-                await _ignoreErrorWrapper.Ignore404(() => _oc.Catalogs.DeleteAsync(buyerID), logger);
-            }
         }
 
         private List<ApiRole> ConvertOcApiRoles(string? roles, bool isStorefront)
