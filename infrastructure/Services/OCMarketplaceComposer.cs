@@ -2,6 +2,8 @@ using OC_Accelerator.Models;
 using OrderCloud.SDK;
 using Microsoft.TeamFoundation.Common;
 using OC_Accelerator.Helpers;
+using Flurl.Http;
+using Newtonsoft.Json;
 
 namespace OC_Accelerator.Services
 {
@@ -35,17 +37,19 @@ namespace OC_Accelerator.Services
                 if (storefrontApiClientID.IsNullOrEmpty())
                 {
                     await logger.WriteLineAsync($"Creating Buyer {storefrontDirectory}");
-                    var buyer = await _oc.Buyers.CreateAsync(new Buyer()
+                    var buyerId = string.Join("-", storefrontDirectory);
+                    var buyer = await _oc.Buyers.SaveAsync(buyerId, new Buyer()
                     {
-                        ID = string.Join("-", storefrontDirectory),
+                        ID = buyerId,
                         Active = true,
                         Name = storefrontDirectory
                     });
 
                     await logger.WriteLineAsync($"Creating Security Profile for {storefrontDirectory}");
-                    var buyerSecurityProfile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
+                    var buyerSecurityProfileId = string.Join("-", storefrontDirectory);
+                    var buyerSecurityProfile = await _oc.SecurityProfiles.SaveAsync(buyerSecurityProfileId, new SecurityProfile()
                     {
-                        ID = string.Join("-", storefrontDirectory),
+                        ID = buyerSecurityProfileId,
                         Name = $"{storefrontDirectory} Security Profile",
                         Roles = ConvertOcApiRoles(_appSettings.ocStorefrontScope, true),
                         CustomRoles = _appSettings.ocStorefrontCustomScope?.Split(" ").ToList() ?? new List<string>()
@@ -60,9 +64,11 @@ namespace OC_Accelerator.Services
                     if (_appSettings.ocStorefrontAllowAnon == true)
                     {
                         await logger.WriteLineAsync("Creating Default Context User for anonymous shopping");
-                        defaultContextUser = await _oc.Users.CreateAsync(buyer.ID, new User()
+                        var defaultContextUserId = "StorefrontDefaultContextUser";
+                        defaultContextUser = await _oc.Users.SaveAsync(buyer.ID, defaultContextUserId, new User()
                         {
                             Active = true,
+                            ID = defaultContextUserId,
                             Username = "DefaultContextUser",
                             FirstName = "Anonymous",
                             LastName = "User",
@@ -71,27 +77,35 @@ namespace OC_Accelerator.Services
                     }
 
                     await logger.WriteLineAsync($"Creating Buyer API Client with Default Context User {defaultContextUser.Username}");
-                    var storefrontApiClient = new ApiClient
+                    var apiClients = await _oc.ApiClients.ListAsync(filters: new { AppName = storefrontDirectory });
+                    if (apiClients.Items.Count == 0)
                     {
-                        Active = true,
-                        AccessTokenDuration = 600,
-                        AppName = storefrontDirectory,
-                        DefaultContextUserName = defaultContextUser.Username,
-                        AllowAnyBuyer = true,
-                        AllowAnySupplier = false,
-                        AllowSeller = false,
-                        IsAnonBuyer = false,
-                    };
-                    storefrontApiClient = await _oc.ApiClients.CreateAsync(storefrontApiClient);
-                    storefrontApiClientID = storefrontApiClient.ID;
+                        var storefrontApiClient = new ApiClient
+                        {
+                            Active = true,
+                            AccessTokenDuration = 600,
+                            AppName = storefrontDirectory,
+                            DefaultContextUserName = defaultContextUser.Username,
+                            AllowAnyBuyer = true,
+                            AllowAnySupplier = false,
+                            AllowSeller = false,
+                            IsAnonBuyer = false,
+                        };
+                        storefrontApiClient = await _oc.ApiClients.CreateAsync(storefrontApiClient);
+                        storefrontApiClientID = storefrontApiClient.ID;
+                    } else
+                    {
+                        storefrontApiClientID = apiClients.Items[0].ID;
+                    }
                 }
 
                 if (adminApiClientID.IsNullOrEmpty())
                 {
                     await logger.WriteLineAsync($"Creating Security Profile for {adminDirectory}");
-                    var adminSecurityProfile = await _oc.SecurityProfiles.CreateAsync(new SecurityProfile()
+                    var adminSecurityProfileId = string.Join("-", adminDirectory);
+                    var adminSecurityProfile = await _oc.SecurityProfiles.SaveAsync(adminSecurityProfileId, new SecurityProfile()
                     {
-                        ID = string.Join("-", adminDirectory),
+                        ID = adminSecurityProfileId,
                         Name = $"{adminDirectory} Security Profile",
                         Roles = ConvertOcApiRoles(_appSettings.ocAdminScope, false),
                         CustomRoles = _appSettings.ocAdminCustomScope?.Split(" ").ToList() ?? new List<string>()
@@ -103,20 +117,27 @@ namespace OC_Accelerator.Services
                     });
 
                     await logger.WriteLineAsync("Creating Seller API Client");
-                    var adminApiClient = new ApiClient
+                    var apiClients = await _oc.ApiClients.ListAsync(filters: new { AppName = adminDirectory });
+                    if (apiClients.Items.Count == 0)
                     {
-                        Active = true,
-                        AccessTokenDuration = 600,
-                        AppName = adminDirectory,
-                        DefaultContextUserName = null,
-                        AllowAnyBuyer = false,
-                        AllowAnySupplier = false,
-                        AllowSeller = true,
-                        IsAnonBuyer = false,
-                    };
-                    adminApiClient = await _oc.ApiClients.CreateAsync(adminApiClient);
-                    adminApiClientID = adminApiClient.ID;
-
+                        var adminApiClient = new ApiClient
+                        {
+                            Active = true,
+                            AccessTokenDuration = 600,
+                            AppName = adminDirectory,
+                            DefaultContextUserName = null,
+                            AllowAnyBuyer = false,
+                            AllowAnySupplier = false,
+                            AllowSeller = true,
+                            IsAnonBuyer = false,
+                        };
+                        adminApiClient = await _oc.ApiClients.CreateAsync(adminApiClient);
+                        adminApiClientID = adminApiClient.ID;
+                    }
+                    else
+                    {
+                        storefrontApiClientID = apiClients.Items[0].ID;
+                    }
                 }
 
                 return Tuple.Create(storefrontApiClientID, adminApiClientID);
@@ -124,9 +145,17 @@ namespace OC_Accelerator.Services
             catch (OrderCloudException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                await logger.WriteLineAsync(ex.Message);
-                // await CleanupAsync(logger, storefrontDirectory);
-                throw;
+                var flurlException = ex.InnerException as FlurlHttpException;
+                var error = new
+                {
+                    ex.Message,
+                    ex.Errors,
+                    RequestMessage = flurlException?.Message,
+                    flurlException.Call.RequestBody,
+                    RequestHeaders = flurlException.Call.Request.Headers
+                };
+                var errorStringified = JsonConvert.SerializeObject(error, Formatting.Indented);
+                throw new Exception(errorStringified);
             }
         }
 
@@ -139,10 +168,12 @@ namespace OC_Accelerator.Services
         public async Task ConfigureOrderCheckoutIntegrationEvent(TextWriter logger, string hostedAppUrl)
         {
             await logger.WriteLineAsync("Creating OrderCheckout Integration Event");
+            var orderCheckoutIntegrationEventId = "OrderCheckout";
             try
             {
-                await _oc.IntegrationEvents.CreateAsync(new IntegrationEvent
+                await _oc.IntegrationEvents.SaveAsync(orderCheckoutIntegrationEventId, new IntegrationEvent
                 {
+                    ID = orderCheckoutIntegrationEventId,
                     EventType = IntegrationEventType.OrderCheckout,
                     CustomImplementationUrl = $"{hostedAppUrl}/api/integrationevent",
                     Name = "Order Checkout Integration Event",
@@ -174,11 +205,12 @@ namespace OC_Accelerator.Services
                     Verb = "POST"
                 }
             };
+            var validateBuyerAddressWebhookId = "validate-buyer-address";
             try
             {
-                await _oc.Webhooks.CreateAsync(new Webhook
+                await _oc.Webhooks.SaveAsync(validateBuyerAddressWebhookId, new Webhook
                 {
-                    Name = "Validate Address",
+                    Name = "Validate Buyer Address",
                     Description = "Pre-webhook to validate a buyer address before it's created",
                     Url = $"{hostedAppUrl}/api/webhook/createaddress",
                     HashKey = _appSettings.ocHashKey,

@@ -34,9 +34,9 @@ namespace OC_Accelerator
             string? funcDirectory = null;
 
 
-            Action action = Prompt.Select<Action>("What would you like to do?");
+            Action action = Prompt.Select<Action>("What would you like to do? Use arrow keys to make a selection");
             Console.WriteLine($"You selected {action}");
-            
+
             if (action == Action.Seed)
             {
                 if (!isDebugging)
@@ -98,7 +98,7 @@ namespace OC_Accelerator
                     .GetCustomAttribute<DisplayAttribute>()?
                     .GetName();
                 var selectedDirectory = Prompt.Select($"Which directory would you like to {actionDescription} for?", directories);
-                
+
                 if (selectedDirectory != "All")
                 {
                     // REMEMBER: APP TYPE MAY NOT ALWAYS EQUAL DIRECTORY NAME
@@ -111,15 +111,15 @@ namespace OC_Accelerator
                         ApplicationType.Storefront => appSettings.ocStorefrontClientId,
                         _ => throw new Exception("not sure what you're doing")
                     };
-                    if (apiClientId == null) 
+                    if (apiClientId == null)
                         throw new Exception($"Must provide API clientID for {appType}");
-                    
+
                     if (action == Action.EnvVar)
                     {
                         // TODO: Do we want to allow writing to env variables for Azure Functions? 
                         provider.GetService<WriteEnvVariables>()?.Run(selectedDirectory, apiClientId, appType);
-                    } 
-                    else 
+                    }
+                    else
                     {
                         var azSettingsService = provider.GetService<WriteAzSettings>();
                         var azureResources = await provider.GetService<AzureResourceService>()?.ListAsync(Console.Out);
