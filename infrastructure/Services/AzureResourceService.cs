@@ -56,16 +56,23 @@ public class AzureResourceService
         string appPlanSku;
         string storageSku;
         string storageType;
+        string accessTier = null;
 
         bool confirmTierSelections = false;
         do
         {
-            appPlanSku = Prompt.Select("Select the desired SKU for your Azure App Service Plan", _azPlanOptions.GetAzureAppPlanSkuValues());
-            storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function)", _azPlanOptions.GetAzureStorageSkuValues());
+            appPlanSku = Prompt.Select("Select the desired SKU for your Azure App Service Plan. Please see https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans for more information", _azPlanOptions.GetAzureAppPlanSkuValues());
+            storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function). Please see https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy for more information", _azPlanOptions.GetAzureStorageSkuValues());
             storageType =
                 Prompt.Select(
-                    "Select the desired storage type for your Azure Storage Account (required to create an Azure Function)",
+                    "Select the desired storage type for your Azure Storage Account (required to create an Azure Function). Please see https://learn.microsoft.com/en-us/azure/storage/common/storage-account-overview#types-of-storage-accounts for more information",
                     _azPlanOptions.GetAzureStorageKindValues(storageSku));
+            if (storageType == "BlobStorage")
+            {
+                accessTier = Prompt.Select(
+                    "Select the desired access tier for your Blob Storage Account. Please see https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview",
+                    new[] { "Cool", "Hot", "Premium"});
+            }
             confirmTierSelections = Prompt.Confirm("Everything look good?", defaultValue: true);
         } while (!confirmTierSelections);
 
@@ -109,6 +116,10 @@ public class AzureResourceService
             appPlanSkuName = new
             {
                 value = appPlanSku
+            },
+            accessTier = new
+            {
+                value = accessTier
             }
         };
 
@@ -263,6 +274,9 @@ public class AzureResourceService
             credentialOpts.TenantId = _appSettings.tenantId;
 
         await logger.WriteLineAsync("Authenticate to Azure via web browser prompt");
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        await logger.WriteLineAsync("A browser window has opened to the Azure Portal. If you are not logged in, you will be prompted to log in.");
+        Console.ForegroundColor = ConsoleColor.White;
         InteractiveBrowserCredential credential = new InteractiveBrowserCredential(credentialOpts);
         ArmClient client = new ArmClient(credential, _appSettings.subscriptionId);
         SubscriptionCollection subscriptions = client.GetSubscriptions();
@@ -292,7 +306,7 @@ public class AzureResourceService
             Console.ForegroundColor = ConsoleColor.White;
             var resourcesCreated = results.Select(r => $"{r.Data.Name} ({r.Data.ResourceType.Type})");
             await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourcesCreated)}");
-            bool delete = Prompt.Confirm("Would you like to delete any?");
+            bool delete = Prompt.Confirm("Would you like to delete any? Note: Any future seeding requests will create entirely new azure resources");
             if (delete)
             {
                 var resourceNames = results.Select(r => r.Data.Name);

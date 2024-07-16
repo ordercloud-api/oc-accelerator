@@ -6,13 +6,18 @@ namespace OC_Accelerator.Helpers
     {
         public void Run(TextWriter logger)
         {
+            Console.WriteLine("Building Bicep files...");
             // Cannot send .bicep files through resource management API. Convert to ARM .json file
-            var filePath = "../../../Templates/Bicep";
+            var workingDirectory = Environment.CurrentDirectory;
+            var projectDirectory = Directory.GetParent(workingDirectory)?.Parent?.Parent?.FullName;
+            var filePath = Path.Combine(projectDirectory, "Templates", "Bicep");
             var templateNames = Directory.GetFiles(filePath).Select(Path.GetFileName).Where(f => f.Contains(".bicep")).ToList();
             var processStartInfo = new ProcessStartInfo();
-            
+
+
             foreach (var templateName in templateNames)
             {
+                Console.WriteLine($"Building Bicep files for {templateName}");
                 var fullFilePath = $"{filePath}/{templateName}";
                 processStartInfo.FileName = "powershell.exe";
                 processStartInfo.Arguments = $"-Command az bicep build -f \"{fullFilePath}\"";
@@ -23,7 +28,10 @@ namespace OC_Accelerator.Helpers
                 process.StartInfo = processStartInfo;
                 process.Start();
                 string output = process.StandardOutput.ReadToEnd();
-                logger.WriteLine(output);
+                if (!string.IsNullOrEmpty(output))
+                {
+                    logger.WriteLine(output);
+                }
                 process.Dispose();
             }
         }

@@ -27,7 +27,13 @@ namespace OC_Accelerator
                 ClientId = settings.ocFunctionsClientId,
                 ClientSecret = settings.ocFunctionsClientSecret,
                 Roles = new[] {
-                    ApiRole.FullAccess
+                    ApiRole.ApiClientAdmin,
+                    ApiRole.BuyerAdmin,
+                    ApiRole.BuyerUserAdmin,
+                    ApiRole.CatalogAdmin,
+                    ApiRole.WebhookAdmin,
+                    ApiRole.IntegrationEventAdmin,
+                    ApiRole.SecurityProfileAdmin
                 }
             }));
             services.AddSingleton<AzureResourceService>();

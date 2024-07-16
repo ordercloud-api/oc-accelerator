@@ -22,7 +22,7 @@ param storageSkuName string
 
 param storageType string
 
-
+param accessTier string?
 
 // Creates the app service plan
 resource appPlan 'Microsoft.Web/serverfarms@2022-09-01' = {
@@ -46,6 +46,9 @@ resource functionStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
     name: storageSkuName
   }
   kind: storageType
+  properties: accessTier != null ? {
+    accessTier: accessTier
+  } : null
 }
 
 // Creates the admin web application
