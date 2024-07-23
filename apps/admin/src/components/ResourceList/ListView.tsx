@@ -92,6 +92,7 @@ const ListView = <T extends IDefaultResource>({
           itemHrefResolver={itemHrefResolver}
           itemActions={itemActions}
           resource={resourceName}
+          listAssignments={!!listAssignments}
         />
       </Flex>
     )

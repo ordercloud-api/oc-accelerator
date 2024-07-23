@@ -37,6 +37,7 @@ import {
   TbChevronUp,
   TbChevronsLeft,
   TbChevronsRight,
+  TbLink,
 } from 'react-icons/tb'
 import { Link } from 'react-router-dom'
 import { getHeaderNameOverride, getPropertyLabel } from '../../utils/spec.utils'
@@ -46,6 +47,7 @@ export interface IDataTable<TData = unknown, TColumn = unknown> {
   resource: string
   columns: ColumnDef<RequiredDeep<TData>, TColumn>[]
   query: UseQueryResult<any>
+  listAssignments?: boolean
   itemHrefResolver?: (item: unknown) => string
   tableState: Partial<TableState>
   onOptionChange: (key: any, resetPage?: boolean) => (value: any) => void
@@ -95,6 +97,7 @@ const DataTable = <T extends IDefaultResource>({
   columns,
   tableState,
   resource,
+  listAssignments,
   onOptionChange,
   itemHrefResolver,
   itemActions,
@@ -128,6 +131,24 @@ const DataTable = <T extends IDefaultResource>({
   }, [queryData, columns, tableState])
 
   const table = useDataTable(dataTableOptions)
+
+  const getAssignmentCellHref = useCallback((cell: any, item: any) => {
+    const buyerID = item['BuyerID']
+    const header = cell.column.columnDef.header
+    const resourceID = item[header]
+    if (!resourceID) return ''
+
+    switch (header) {
+      case 'BuyerID':
+        return `/buyers/${resourceID}`
+      case 'PriceScheduleID':
+        return `/price-schedules/${resourceID}`
+      case 'UserGroupID':
+        return `/buyers/${buyerID}/user-groups/${resourceID}`
+      default:
+        return ''
+    }
+  }, [])
 
   const tableHeaderRowHeader = useCallback(
     (header: Header<unknown, unknown>) => {
@@ -168,8 +189,11 @@ const DataTable = <T extends IDefaultResource>({
               }}
             >
               {flexRender(
-                getHeaderNameOverride(header.column.columnDef, resource) ??
-                  getPropertyLabel(header.column.columnDef.header as string),
+                getHeaderNameOverride(
+                  (header.column.columnDef?.id as string) ??
+                    (header.column.columnDef.header as string),
+                  resource
+                ) ?? getPropertyLabel(header.column.columnDef.header as string),
                 header.getContext()
               )}
               {{
@@ -206,15 +230,18 @@ const DataTable = <T extends IDefaultResource>({
           colorMode === 'dark' ? 'var(--chakra-colors-gray-700)' : 'var(--chakra-colors-gray-100)'
         }`}
       >
-        <Th
-          key={headerGroup.id}
-          background="chakra-body-bg"
-          borderBottomWidth="0px !important"
-        ></Th>
+        {itemActions && (
+          <Th
+            key={headerGroup.id}
+            background="chakra-body-bg"
+            borderBottomWidth="0px !important"
+          ></Th>
+        )}
+
         {headerGroup.headers?.map((h: any) => tableHeaderRowHeader(h))}
       </Tr>
     ),
-    [colorMode, tableHeaderRowHeader]
+    [colorMode, itemActions, tableHeaderRowHeader]
   )
 
   const tableRow = useCallback(
@@ -233,8 +260,12 @@ const DataTable = <T extends IDefaultResource>({
             },
           }}
         >
-          <Td>{itemActions ? itemActions(row?.original) : ''}</Td>
+          {itemActions && <Td>{itemActions(row?.original)}</Td>}
           {row.getVisibleCells().map((cell: any) => {
+            const assignmentLink = listAssignments
+              ? getAssignmentCellHref(cell, row?.original)
+              : undefined
+
             return (
               <Td
                 borderInline="1px"
@@ -254,12 +285,23 @@ const DataTable = <T extends IDefaultResource>({
                   alignItems="center"
                   boxSize="full"
                   minH="55"
-                  as={Link}
+                  as={hrefValue ? Link : undefined}
                   to={hrefValue}
                   py="3"
                   px="6"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  {assignmentLink && (
+                    <Box ml={2}>
+                      <IconButton
+                        icon={<Icon as={TbLink} />}
+                        variant="unstyled"
+                        aria-label={`Link to ${cell.column.columnDef.header}`}
+                        as={Link}
+                        to={assignmentLink}
+                      />
+                    </Box>
+                  )}
                 </Box>
               </Td>
             )
@@ -267,11 +309,10 @@ const DataTable = <T extends IDefaultResource>({
         </Tr>
       )
     },
-    [colorMode, itemActions, itemHrefResolver]
+    [colorMode, getAssignmentCellHref, itemActions, itemHrefResolver, listAssignments]
   )
 
-  return (
-    !query.data && query.isLoading ? null : (
+  return !query.data && query.isLoading ? null : (
     <>
       <TableContainer
         overflowY="auto"
@@ -380,7 +421,7 @@ const DataTable = <T extends IDefaultResource>({
         </HStack>
       </HStack>
     </>
-  ))
+  )
 }
 
 export default DataTable

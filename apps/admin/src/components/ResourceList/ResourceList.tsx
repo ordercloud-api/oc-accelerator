@@ -125,6 +125,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
   const columnFilters = useMemo(() => {
     const filters = [] as { id: string; value: string }[]
+
     for (const entry of searchParams.entries()) {
       if (Object.keys(flattenNestedProperties(properties))?.includes(entry[0])) {
         filters.push({ id: entry[0], value: entry[1] })
@@ -162,25 +163,31 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
   }, [columnFilters, columnVisibility, pagination, sorting])
 
   const handleRoutingChange = useCallback(
-    (queryKey: string, resetPage?: boolean) => (value?: string | boolean | number) => {
-      const searchParams = new URLSearchParams(location.search)
-      const hasPageParam = Boolean(searchParams.get('page'))
+    (queryKey: string, resetPage?: boolean, index?: number) =>
+      (value?: string | boolean | number) => {
+        const searchParams = new URLSearchParams(location.search)
+        const hasPageParam = Boolean(searchParams.get('page'))
+        const isFilterParam = !['search', 'page', 'pageSize'].includes(queryKey)
 
-      const prevValue = searchParams.get(queryKey)
-      if (value) {
-        if (prevValue !== value) {
-          searchParams.set(queryKey, value.toString())
+        // filters can have multiple values for one key i.e. SpecCount > 0 AND SpecCount < 2
+        const prevValue = isFilterParam ? searchParams.getAll(queryKey) : searchParams.get(queryKey)
+
+        if (value) {
+          if (!isFilterParam && prevValue !== value) {
+            searchParams.set(queryKey, value.toString())
+          } else if (isFilterParam) {
+            searchParams.append(queryKey, value.toString())
+          }
           if (hasPageParam && resetPage) searchParams.delete('page') // reset page on filter change
+        } else if (prevValue) {
+          searchParams.delete(queryKey, index !== undefined ? prevValue[index] : undefined)
         }
-      } else if (prevValue) {
-        searchParams.delete(queryKey)
-      }
 
-      navigate(
-        { pathname: location.pathname, search: searchParams.toString() },
-        { state: { shallow: true } }
-      )
-    },
+        navigate(
+          { pathname: location.pathname, search: searchParams.toString() },
+          { state: { shallow: true } }
+        )
+      },
     [location.pathname, location.search, navigate]
   )
 

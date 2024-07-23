@@ -19,7 +19,7 @@ const AdminBreadcrumbs = () => {
       }?${location.search}`
       if (Object.values(params).includes(partial)) {
         const item = Object.values(items).find((item) => item.ID === partial)
-        if (partial === 'incoming') return null
+        if (partial.toLocaleLowerCase() === 'incoming') return null
         return { item: item || { ID: partial }, path: partialPath }
       } else {
         return {
@@ -30,7 +30,7 @@ const AdminBreadcrumbs = () => {
     })
   }, [location, params, items])
 
-  if (parsedBreadcrumbs.length <= 1) {
+  if (parsedBreadcrumbs?.filter(b => !!b)?.length <= 1) {
     return null
   }
   return (

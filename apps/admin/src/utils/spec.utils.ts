@@ -60,11 +60,9 @@ export function getLabelOverride(path: string, resourceName: string) {
   return formOverrides[resourceName][resourcePath]
 }
 
-export function getHeaderNameOverride(column: any, resourceName: string) {  
+export function getHeaderNameOverride(column: string, resourceName: string) {  
   if(!tableOverrides[resourceName]) return 
-
-  const accessorKey = column?.id ?? column?.header
-  return tableOverrides[resourceName][accessorKey]
+  return tableOverrides[resourceName][column]
 }
 
 export function getPropertyLabel(property: string) {
@@ -105,4 +103,3 @@ export function getType(properties: any, value?: any) {
       return type
   }
 }
-

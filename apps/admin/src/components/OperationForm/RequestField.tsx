@@ -235,7 +235,16 @@ const RequestField: FC<IRequestField> = ({
           </FormControl>
         )
     }
-  }, [schema, label, path, hideLabel, hasInitialValues, editExpressionDisclosure])
+  }, [
+    schema,
+    path,
+    hideLabel,
+    label,
+    relatedOperationInfo,
+    hasInitialValues,
+    editExpressionDisclosure,
+    relatedProperty,
+  ])
 
   return removeCallback && !schema.readOnly ? (
     <HStack mb={5}>
