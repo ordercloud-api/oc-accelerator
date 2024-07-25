@@ -143,6 +143,8 @@ const DataTable = <T extends IDefaultResource>({
         return `/buyers/${resourceID}`
       case 'PriceScheduleID':
         return `/price-schedules/${resourceID}`
+      case 'ProductID':
+        return `/products/${resourceID}`
       case 'UserGroupID':
         return `/buyers/${buyerID}/user-groups/${resourceID}`
       default:

@@ -673,7 +673,7 @@ export const resources: ResourceRoute[] = [
       {
         path: "/catalogs/:catalogID/bundles",
         element: (
-          <ResourceAssignment fromResource="Bundles" toResource="Catalogs" />
+          <ResourceAssignment fromResource="Bundles" toResource="Catalogs" operationInclusion="Bundle"/>
         ),
       },
     ],

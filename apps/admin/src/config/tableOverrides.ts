@@ -6,10 +6,9 @@
 */
 
 export const tableOverrides: {[key: string]: any} = {
-    Products: {
-      Name: "Custom Product Name",
-      ID: "ID",
-      Inventory: "abc",
-      ['Inventory.Enabled']: "Enabled"
-    }
+// Products: {
+    //   Name: "Custom Product Name",
+    //   ID: "ID",
+    //   ['Inventory.Enabled']: "Enabled"
+    // }
   }

@@ -8,10 +8,10 @@
 */
 
 export const formOverrides: {[key: string]: any} = {
-    Products: {
-      Name: "Custom Product Name",
-      ID: "ID",
-      Inventory: "Custom Inventory Name",
-      ['Inventory.Enabled']: "Enabled"
-    },
+    // Products: {
+    //   Name: "Custom Product Name",
+    //   ID: "ID",
+    //   Inventory: "Custom Inventory Name",
+    //   ['Inventory.Enabled']: "Enabled"
+    // },
   }
