@@ -60,5 +60,3 @@ x64/
 UpgradeLog.*
 .git/*
 .vs/*
-
-.fake
