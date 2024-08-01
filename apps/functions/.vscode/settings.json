@@ -1,1 +1,9 @@
-{"azureFunctions.deploySubpath":".","azureFunctions.postDeployTask":"npm install (functions)","azureFunctions.projectLanguage":"TypeScript","azureFunctions.projectRuntime":"~4","debug.internalConsoleOptions":"neverOpen","azureFunctions.projectLanguageModel":4,"azureFunctions.preDeployTask":"npm prune (functions)","azureFunctions.defaultFunctionAppToDeploy":"/subscriptions/4dd6e0eb-b7a5-4165-9106-af8b7565feea/resourceGroups/accelerator_demo/providers/Microsoft.Web/sites/nemwmb-functions-soq6wdiz2egks"}
+{
+    "azureFunctions.deploySubpath": ".",
+    "azureFunctions.postDeployTask": "npm install (functions)",
+    "azureFunctions.projectLanguage": "TypeScript",
+    "azureFunctions.projectRuntime": "~4",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.projectLanguageModel": 4,
+    "azureFunctions.preDeployTask": "npm prune (functions)"
+}
