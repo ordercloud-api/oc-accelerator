@@ -32,7 +32,7 @@ const DirectionMenu: FC = () => {
           ({direction})
         </Text>
       </MenuButton>
-      <MenuList minWidth="240px">
+      <MenuList>
         <MenuOptionGroup
           defaultValue={direction.toLowerCase()}
           type="radio"
@@ -40,6 +40,7 @@ const DirectionMenu: FC = () => {
         >
           <MenuItemOption value="incoming">Incoming</MenuItemOption>
           <MenuItemOption value="outgoing">Outgoing</MenuItemOption>
+          <MenuItemOption value="all">All</MenuItemOption>
         </MenuOptionGroup>
       </MenuList>
     </Menu>

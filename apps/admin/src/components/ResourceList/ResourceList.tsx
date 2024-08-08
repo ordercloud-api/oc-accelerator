@@ -124,8 +124,6 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
   const isOnOrders = useMemo(() => location.pathname.startsWith('/orders'), [location.pathname])
 
-  console.log('🚀 ~ isOnOrders:', isOnOrders)
-
   /* @tanstack/react-table table state */
 
   const columnFilters = useMemo(() => {
@@ -178,6 +176,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
         const prevValue = isFilterParam ? searchParams.getAll(queryKey) : searchParams.get(queryKey)
 
         if (value) {
+          if (!value && !prevValue) return
           if (!isFilterParam && prevValue !== value) {
             searchParams.set(queryKey, value.toString())
           } else if (isFilterParam) {
