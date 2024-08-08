@@ -177,9 +177,8 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
         // filters can have multiple values for one key i.e. SpecCount > 0 AND SpecCount < 2
         const prevValue = isFilterParam ? searchParams.getAll(queryKey) : searchParams.get(queryKey)
-
+        if (!value && !prevValue) return
         if (value) {
-          if (!value && !prevValue) return
           if (!isFilterParam && prevValue !== value) {
             searchParams.set(queryKey, value.toString())
           } else if (isFilterParam) {
