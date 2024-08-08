@@ -122,7 +122,10 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
   const [columnVisibility, _setColumnVisibility] = useState<VisibilityState>(getVisibility)
 
-  const isOnOrders = useMemo(() => location.pathname.startsWith('/orders'), [location.pathname])
+  const hasDirectionParam = useMemo(
+    () => Object.prototype.hasOwnProperty.call(routeParams, 'direction'),
+    [routeParams]
+  )
 
   /* @tanstack/react-table table state */
 
@@ -263,7 +266,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
                       handleRoutingChange={handleRoutingChange}
                     />
                   )}
-                  {isOnOrders && <DirectionMenu />}
+                  {hasDirectionParam && <DirectionMenu />}
                   {!readOnly && isAdmin && (
                     <Button
                       ml="auto"
