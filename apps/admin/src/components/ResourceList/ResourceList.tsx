@@ -26,6 +26,7 @@ import FilterSearchMenu from './FilterSearchMenu'
 import NoAccessMessage from '../Shared/NoAccessMessage'
 import { tableOverrides } from '../../config/tableOverrides'
 import { cloneDeep } from 'lodash'
+import DirectionMenu from './DirectionMenu'
 
 interface ResourceListProps {
   resourceName: string
@@ -120,6 +121,10 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
   }, [dynamicColumns, resourceName])
 
   const [columnVisibility, _setColumnVisibility] = useState<VisibilityState>(getVisibility)
+
+  const isOnOrders = useMemo(() => location.pathname.startsWith('/orders'), [location.pathname])
+
+  console.log('🚀 ~ isOnOrders:', isOnOrders)
 
   /* @tanstack/react-table table state */
 
@@ -259,6 +264,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
                       handleRoutingChange={handleRoutingChange}
                     />
                   )}
+                  {isOnOrders && <DirectionMenu />}
                   {!readOnly && isAdmin && (
                     <Button
                       ml="auto"
