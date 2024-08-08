@@ -26,6 +26,7 @@ import FilterSearchMenu from './FilterSearchMenu'
 import NoAccessMessage from '../Shared/NoAccessMessage'
 import { tableOverrides } from '../../config/tableOverrides'
 import { cloneDeep } from 'lodash'
+import DirectionMenu from './DirectionMenu'
 
 interface ResourceListProps {
   resourceName: string
@@ -121,6 +122,11 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
   const [columnVisibility, _setColumnVisibility] = useState<VisibilityState>(getVisibility)
 
+  const hasDirectionParam = useMemo(
+    () => Object.prototype.hasOwnProperty.call(routeParams, 'direction'),
+    [routeParams]
+  )
+
   /* @tanstack/react-table table state */
 
   const columnFilters = useMemo(() => {
@@ -171,7 +177,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
         // filters can have multiple values for one key i.e. SpecCount > 0 AND SpecCount < 2
         const prevValue = isFilterParam ? searchParams.getAll(queryKey) : searchParams.get(queryKey)
-
+        if (!value && !prevValue) return
         if (value) {
           if (!isFilterParam && prevValue !== value) {
             searchParams.set(queryKey, value.toString())
@@ -259,6 +265,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
                       handleRoutingChange={handleRoutingChange}
                     />
                   )}
+                  {hasDirectionParam && <DirectionMenu />}
                   {!readOnly && isAdmin && (
                     <Button
                       ml="auto"

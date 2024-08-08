@@ -184,8 +184,8 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
     (queryKey: string, resetPage?: boolean) => (value?: string | boolean | number) => {
       const searchParams = new URLSearchParams(location.search)
       const hasPageParam = Boolean(searchParams.get('page'))
-
       const prevValue = searchParams.get(queryKey)
+      if (!value && !prevValue) return
       if (value) {
         if (prevValue !== value) {
           searchParams.set(queryKey, value.toString())

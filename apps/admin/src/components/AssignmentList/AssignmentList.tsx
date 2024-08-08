@@ -167,23 +167,23 @@ const AssignmentList: FC<AssignmentListProps> = ({
       (value?: string | boolean | number) => {
         const searchParams = new URLSearchParams(location.search);
         const hasPageParam = Boolean(searchParams.get("page"));
-
-        const prevValue = searchParams.get(queryKey);
+        const prevValue = searchParams.get(queryKey)
+        if (!value && !prevValue) return
         if (value) {
-          if (prevValue !== value) {
-            searchParams.set(queryKey, value.toString());
-            if (hasPageParam && resetPage) searchParams.delete("page"); // reset page on filter change
+            if (prevValue !== value) {
+              searchParams.set(queryKey, value.toString());
+              if (hasPageParam && resetPage) searchParams.delete("page"); // reset page on filter change
+            }
+          } else if (prevValue) {
+            searchParams.delete(queryKey);
           }
-        } else if (prevValue) {
-          searchParams.delete(queryKey);
-        }
 
-        navigate(
-          { pathname: location.pathname, search: searchParams.toString() },
-          { state: { shallow: true } }
-        );
-      },
-    [navigate]
+          navigate(
+            { pathname: location.pathname, search: searchParams.toString() },
+            { state: { shallow: true } }
+          );
+        },
+      [navigate]
   );
 
   return (
