@@ -10,15 +10,20 @@ const AdminBreadcrumbs = () => {
   const location = useLocation()
   const { items } = useBreadcrumbItems()
 
+  const hasDirectionParam = useMemo(
+    () => Object.prototype.hasOwnProperty.call(params, 'direction'),
+    [params]
+  )
+
   const parsedBreadcrumbs = useMemo(() => {
     const partials = location.pathname.split('/').slice(1)
 
     return partials.map((partial, index) => {
       const partialPath = `/${partials.slice(0, index + 1).join('/')}${
-        partial === 'orders' ? '/incoming' : ''
+        hasDirectionParam && partial === 'orders' ? '/incoming' : ''
       }?${location.search}`
 
-      if (['incoming', 'outgoing', 'all'].includes(partial.toLowerCase())) {
+      if (hasDirectionParam && ['incoming', 'outgoing', 'all'].includes(partial.toLowerCase())) {
         return null
       }
 
@@ -32,7 +37,7 @@ const AdminBreadcrumbs = () => {
         }
       }
     })
-  }, [location, params, items])
+  }, [location, params, items, hasDirectionParam])
 
   if (parsedBreadcrumbs?.filter(b => !!b)?.length <= 1) {
     return null
