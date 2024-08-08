@@ -17,9 +17,13 @@ const AdminBreadcrumbs = () => {
       const partialPath = `/${partials.slice(0, index + 1).join('/')}${
         partial === 'orders' ? '/incoming' : ''
       }?${location.search}`
+
+      if (['incoming', 'outgoing', 'all'].includes(partial.toLowerCase())) {
+        return null
+      }
+
       if (Object.values(params).includes(partial)) {
         const item = Object.values(items).find((item) => item.ID === partial)
-        if (partial.toLocaleLowerCase() === 'incoming') return null
         return { item: item || { ID: partial }, path: partialPath }
       } else {
         return {
