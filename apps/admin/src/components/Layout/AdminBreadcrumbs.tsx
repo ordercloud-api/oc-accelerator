@@ -10,34 +10,29 @@ const AdminBreadcrumbs = () => {
   const location = useLocation()
   const { items } = useBreadcrumbItems()
 
-  const hasDirectionParam = useMemo(
-    () => Object.prototype.hasOwnProperty.call(params, 'direction'),
-    [params]
-  )
+    const direction = useMemo(() => {
+      return params['direction'] ?? null
+    }, [params])
 
-  const parsedBreadcrumbs = useMemo(() => {
-    const partials = location.pathname.split('/').slice(1)
+    const parsedBreadcrumbs = useMemo(() => {
+      const partials = location.pathname.split('/').slice(1)
 
-    return partials.map((partial, index) => {
-      const partialPath = `/${partials.slice(0, index + 1).join('/')}${
-        hasDirectionParam && partial === 'orders' ? '/incoming' : ''
-      }?${location.search}`
+      return partials.map((partial, index) => {
+        if (direction === partial) return null
 
-      if (hasDirectionParam && ['incoming', 'outgoing', 'all'].includes(partial.toLowerCase())) {
-        return null
-      }
+        const partialPath = `/${partials.slice(0, index + 1).join('/')}?${location.search}`
 
-      if (Object.values(params).includes(partial)) {
-        const item = Object.values(items).find((item) => item.ID === partial)
-        return { item: item || { ID: partial }, path: partialPath }
-      } else {
-        return {
-          item: { ID: Case.title(partial) },
-          path: partialPath,
+        if (Object.values(params).includes(partial)) {
+          const item = Object.values(items).find((item) => item.ID === partial)
+          return { item: item || { ID: partial }, path: partialPath }
+        } else {
+          return {
+            item: { ID: Case.title(partial) },
+            path: partialPath,
+          }
         }
-      }
-    })
-  }, [location, params, items, hasDirectionParam])
+      })
+    }, [location.pathname, location.search, direction, params, items])
 
   if (parsedBreadcrumbs?.filter(b => !!b)?.length <= 1) {
     return null
