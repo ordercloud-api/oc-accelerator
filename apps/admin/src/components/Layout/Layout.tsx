@@ -16,7 +16,7 @@ import {
 import { useOrderCloudContext } from '@rwatt451/ordercloud-react'
 import { FC, Fragment, PropsWithChildren, forwardRef, useEffect, useMemo, useRef } from 'react'
 import { TbPalette } from 'react-icons/tb'
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, matchPath, Outlet, useLocation } from 'react-router-dom'
 import { resources } from '../../routes/resources'
 import LoginModal from '../Login/LoginModal'
 import AdminBreadcrumbs from './AdminBreadcrumbs'
@@ -30,8 +30,9 @@ interface NavButtonProps extends PropsWithChildren<ButtonProps> {
 
 export const NavButton = forwardRef<ButtonProps, NavButtonProps>(({ to, ...props }, ref) => {
   const { pathname } = useLocation()
+
   const isActive = useMemo(() => {
-    return pathname.includes(`${to}/`)
+    return matchPath({ path: to, end: false }, pathname) !== null
   }, [pathname, to])
 
   return (
