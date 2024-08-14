@@ -57,29 +57,32 @@ The Accelerator creates OrderCloud API Clients configured for Storefront, Admin,
 ### Configure app settings
 
 1. Open the root of the project in Visual Studio Code
-2. Under the /infrastructure directory, copy the `appSettings.example.json` file to `appSettings.json`
-3. Populate the following values in `appSettings.json`
+2. Create a new file in the infrastructure directory called `appSettings.json`
+3. Copy the contents of `appSettings.example.json` file into the `appSettings.json` file you just created
+4. Populate the following values in `appSettings.json`
     - `ocFunctionsClientId` - the ID of your API Client for your Azure Functions application
     - `ocFunctionsClientSecret` - the secret of your API Client for your Azure Functions application
     - `ocApiUrl` - the URL of your OrderCloud API (varies by region/environment)
+       - can be found in Portal > Settings > OrderCloud API Instance > API Server
     - `ocHashKey` - a long non-guessable string (max 50 characters) that will be used when creating a Webhook and the OrderCheckout Integration Event. This value should be kept secret, and is used to verify requests to your application come from OrderCloud. Read more about verifying requests [here](https://ordercloud.io/knowledge-base/using-webhooks#verifying-the-webhook-request).
-    - Optional: The infrastructure seeding tool will create API Clients representing your Storefront and Admin applications. However, if you already have an established marketplace and wish to use existing API Clients for your Storefront and/or Admin applications, add them to the appSettings.json as `ocStorefrontClientId` and/or `ocAdminClientId`.
+    - Optional: The infrastructure seeding tool will create API Clients representing your Storefront and Admin applications. However, if you already have an established marketplace and wish to use existing API Clients for your Storefront and/or Admin applications, add them to the `appSettings.json` as `ocStorefrontClientId` and/or `ocAdminClientId`.
 
 ### Configure Azure
 
 #### Create a Subscription, and a Resource Group within that Subscription in Azure portal
 
-1. Create a [Subscription](https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/create-subscription)
-    - Under the"Overview" section
-        - Set the `subscriptionId` value to the "Subscription ID"
-        - Set the `tenantId` value to the "Parent management group"
-3. Create a [Resource Group](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal#create-resource-groups).
-    - Set the `resourceGroup` value to the "Resource Group"
+1. Create a [Subscription](https://learn.microsoft.com/en-us/azure/cost-management-billing/manage/create-subscription) or select an existing one
+    - Under the "Overview" section
+        - Copy the "Subscription ID" and paste it in `subscriptionId` in `appSettings.json`
+        - Copy the "Parent management group" value and paste it in `tenantId` in `appSettings.json` 
+3. Create a [Resource Group](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal#create-resource-groups) or select an existing one 
+    - Copy the name of the Resource group and paste it in `resourceGroup` in `appSettings.json` 
 
-#### Install Powershell and Azure CLI
+#### Install Powershell, Azure CLI, and Node.js if needed
 
 1. [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.4)
 2. [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (this is needed to compile a .bicep file into an ARM template JSON file)
+3. [Node.js](https://nodejs.org/en/download/package-manager)
 
 #### Install Azure App Service extension in VS Code
 
@@ -99,15 +102,20 @@ This extension is necessary in order to run the accelerator tool
 
 ### Run the Accelerator
 1. Open the /infrastructure directory in VS code and click "Run and Debug" in the left toolbar. The program will run in the integrated terminal within VS Code.
-    - Note: A browser window will open to the Azure Portal. If you are not already logged in, you will be prompted to login.
+    - A browser window will open to the Azure Portal. If you are not already logged in, you will be prompted to login.
 2. Select `Seed Azure Infrastructure` for your first execution. You can use the arrow keys to select the option and hit enter to run it.
 3. Follow the prompts in the terminal.
-
-### Publish Your App Code
-1. Once the accelerator has run successfully, you should be able to see two web app services, an app service plan, an Azure function, and a storage account all within the resource group you created.
-2. In VS Code, open the directory for the app code you want to publish and run `npm install`
-3. In the file explorer, right click and select "Deploy To Web App" (or Deploy To Function App if deploying your functions code)
+4. Once the accelerator has run successfully, you should be able to see two web app services, an app service plan, an Azure function, and a storage account all within the resource group you created.
 
 ### Admin Application Additional Setup
 1. You will need an admin user to log into the admin application. Navigate to your marketplace in [OrderCloud Portal](https://portal.ordercloud.io/) and open the API Console.
 2. Navigate to Admin Users and create a new user with a password.  The admin user will now have the necessary `admin` security profile roles to view and edit all resources included in the admin application.
+
+### Publish Your App Code
+1. In VS Code, open the directory for the app code you want to publish (admin, functions, or storefront) and run `npm install`
+2. Right click anywhere in the file explorer and select "Deploy To Web App" or "Deploy To Function App"
+   - Attempting to deploy from the project root will cause unintended results
+3. If your deployment was successful, you should see a popup in the lower right hand side that will launch the app
+   - If your initial attempt at deploy was unsuccessful and you have to retry, occasionally you may observe a 503 in the browser for 2-3 minutes before the site loads correctly
+   
+
