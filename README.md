@@ -78,23 +78,27 @@ The Accelerator creates OrderCloud API Clients configured for Storefront, Admin,
 3. Create a [Resource Group](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal#create-resource-groups) or select an existing one 
     - Copy the name of the Resource group and paste it in `resourceGroup` in `appSettings.json` 
 
-#### Install Powershell, Azure CLI, and Node.js if needed
+#### Install Powershell, Azure CLI, Node.js, and Dotnet SDK if needed
 
 1. [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.4)
 2. [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (this is needed to compile a .bicep file into an ARM template JSON file)
 3. [Node.js](https://nodejs.org/en/download/package-manager)
+4. [.NET 8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
 #### Install VS Code Extensions
 
 1. [Azure App Service extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice)
     - This extension is necessary in order to publish your code to a web application created via accelerator tool
-2. [Azure Functions exetension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
+2. [Azure Functions extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
     - This extension is necessary in order to deploy the functions application
 3. [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
+    - This extension is necessary in order to run the accelerator tool
+4. [C# Dev Kit extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit)
     - This extension is necessary in order to run the accelerator tool
 
 ### Run the Accelerator
 1. Open the /infrastructure directory in VS code and click "Run and Debug" in the left toolbar. The program will run in the integrated terminal within VS Code.
+    - Select the C# Launch Configuration from the dropdown.
     - A browser window will open to the Azure Portal. If you are not already logged in, you will be prompted to login.
 2. Select `Seed Azure Infrastructure` for your first execution. You can use the arrow keys to select the option and hit enter to run it.
 3. Follow the prompts in the terminal.
