@@ -51,7 +51,7 @@ public class AzureResourceService
         ResourceGroupResource resourceGroup = await AuthenticateToAzureAsync(logger);
 
         // Build up parameters for ARM template
-        var prefix = _appSettings.azureResourcePrefix ?? GenerateRandomString(6, lowerCase: true); 
+        var prefix = !string.IsNullOrEmpty(_appSettings.azureResourcePrefix) ? _appSettings.azureResourcePrefix : GenerateRandomString(6, lowerCase: true); 
 
         string appPlanSku;
         string storageSku;
