@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 
 namespace OC_Accelerator.Helpers
 {
@@ -8,7 +9,7 @@ namespace OC_Accelerator.Helpers
         {
             Console.WriteLine("Building Bicep files...");
             // Cannot send .bicep files through resource management API. Convert to ARM .json file
-            var workingDirectory = Environment.CurrentDirectory;
+            var workingDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             var projectDirectory = Directory.GetParent(workingDirectory)?.Parent?.Parent?.FullName;
             var filePath = Path.Combine(projectDirectory, "Templates", "Bicep");
             var templateNames = Directory.GetFiles(filePath).Select(Path.GetFileName).Where(f => f.Contains(".bicep")).ToList();
