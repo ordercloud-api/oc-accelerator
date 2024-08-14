@@ -84,21 +84,14 @@ The Accelerator creates OrderCloud API Clients configured for Storefront, Admin,
 2. [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) (this is needed to compile a .bicep file into an ARM template JSON file)
 3. [Node.js](https://nodejs.org/en/download/package-manager)
 
-#### Install Azure App Service extension in VS Code
+#### Install VS Code Extensions
 
-This extension is necessary in order to publish your code to a web application created via accelerator tool
-
-1. Open the Extensions sidebar in VS Code
-2. Search for ["Azure App Service"](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice)
-3. Install the extension
-
-#### Install C# extension in VS Code
-
-This extension is necessary in order to run the accelerator tool
-
-1. Open the Extensions sidebar in VS Code
-2. Search for ["C#"](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
-3. Install the extension
+1. [Azure App Service extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice)
+    - This extension is necessary in order to publish your code to a web application created via accelerator tool
+2. [Azure Functions exetension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
+    - This extension is necessary in order to deploy the functions application
+3. [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
+    - This extension is necessary in order to run the accelerator tool
 
 ### Run the Accelerator
 1. Open the /infrastructure directory in VS code and click "Run and Debug" in the left toolbar. The program will run in the integrated terminal within VS Code.
