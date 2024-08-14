@@ -89,9 +89,9 @@ The Accelerator creates OrderCloud API Clients configured for Storefront, Admin,
 1. [Azure App Service extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice)
     - This extension is necessary in order to publish your code to a web application created via accelerator tool
 2. [Azure Functions exetension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
-    - This extension is necessary in order to run the accelerator tool
-3. [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
     - This extension is necessary in order to deploy the functions application
+3. [C# extension](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp)
+    - This extension is necessary in order to run the accelerator tool
 
 ### Run the Accelerator
 1. Open the /infrastructure directory in VS code and click "Run and Debug" in the left toolbar. The program will run in the integrated terminal within VS Code.
