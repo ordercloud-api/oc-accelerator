@@ -75,7 +75,7 @@ The Accelerator creates OrderCloud API Clients configured for Storefront, Admin,
     - Under the "Overview" section
         - Copy the "Subscription ID" and paste it in `subscriptionId` in `appSettings.json`
         - Copy the "Parent management group" value and paste it in `tenantId` in `appSettings.json` 
-3. Create a [Resource Group](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal#create-resource-groups) or select an existing one 
+2. Create a [Resource Group](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal#create-resource-groups) or select an existing one 
     - Copy the name of the Resource group and paste it in `resourceGroup` in `appSettings.json` 
 
 #### Install Powershell, Azure CLI, Node.js, and Dotnet SDK if needed
