@@ -27,7 +27,7 @@ namespace OC_Accelerator
             Tuple<string, string> apiClientIDs = new Tuple<string, string>(null, null);
             AzResourceGeneratorResponse armResponse = new AzResourceGeneratorResponse();
 
-            bool isDebugging = true;
+            bool isDebugging = false;
 
             string? storefrontDirectory;
             string? adminDirectory;

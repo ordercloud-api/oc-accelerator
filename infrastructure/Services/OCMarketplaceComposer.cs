@@ -136,7 +136,7 @@ namespace OC_Accelerator.Services
                     }
                     else
                     {
-                        storefrontApiClientID = apiClients.Items[0].ID;
+                        adminApiClientID = apiClients.Items[0].ID;
                     }
                 }
 

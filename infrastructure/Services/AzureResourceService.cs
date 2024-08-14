@@ -51,7 +51,7 @@ public class AzureResourceService
         ResourceGroupResource resourceGroup = await AuthenticateToAzureAsync(logger);
 
         // Build up parameters for ARM template
-        var prefix = /*_appSettings.azureResourcePrefix ??*/ GenerateRandomString(6, lowerCase: true); // TODO: for local dev only - some resources in Azure are soft delete, so name conflicts arise when creating/deleting/creating the same name
+        var prefix = !string.IsNullOrEmpty(_appSettings.azureResourcePrefix) ? _appSettings.azureResourcePrefix : GenerateRandomString(6, lowerCase: true); 
 
         string appPlanSku;
         string storageSku;
