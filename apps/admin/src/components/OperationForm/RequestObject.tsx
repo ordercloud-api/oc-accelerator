@@ -1,10 +1,11 @@
-import { Box, HStack, Heading, useColorModeValue, Button } from '@chakra-ui/react'
+import { Box, HStack, Heading, useColorModeValue, Button, useDisclosure } from '@chakra-ui/react'
 import { FC, Fragment, useCallback, useMemo } from 'react'
 import RequestArray from './RequestArray'
 import RequestField from './RequestField'
 import { getLabelOverride, getPropertyLabel } from '../../utils/spec.utils'
 import SCHEMA_SORT_ORDER from '../../config/schemaSortOrder.config'
 import { formOverrides } from '../../config/formOverrides'
+import ExpressionModal from './ExpressionBuilder/PromotionExpressionBuilder/ExpressionModal'
 
 interface IRequestObject {
   unwrapped?: boolean
@@ -40,6 +41,7 @@ const RequestObject: FC<IRequestObject> = ({
   const label = useMemo(() => {
     return path && getPropertyLabel(path)
   }, [path])
+  const editExpressionDisclosure = useDisclosure()
 
   const boxProps = useMemo(() => {
     return unwrapped
@@ -97,8 +99,17 @@ const RequestObject: FC<IRequestObject> = ({
     return items.type
   }, [])
 
+  const expressionType = useMemo(
+    () => (resourceId === 'Promotions' ? 'Promotion' : 'Approval Rule'),
+    [resourceId]
+  )
+
   return !readOnly || showReadOnlyFields ? (
     <>
+          <ExpressionModal
+        disclosure={editExpressionDisclosure}
+        type={expressionType}
+      />
       <Box
         {...boxProps}
         mx="auto"
@@ -146,6 +157,7 @@ const RequestObject: FC<IRequestObject> = ({
                 return (
                   <Fragment key={propKey}>
                     <RequestField
+                      editExpressionDisclosure={editExpressionDisclosure}
                       resourceId={resourceId}
                       key={propPath}
                       path={propPath}
@@ -190,6 +202,7 @@ const RequestObject: FC<IRequestObject> = ({
               return !propSchema.readOnly || showReadOnlyFields ? (
                 <Fragment key={propKey}>
                   <RequestField
+                    editExpressionDisclosure={editExpressionDisclosure}
                     resourceId={resourceId}
                     key={propPath}
                     path={propPath}

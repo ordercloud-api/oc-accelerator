@@ -1,0 +1,171 @@
+[
+  {
+    "group": "Approval Rule Chaining",
+    "label": "Order approved",
+    "variables": [
+      {
+        "label": "ApprovalRule",
+        "ordercloudProperty": "ApprovalRule.ID",
+        "token": "APPROVALRULE",
+        "transformFunctionName": "",
+        "value": ""
+      }
+    ],
+    "ruleExpressionQuery": {
+      "rules": [
+        {
+          "id": "1",
+          "field": "ApprovalRule.ID",
+          "operator": "=",
+          "valueSource": "value",
+          "value": "APPROVALRULE",
+          "modelPath": "ApprovalRule",
+          "modelName": "Approval Rule"
+        }
+      ],
+      "id": "1",
+      "operator": "order.approved"
+    }
+  },
+  {
+    "group": "Approval Rule Chaining",
+    "label": "Order return approved",
+    "variables": [
+      {
+        "label": "ApprovalRule",
+        "ordercloudProperty": "ApprovalRule.ID",
+        "token": "APPROVALRULE",
+        "transformFunctionName": "",
+        "value": ""
+      }
+    ],
+    "ruleExpressionQuery": {
+      "rules": [
+        {
+          "id": "1",
+          "field": "ApprovalRule.ID",
+          "operator": "=",
+          "valueSource": "value",
+          "value": "APPROVALRULE",
+          "modelPath": "ApprovalRule",
+          "modelName": "Approval Rule"
+        }
+      ],
+      "id": "1",
+      "operator": "orderReturn.approved"
+    }
+  },
+  {
+    "group": "Order",
+    "label": "Order Total Exceeds X",
+    "variables": [      {
+      "label": "Order Total",
+      "ordercloudProperty": "Order.Total",
+      "token": "ORDER_TOTAL",
+      "transformFunctionName": "",
+      "value": ""
+    }],
+
+    "ruleExpressionQuery": {
+      "rules": [
+        {
+          "id": "1",
+          "field": "Order.Total",
+          "operator": ">",
+          "valueSource": "value",
+          "value": "ORDER_TOTAL",
+          "modelPath": "Order",
+          "modelName": "Order"
+        }
+      ],
+      "operator": "",
+      "id": "2"
+    }
+  },
+  {
+    "group": "Category",
+    "label": "Products in category X",
+    "isLineItemLevel": true,
+    "variables": [
+      {
+        "label": "Category",
+        "ordercloudProperty": "LineItem.Product.Category",
+        "token": "CATEGORY",
+        "transformFunctionName": "",
+        "value": ""
+      }
+    ],
+    "ruleExpressionQuery": {
+      "rules": [
+        {
+          "id": "1",
+          "field": "LineItem.Product.Category",
+          "operator": "=",
+          "valueSource": "value",
+          "value": "CATEGORY",
+          "modelPath": "LineItem.Product",
+          "modelName": "Product"
+        }
+      ],
+      "operator": "items.any",
+      "id": "3"
+    }
+  },
+  {
+    "group": "Cost Center",
+    "label": "Items in Cost Center X",
+    "variables": [
+      {
+        "label": "CostCenter",
+        "ordercloudProperty": "CostCenter.ID",
+        "token": "COSTCENTER",
+        "transformFunctionName": "",
+        "value": ""
+      }
+    ],
+    "ruleExpressionQuery": {
+      "rules": [
+        {
+          "id": "1",
+          "field": "CostCenter.ID",
+          "operator": "=",
+          "valueSource": "value",
+          "value": "COSTCENTER",
+          "modelPath": "CostCenter",
+          "modelName": "Cost Center"
+        }
+      ],
+      "operator": "items.any",
+      "id": "4"
+    }
+  },
+  {
+    "group": "Inventory",
+    "label": "Inventory Quantity Greater than X",
+    "isLineItemLevel": true,
+    "variables": [
+      {
+        "label": "Inventory Quantity",
+        "ordercloudProperty": "LineItem.Product.Inventory.QuantityAvailable",
+        "token": "QUANTITY",
+        "transformFunctionName": "",
+        "value": ""
+      }
+    ],
+    "ruleExpressionQuery": {
+      "rules": [
+        {
+          "id": "1",
+          "field": "LineItem.Product.Inventory.QuantityAvailable",
+          "operator": ">",
+          "valueSource": "value",
+          "value": "QUANTITY",
+          "modelPath": "LineItem.Product",
+          "modelName": "Product"
+        }
+      ],
+      "operator": "items.any",
+      "id": "5"
+    }
+  }
+]

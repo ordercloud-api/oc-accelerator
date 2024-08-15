@@ -1,8 +1,9 @@
-import { Textarea, TextareaProps, UseDisclosureProps } from '@chakra-ui/react'
+import { Button, Textarea, TextareaProps, UseDisclosureProps } from '@chakra-ui/react'
 import { get, isNil } from 'lodash'
 import { FC, useCallback } from 'react'
 import { useController, useFormContext } from 'react-hook-form'
 import { BaseProps, FormControl } from '../form-control'
+import { EditIcon } from '@chakra-ui/icons'
 
 export interface TextareaControlProps extends BaseProps {
   /**
@@ -51,6 +52,20 @@ export const TextareaControl: FC<TextareaControlProps> = (props: TextareaControl
         isDisabled={isSubmitting}
         {...textareaProps}
       />
+          {name.match(/(body.ValueExpression|body.EligibleExpression|body.RuleExpression)/g) && (
+        <Button
+          position="absolute"
+          bottom={14}
+          right={4}
+          zIndex={1}
+          variant="solid"
+          size="xs"
+          leftIcon={<EditIcon />}
+          onClick={editExpressionDisclosure?.onOpen}
+        >
+          Expression Builder
+        </Button>
+      )}
     </FormControl>
   )
 }
