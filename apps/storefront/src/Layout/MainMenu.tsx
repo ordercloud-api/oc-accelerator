@@ -1,34 +1,33 @@
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Button,
   Container,
   Heading,
   HStack,
   Icon,
-  useDisclosure,
-  UseDisclosureProps,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
+  useDisclosure,
+  UseDisclosureProps,
 } from "@chakra-ui/react";
+import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
+import { Catalog, ListPage, Me } from "ordercloud-javascript-sdk";
 import { FC, useEffect, useState } from "react";
 import { TbShoppingCart } from "react-icons/tb";
 import { Link as RouterLink } from "react-router-dom";
-import { ChevronDownIcon } from "@chakra-ui/icons";
 import { APP_NAME } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
-import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import MegaMenu from "./MegaMenu";
-import { Catalog, ListPage, Me } from "ordercloud-javascript-sdk";
 
+interface MainMenuProps {
   loginDisclosure: UseDisclosureProps;
 }
 
-const Header: FC<HeaderProps> = ({loginDisclosure}) => {
-interface HeaderProps {
+const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const { data: user } = useCurrentUser();
   const { isLoggedIn, logout } = useOrderCloudContext();
-  const loginDisclosure = useDisclosure();
   const megaMenuDisclosure = useDisclosure();
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
@@ -53,7 +52,12 @@ interface HeaderProps {
     if (catalogs.length > 1) {
       return (
         <Menu>
-          <MenuButton as={Button} variant="outline" size="sm" rightIcon={<ChevronDownIcon />}>
+          <MenuButton
+            as={Button}
+            variant="outline"
+            size="sm"
+            rightIcon={<ChevronDownIcon />}
+          >
             Shop by catalog
           </MenuButton>
           <MenuList>
@@ -147,8 +151,8 @@ interface HeaderProps {
           <MegaMenu
             isOpen={megaMenuDisclosure.isOpen}
             onClose={megaMenuDisclosure.onClose}
-            selectedCatalog={selectedCatalog} // Pass the selected catalog
-            setSelectedCatalog={setSelectedCatalog} // Pass the setter function
+            selectedCatalog={selectedCatalog}
+            setSelectedCatalog={setSelectedCatalog}
           />
         )}
       </Container>

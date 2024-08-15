@@ -16,8 +16,8 @@ import { useNavigate } from "react-router-dom";
 interface MegaMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedCatalog: string; // Selected catalog prop
-  setSelectedCatalog: (catalogID: string) => void; // Setter function prop
+  selectedCatalog: string;
+  setSelectedCatalog: (catalogID: string) => void;
 }
 
 const MegaMenu: FC<MegaMenuProps> = ({
