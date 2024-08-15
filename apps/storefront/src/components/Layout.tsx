@@ -8,7 +8,7 @@ import {
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import { FC, useEffect } from "react";
 import { Outlet } from "react-router-dom";
-import LoginModal from "./LoginModal";
+import LoginModal from "./Login/LoginModal";
 import MainMenu from "../Layout/MainMenu";
 
 const Layout: FC = () => {
@@ -27,7 +27,7 @@ const Layout: FC = () => {
   return (
     <>
       <LoginModal disclosure={loginDisclosure} />
-      <MainMenu />
+      <MainMenu loginDisclosure={loginDisclosure} />
       <VStack
         mt={location.pathname === "/" ? -12 : 0} // header height
         alignItems="flex-start"
