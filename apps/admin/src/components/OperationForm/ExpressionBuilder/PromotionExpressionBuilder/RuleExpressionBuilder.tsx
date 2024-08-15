@@ -111,8 +111,7 @@ export function RuleExpressionBuilder({
             onQueryChange={setQuery}
             onAddRule={(rule, _parentPath, _query, context) => {
               // add the modelPath to the rule so we can filter the fields in the fieldSelector
-              (rule as any)['modelPath'] = context.modelPath
-              // eslint-disable-next-line no-unexpected-multiline
+              (rule as any)['modelPath'] = context.modelPath;
               (rule as any)['modelName'] = context.modelName
 
               if (context['groupOperator'] === 'min' || context['groupOperator'] === 'max') {

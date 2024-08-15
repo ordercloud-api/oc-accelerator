@@ -11,8 +11,10 @@ import {
   VStack,
   useDisclosure,
 } from '@chakra-ui/react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Select } from 'chakra-react-select'
+import { useHasAccess, useOcResourceList } from '@rwatt451/ordercloud-react'
+import pluralize from 'pluralize'
 
 interface SearchableInputProps {
   showInModal: boolean
@@ -31,8 +33,8 @@ export const SearchableInput = ({
   parentResource,
   resource,
   // params,
-  // formatResourceOptions,
-  // formatParentResourceOptions,
+  formatResourceOptions,
+  formatParentResourceOptions,
   value,
   isDisabled,
 }: SearchableInputProps) => {
@@ -40,15 +42,14 @@ export const SearchableInput = ({
 
   // resource state methods
   const [resourceId, setResourceId] = useState<string>()
-  const [_resourceInputValue, setResourceInputValue] = useState('')
-  const [resourceOptions, _setResourceOptions] = useState<any[]>([])
-  const [resourceLoading, _setResourceLoading] = useState(false)
+  const [resourceInputValue, setResourceInputValue] = useState('')
 
   // parent resource state methods
   const [parentResourceId, setParentResourceId] = useState<string>()
-  const [_parentResourceInputValue, setParentResourceInputValue] = useState('')
-  const [parentResourceOptions, _setParentResourceOptions] = useState<any[]>([])
-  const [parentResourceLoading, _setParentResourceLoading] = useState(false)
+  const [parentResourceInputValue, setParentResourceInputValue] = useState('')
+
+  const { allowed: hasAccess } = useHasAccess(resource)
+  const { allowed: hasAccessToParent } = useHasAccess(parentResource)
 
   const handleAdd = () => {
     onUpdate(resourceId)
@@ -57,142 +58,56 @@ export const SearchableInput = ({
     setParentResourceId(undefined)
   }
 
-  // const operation = useMemo(() => {
-  //   return operationsById[`${resource}.List`]
-  // }, [operationsById, resource])
+  const parentResourceParam: string | null = useMemo(() => {
+    if (!parentResource) return null
+    return pluralize.singular(parentResource.toLocaleLowerCase()) + 'ID'
+  }, [parentResource])
 
-  // const parentOperation = useMemo(() => {
-  //   return operationsById[`${parentResource}.List`]
-  // }, [operationsById, parentResource])
+  const paramsObj = useMemo(() => {
+    let paramsObj = {}
+    if (parentResourceId && parentResourceParam) {
+      paramsObj = { ...paramsObj, ...{ [parentResourceParam]: parentResourceId } }
+    }
+    if (resource === 'Orders' || resource === 'LineItems')
+      paramsObj = { ...paramsObj, ...{ direction: 'All' } }
+    return paramsObj
+  }, [parentResourceId, parentResourceParam, resource])
 
-  // const parentResourceParam: string | null = useMemo(() => {
-  //   if (!parentResource) return null
-  //   return pluralize.singular(parentResource.toLocaleLowerCase()) + 'ID'
-  // }, [parentResource])
+  const parentParamsObj = useMemo(() => {
+    let paramsObj = {}
+    if (parentResource === 'Orders' || parentResource === 'LineItems')
+      paramsObj = { ...paramsObj, ...{ direction: 'All' } }
+    return paramsObj
+  }, [parentResource])
 
-  // const loadResources = useMemo(
-  //   () =>
-  //     debounce(async (search: string) => {
-  //       try {
-  //         if (parentResource && !parentResourceId) return
-  //         setResourceLoading(true)
+  const dataQuery = useOcResourceList(
+    resource,
+    { search: resourceInputValue, pageSize: '5' },
+    paramsObj,
+    {
+      staleTime: 300000, // 5 min
+      enabled: (!parentResource || (!!parentResource && !!parentResourceId)) && hasAccess,
+    }
+  )
 
-  //         // Make api calls
-  //         let paramsObj = { pageSize: 5, search }
-  //         if (parentResourceId && parentResourceParam) {
-  //           paramsObj = { ...paramsObj, ...{ [parentResourceParam]: parentResourceId } }
-  //         }
-  //         if (
-  //           operation.operationId === 'Orders.List' ||
-  //           operation.operationId === 'LineItems.List'
-  //         ) {
-  //           paramsObj = { ...paramsObj, ...{ direction: 'All' } }
-  //         }
+  const parentDataQuery = useOcResourceList(
+    parentResource || resource, //TODO: fix, hack
+    { search: parentResourceInputValue, pageSize: '5' },
+    parentParamsObj,
+    {
+      staleTime: 300000, // 5 min
+      enabled: !!parentResource && hasAccessToParent,
+    }
+  )
 
-  //         const listResourceRequest = new BizUserRequest(
-  //           developerToken!,
-  //           {
-  //             body: {} as FieldValues,
-  //             params: paramsObj,
-  //             locked: {},
-  //           },
-  //           operation,
-  //           marketplace?.CoreApiUrl
-  //         )
-  //         const requests = [listResourceRequest.send()]
+  const resourceOptions = useMemo(() => {
+    return dataQuery?.data?.Items?.map(formatResourceOptions)
+  }, [dataQuery?.data?.Items, formatResourceOptions])
 
-  //         if (value) {
-  //           const listResourceRequest = new BizUserRequest(
-  //             developerToken!,
-  //             {
-  //               body: {} as FieldValues,
-  //               params: { ...paramsObj, ID: value },
-  //               locked: {},
-  //             },
-  //             operation,
-  //             marketplace?.CoreApiUrl
-  //           )
-  //           requests.push(listResourceRequest.send())
-  //         }
-
-  //         // Map options
-  //         const responses = await Promise.all(requests)
-  //         setResourceOptions(
-  //           responses
-  //             .map((r) => r.data.Items)
-  //             .flat()
-  //             .map(formatResourceOptions)
-  //         )
-  //       } finally {
-  //         setResourceLoading(false)
-  //       }
-  //     }, 500),
-  //   [
-  //     parentResource,
-  //     parentResourceId,
-  //     operation,
-  //     developerToken,
-  //     marketplace?.CoreApiUrl,
-  //     value,
-  //     formatResourceOptions,
-  //     parentResourceParam,
-  //   ]
-  // )
-
-  // useEffect(() => {
-  //   loadResources(resourceInputValue)
-  // }, [resourceInputValue, parentResourceId, loadResources])
-
-  // const loadParentResources = useMemo(
-  //   () =>
-  //     debounce(async (search: string) => {
-  //       try {
-  //         if (!parentResource) return
-  //         setParentResourceLoading(true)
-
-  //         var paramsObj = { pageSize: 5, search }
-  //         if (
-  //           operation.operationId === 'Orders.List' ||
-  //           operation.operationId === 'LineItems.List'
-  //         ) {
-  //           paramsObj = { ...paramsObj, ...{ direction: 'All' } }
-  //         }
-
-  //         // Make api call
-  //         const listParentResourceRequest = new BizUserRequest(
-  //           developerToken!,
-  //           {
-  //             body: {} as FieldValues,
-  //             params: paramsObj,
-  //             locked: {},
-  //           },
-  //           parentOperation,
-  //           marketplace?.CoreApiUrl
-  //         )
-
-  //         const parentResources = await listParentResourceRequest.send()
-
-  //         // Set options
-  //         if (parentResources?.data?.Items) {
-  //           setParentResourceOptions(parentResources.data.Items.map(formatParentResourceOptions))
-  //         }
-  //       } finally {
-  //         setParentResourceLoading(false)
-  //       }
-  //     }, 500),
-  //   [
-  //     parentResource,
-  //     operation.operationId,
-  //     developerToken,
-  //     parentOperation,
-  //     marketplace?.CoreApiUrl,
-  //     formatParentResourceOptions,
-  //   ]
-  // )
-
-  // useEffect(() => {
-  //   loadParentResources(parentResourceInputValue)
-  // }, [loadParentResources, parentResourceInputValue])
+  const parentResourceOptions = useMemo(() => {
+    // return []
+    return parentDataQuery?.data?.Items?.map(formatParentResourceOptions)
+  }, [formatParentResourceOptions, parentDataQuery?.data?.Items])
 
   const handleResourceSelect = (option: any) => {
     const updatedResourceId = option.value
@@ -210,10 +125,10 @@ export const SearchableInput = ({
   const ResourceSelect = (
     <Select<any, false>
       isMulti={false}
-      value={resourceOptions.find((option) => option.value === value)}
+      value={resourceOptions?.find((option: any) => option.value === value)}
       options={resourceOptions}
-      isLoading={resourceLoading}
-      isDisabled={parentResourceLoading || isDisabled}
+      isLoading={dataQuery.isLoading}
+      isDisabled={parentDataQuery.isLoading || isDisabled}
       onInputChange={setResourceInputValue}
       onChange={handleResourceSelect}
       isClearable={false}
@@ -242,9 +157,9 @@ export const SearchableInput = ({
     <VStack>
       <Select<any, false>
         isMulti={false}
-        value={parentResourceOptions.find((option) => option.value === parentResourceId)}
+        value={parentResourceOptions?.find((option) => option?.value === parentResourceId)}
         options={parentResourceOptions}
-        isLoading={parentResourceLoading}
+        isLoading={parentDataQuery.isLoading}
         onInputChange={setParentResourceInputValue}
         onChange={handleParentResourceSelect}
         isClearable={false}
@@ -281,7 +196,7 @@ export const SearchableInput = ({
       {parentResource ? (
         <Input
           type="text"
-          value={(resourceOptions.find((r) => r.value === value)?.label || value || '') as string}
+          value={(resourceOptions?.find((r) => r.value === value)?.label || value || '') as string}
           onClick={!isDisabled ? onOpen : undefined}
         />
       ) : (
@@ -305,9 +220,9 @@ export const SearchableInput = ({
             <VStack>
               <Select<any, false>
                 isMulti={false}
-                value={parentResourceOptions.find((option) => option.value === parentResourceId)}
+                value={parentResourceOptions?.find((option) => option.value === parentResourceId)}
                 options={parentResourceOptions}
-                isLoading={parentResourceLoading}
+                isLoading={parentDataQuery.isLoading}
                 onInputChange={setParentResourceInputValue}
                 onChange={handleParentResourceSelect}
                 isClearable={false}
