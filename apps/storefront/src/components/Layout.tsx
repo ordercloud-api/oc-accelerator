@@ -32,13 +32,13 @@ const Layout: FC = () => {
         mt={location.pathname === "/" ? -12 : 0} // header height
         alignItems="flex-start"
         w="full"
-        h="100dvh"
+        minH="100dvh"
         sx={{ "&>*": { width: "full" } }}
         bgColor="chakra-subtle-bg"
       >
         <Container
-          maxW={location.pathname === "/" ? "full" : "container.3xl"}
-          px={0} // set padding on child component containers
+          maxW={location.pathname === "/" ? "full" : "container.4xl"}
+          mx="auto"
           flex="1"
         >
           <Outlet />

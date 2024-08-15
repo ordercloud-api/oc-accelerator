@@ -1,19 +1,17 @@
-import { Box, Button, Container, Heading, Image, SimpleGrid, Stack } from "@chakra-ui/react";
+import { Button, Container, Heading, Image, SimpleGrid, Stack } from "@chakra-ui/react";
 import { FC } from "react";
-import { useCurrentUser } from "../hooks/currentUser";
 
 
 const Dashboard: FC = () => {
-  const { data: user } = useCurrentUser();
 
   return (
     <Container maxW="full">
       <SimpleGrid gridTemplateColumns={{ xl: "1fr 2fr" }}>
         <Stack direction="column" justifyContent="center" alignItems="flex-start" gap={6} pl="25%">
-          <Heading maxW="xs" size="2xl">
-            Insert Your Brand's Tagline.
+          <Heading maxW="sm" size="4xl">
+            Insert your brand's tagline.
           </Heading>
-          <Button size="sm">Call to action</Button>
+          <Button size="sm" mt={8}>Call to action</Button>
         </Stack>
         <Image
           h="75dvh"

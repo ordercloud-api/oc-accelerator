@@ -6,24 +6,83 @@ import {
   Icon,
   useDisclosure,
   UseDisclosureProps,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
 } from "@chakra-ui/react";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { TbShoppingCart } from "react-icons/tb";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { APP_NAME } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
-import MegaMenu from "./MegaMenu"; // Import the MegaMenu component
+import MegaMenu from "./MegaMenu";
+import { Catalog, ListPage, Me } from "ordercloud-javascript-sdk";
 
-interface HeaderProps {
   loginDisclosure: UseDisclosureProps;
 }
 
 const Header: FC<HeaderProps> = ({loginDisclosure}) => {
+interface HeaderProps {
   const { data: user } = useCurrentUser();
-  const location = useLocation();
   const { isLoggedIn, logout } = useOrderCloudContext();
-  const megaMenuDisclosure = useDisclosure(); // Add this line
+  const loginDisclosure = useDisclosure();
+  const megaMenuDisclosure = useDisclosure();
+  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
+  const [selectedCatalog, setSelectedCatalog] = useState<string>("");
+
+  useEffect(() => {
+    const fetchCatalogs = async () => {
+      try {
+        const catalogResult: ListPage<Catalog> = await Me.ListCatalogs();
+        setCatalogs(catalogResult.Items || []);
+        if (catalogResult.Items && catalogResult.Items.length > 0) {
+          setSelectedCatalog(catalogResult.Items[0].ID || "");
+        }
+      } catch (error) {
+        console.error("Error fetching catalogs:", error);
+      }
+    };
+
+    fetchCatalogs();
+  }, []);
+
+  const renderCatalogMenu = () => {
+    if (catalogs.length > 1) {
+      return (
+        <Menu>
+          <MenuButton as={Button} variant="outline" size="sm" rightIcon={<ChevronDownIcon />}>
+            Shop by catalog
+          </MenuButton>
+          <MenuList>
+            {catalogs.map((catalog) => (
+              <MenuItem
+                key={catalog.ID}
+                onClick={() => setSelectedCatalog(catalog.ID || "")}
+                as={RouterLink}
+                to={`/products/${selectedCatalog}`}
+              >
+                {catalog.Name}
+              </MenuItem>
+            ))}
+          </MenuList>
+        </Menu>
+      );
+    } else if (catalogs.length === 1) {
+      return (
+        <Button
+          as={RouterLink}
+          to={`/products/${catalogs[0].ID}`}
+          variant="ghost"
+        >
+          Shop All Products
+        </Button>
+      );
+    }
+    return null;
+  };
 
   return (
     <HStack
@@ -33,9 +92,9 @@ const Header: FC<HeaderProps> = ({loginDisclosure}) => {
       w="full"
       top="0"
       zIndex={2}
-      bgColor="whiteAlpha.300"
+      bgColor="whiteAlpha.600"
       borderBottom="1px solid"
-      borderColor="whiteAlpha.300"
+      borderColor="whiteAlpha.900"
       px="8"
       backdropFilter="auto"
       backdropBlur="5px"
@@ -55,15 +114,7 @@ const Header: FC<HeaderProps> = ({loginDisclosure}) => {
             >
               Categories
             </Button>
-            <Button
-              as={RouterLink}
-              isActive={location.pathname === "/products"}
-              to="/products"
-              size="sm"
-              variant="ghost"
-            >
-              Shop all products
-            </Button>
+            {renderCatalogMenu()}
           </HStack>
           <HStack>
             <Heading size="sm">
@@ -96,6 +147,8 @@ const Header: FC<HeaderProps> = ({loginDisclosure}) => {
           <MegaMenu
             isOpen={megaMenuDisclosure.isOpen}
             onClose={megaMenuDisclosure.onClose}
+            selectedCatalog={selectedCatalog} // Pass the selected catalog
+            setSelectedCatalog={setSelectedCatalog} // Pass the setter function
           />
         )}
       </Container>
@@ -103,4 +156,4 @@ const Header: FC<HeaderProps> = ({loginDisclosure}) => {
   );
 };
 
-export default Header;
+export default MainMenu;

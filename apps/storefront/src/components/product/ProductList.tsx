@@ -23,8 +23,6 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
   const [loading, setLoading] = useState(true);
 
   const getProducts = useCallback(async () => {
-    if (!catalogId) return;
-
     setLoading(true);
     try {
       const result = await Me.ListProducts({
@@ -60,21 +58,8 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
 
   return (
     <>
-      <Heading
-        as="h1"
-        size="xl"
-        flexGrow="1"
-        color="chakra-placeholder-color"
-        textTransform="uppercase"
-        fontWeight="300"
-        mb={8}
-        pb={2}
-        borderBottom="1px solid"
-        borderColor="chakra-border-color"
-      >
-        {category ? `Shop ${category.Name}` : "Shop all products"}
-      </Heading>
       <SimpleGrid
+      py={12}
         gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
         spacing={4}
       >
