@@ -10,8 +10,8 @@ import {
   InputGroup,
   InputLeftElement,
 } from '@chakra-ui/react'
-import { useOrderCloudContext } from '@rwatt451/ordercloud-react'
-import { OrderCloudError } from 'ordercloud-javascript-sdk'
+import { useOrderCloudContext, parseToken } from '@rwatt451/ordercloud-react'
+import { AccessToken, OrderCloudError } from 'ordercloud-javascript-sdk'
 import { FC, FormEvent, useCallback, useState } from 'react'
 
 interface ILoginForm {
@@ -19,23 +19,49 @@ interface ILoginForm {
   onSuccess?: () => void
 }
 
+//Placeholder interface for creating custom login error messages
+interface ILoginError {
+  Message: string
+}
+
+//Placeholder interface for creating custom login error messages
+interface ILoginErrors {
+  errors: ILoginError[]
+}
+
+const isBuyerUser = (token: AccessToken) => {
+  if (!token || !token.access_token) return false;
+  const parsedToken = parseToken(token.access_token);
+  return parsedToken.usrtype === 'buyer';
+}
+
 const LoginForm: FC<ILoginForm> = ({ initialFocusRef, onSuccess }) => {
-  const { login } = useOrderCloudContext()
+  const { login, logout } = useOrderCloudContext()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
-  const [error, setError] = useState<OrderCloudError | undefined>()
+  const [error, setError] = useState<OrderCloudError | ILoginErrors | undefined>()
   const [loading, setLoading] = useState(false)
 
   const handleLogin = useCallback(
     async (e: FormEvent) => {
       e.preventDefault()
       setLoading(true)
+      let authResponse
       try {
-        await login(username, password, rememberMe)
+        authResponse = await login(username, password, rememberMe)
         setError(undefined)
+
         if (onSuccess) {
-          onSuccess()
+          if (isBuyerUser(authResponse)) {
+            //The Sitecore Commerce team does not recommend using this application with non-seller users.
+            logout()
+            setError({
+              errors: [{ Message: 'Buyer users should not use this application.' }],
+            })
+          } else {
+            onSuccess()
+          }
         }
       } catch (ex) {
         setError(ex as OrderCloudError)
@@ -43,7 +69,7 @@ const LoginForm: FC<ILoginForm> = ({ initialFocusRef, onSuccess }) => {
         setLoading(false)
       }
     },
-    [login, password, rememberMe, username, onSuccess]
+    [login, username, password, rememberMe, onSuccess, logout]
   )
 
   return (
