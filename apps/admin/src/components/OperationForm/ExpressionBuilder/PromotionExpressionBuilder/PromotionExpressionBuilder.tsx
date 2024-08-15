@@ -1,6 +1,6 @@
 import { FormControl, FormLabel, Tooltip, VStack } from '@chakra-ui/react'
 import { QueryBuilderChakra } from '@react-querybuilder/chakra'
-import { QueryBuilder, RuleGroupTypeIC } from 'react-querybuilder'
+import { Field, QueryBuilder, RuleGroupTypeIC } from 'react-querybuilder'
 import { combinators } from './combinators'
 import { CustomAddGroupAction } from './components/CustomAddGroupAction'
 import { CustomAddRuleAction } from './components/CustomAddRuleAction'
@@ -104,7 +104,7 @@ export function PromotionExpressionBuilder({
       >
         <QueryBuilderChakra>
           <QueryBuilder
-            fields={fields}
+            fields={fields as Field[]}
             independentCombinators={true}
             combinators={combinators}
             query={query}

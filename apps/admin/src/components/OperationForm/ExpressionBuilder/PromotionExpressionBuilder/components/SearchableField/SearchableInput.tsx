@@ -105,7 +105,7 @@ export const SearchableInput = ({
   }, [dataQuery?.data?.Items, formatResourceOptions])
 
   const parentResourceOptions = useMemo(() => {
-    if(!parentResource) return []
+    if(!parentResource || !formatParentResourceOptions) return []
     return parentDataQuery?.data?.Items?.map(formatParentResourceOptions)
   }, [formatParentResourceOptions, parentDataQuery?.data?.Items, parentResource])
 
