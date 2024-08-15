@@ -107,7 +107,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
       offsetY={-12}
       in={isOpen}
       position="absolute"
-      top={12}
+      top={14}
       maxW="container.4xl"
       py={4}
       bgColor="whiteAlpha.600"
@@ -133,6 +133,8 @@ const MegaMenu: FC<MegaMenuProps> = ({
             display="grid"
             alignContent="flex-start"
             gap={3}
+            maxH="500px"
+            overflowY="auto"
             gridTemplateColumns={
               !loading ? "repeat( auto-fit, minmax(300px, 1fr))" : "1fr"
             }

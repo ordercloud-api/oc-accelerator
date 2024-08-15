@@ -10,16 +10,17 @@ import {
   MenuItem,
   MenuList,
   useDisclosure,
-  UseDisclosureProps,
+  UseDisclosureProps
 } from "@chakra-ui/react";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import { Catalog, ListPage, Me } from "ordercloud-javascript-sdk";
 import { FC, useEffect, useState } from "react";
 import { TbShoppingCart } from "react-icons/tb";
 import { Link as RouterLink } from "react-router-dom";
-import { APP_NAME } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
 import MegaMenu from "./MegaMenu";
+// import logo from "../assets/oc-accelerator.svg";
+import { AcceleratorLogo } from "../assets/Icons";
 
 interface MainMenuProps {
   loginDisclosure: UseDisclosureProps;
@@ -106,9 +107,9 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
     >
       <Container h="100%" maxW="full">
         <HStack h="100%" justify="flex-start" alignItems="center">
-          <Heading as={RouterLink} to="/" size="md">
-            {APP_NAME}
-          </Heading>
+          <RouterLink to="/">
+            <AcceleratorLogo h="10" />
+          </RouterLink>
           <HStack as="nav" flexGrow="1" ml={3}>
             <Button
               isActive={megaMenuDisclosure.isOpen}
