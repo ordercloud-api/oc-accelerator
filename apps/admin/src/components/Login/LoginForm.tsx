@@ -52,17 +52,16 @@ const LoginForm: FC<ILoginForm> = ({ initialFocusRef, onSuccess }) => {
         authResponse = await login(username, password, rememberMe)
         setError(undefined)
 
-        if (onSuccess) {
-          if (isBuyerUser(authResponse)) {
-            //The Sitecore Commerce team does not recommend using this application with non-seller users.
-            logout()
-            setError({
-              errors: [{ Message: 'Buyer users should not use this application.' }],
-            })
-          } else {
-            onSuccess()
-          }
+        if (isBuyerUser(authResponse)) {
+          //The Sitecore Commerce team does not recommend using this application with non-seller users.
+          logout()
+          setError({
+            errors: [{ Message: 'Buyer users should not login to this application.' }],
+          })
+        } else if (onSuccess) {
+          onSuccess()
         }
+        
       } catch (ex) {
         setError(ex as OrderCloudError)
       } finally {

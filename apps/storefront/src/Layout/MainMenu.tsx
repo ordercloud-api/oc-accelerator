@@ -5,6 +5,7 @@ import {
   HStack,
   Icon,
   useDisclosure,
+  UseDisclosureProps,
 } from "@chakra-ui/react";
 import { FC } from "react";
 import { TbShoppingCart } from "react-icons/tb";
@@ -14,11 +15,14 @@ import { useCurrentUser } from "../hooks/currentUser";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import MegaMenu from "./MegaMenu"; // Import the MegaMenu component
 
-const Header: FC = () => {
+interface HeaderProps {
+  loginDisclosure: UseDisclosureProps;
+}
+
+const Header: FC<HeaderProps> = ({loginDisclosure}) => {
   const { data: user } = useCurrentUser();
   const location = useLocation();
   const { isLoggedIn, logout } = useOrderCloudContext();
-  const loginDisclosure = useDisclosure();
   const megaMenuDisclosure = useDisclosure(); // Add this line
 
   return (
