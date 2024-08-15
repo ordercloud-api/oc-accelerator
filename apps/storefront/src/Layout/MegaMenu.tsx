@@ -104,10 +104,11 @@ const MegaMenu: FC<MegaMenuProps> = ({ isOpen, onClose }) => {
       top={12}
       maxW="container.4xl"
       py={4}
-      bgColor="whiteAlpha.300"
+      bgColor="whiteAlpha.400"
       borderBottom="1px solid"
       borderColor="whiteAlpha.400"
       backdropFilter="auto"
+      shadow="sm"
       backdropBlur="10px"
       mx="auto"
       left="0"
@@ -116,8 +117,8 @@ const MegaMenu: FC<MegaMenuProps> = ({ isOpen, onClose }) => {
     >
       <>
         {loading ? (
-          <Flex w="full" alignItems="center" justifyContent="center">
-            <Spinner size="lg" colorScheme="primary" thickness="10px" />
+          <Flex w="full" alignItems="center" justifyContent="center" flex="1">
+            <Spinner size="xl" colorScheme="blackAlpha" thickness="10px" />
           </Flex>
         ) : (
           <Container

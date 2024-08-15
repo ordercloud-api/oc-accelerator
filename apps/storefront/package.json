@@ -12,7 +12,8 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
-    "@rwatt451/ordercloud-react": "^0.0.19",
+    "@rwatt451/ordercloud-react": "^0.0.21",
+    "@sitecore/blok-theme": "^1.1.13",
     "@tanstack/react-query": "^5.24.1",
     "@tanstack/react-table": "^8.13.2",
     "date-fns": "^3.6.0",

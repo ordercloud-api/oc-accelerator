@@ -9,7 +9,7 @@ import Alert from "./alert";
 // import Avatar from "./avatar"
 import Badge from "./badge";
 import Breadcrumb from "./breadcrumb";
-// import Button from "./button"
+import Button from "./button"
 import { Checkbox } from "./checkbox";
 import CloseButton from "./close-button";
 import Code from "./code";
@@ -52,7 +52,7 @@ const components = {
   // Avatar,
   Badge,
   Breadcrumb,
-  // Button,
+  Button,
   Card,
   Checkbox,
   CloseButton,

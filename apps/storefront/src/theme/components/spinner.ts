@@ -1,7 +1,3 @@
-const Spinner = {
-  baseStyle: {
-    color: "primary.500"
-  }
-}
+const Spinner = {}
 
 export default Spinner

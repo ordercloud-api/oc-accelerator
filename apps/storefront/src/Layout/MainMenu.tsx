@@ -45,6 +45,7 @@ const Header: FC = () => {
           <HStack as="nav" flexGrow="1" ml={3}>
             <Button
               isActive={megaMenuDisclosure.isOpen}
+              size="sm"
               variant="ghost"
               onClick={megaMenuDisclosure.onToggle}
             >
@@ -53,12 +54,11 @@ const Header: FC = () => {
             <Button
               as={RouterLink}
               isActive={location.pathname === "/products"}
-              _active={{ bgColor: "primary.50" }}
               to="/products"
               size="sm"
               variant="ghost"
             >
-              Shop All Products
+              Shop all products
             </Button>
           </HStack>
           <HStack>

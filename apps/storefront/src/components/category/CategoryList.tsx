@@ -1,5 +1,5 @@
 import { Heading, SimpleGrid } from "@chakra-ui/react";
-import { Category, Categories } from "ordercloud-javascript-sdk";
+import { Categories, Category } from "ordercloud-javascript-sdk";
 import React, {
   FunctionComponent,
   useCallback,
@@ -14,12 +14,10 @@ export interface CategoryListProps {
 }
 
 const CategoryList: FunctionComponent<CategoryListProps> = ({
-    renderItem,
-    catalogId,
+  renderItem,
+  catalogId,
 }) => {
-    const [categories, setCategories] = useState<Category[]>();
-    
-    console.log(Category);
+  const [categories, setCategories] = useState<Category[]>();
 
   const getCategories = useCallback(async () => {
     if (!catalogId) return; // Ensure catalogId is defined
@@ -63,3 +61,4 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({
 };
 
 export default CategoryList;
+∏
