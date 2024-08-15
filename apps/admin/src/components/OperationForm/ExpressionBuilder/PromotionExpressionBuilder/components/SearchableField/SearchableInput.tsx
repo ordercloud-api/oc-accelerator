@@ -105,9 +105,9 @@ export const SearchableInput = ({
   }, [dataQuery?.data?.Items, formatResourceOptions])
 
   const parentResourceOptions = useMemo(() => {
-    // return []
+    if(!parentResource) return []
     return parentDataQuery?.data?.Items?.map(formatParentResourceOptions)
-  }, [formatParentResourceOptions, parentDataQuery?.data?.Items])
+  }, [formatParentResourceOptions, parentDataQuery?.data?.Items, parentResource])
 
   const handleResourceSelect = (option: any) => {
     const updatedResourceId = option.value
