@@ -148,8 +148,8 @@ const basePalette = {
   },
 };
 
-export const DEFAULT_THEME_ACCENT = basePalette.colors.yellow
-export const DEFAULT_THEME_PRIMARY = basePalette.colors.green
+export const DEFAULT_THEME_ACCENT = basePalette.colors.pink
+export const DEFAULT_THEME_PRIMARY = basePalette.colors.blackAlpha
 export const DEFAULT_THEME_SECONDARY = basePalette.colors.gray
 
 const colors = {

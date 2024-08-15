@@ -59,7 +59,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
   return (
     <>
       <SimpleGrid
-      py={12}
+        py={12}
         gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
         spacing={4}
       >

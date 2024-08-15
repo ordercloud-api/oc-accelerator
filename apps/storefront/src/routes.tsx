@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom";
-import Layout from "./components/Layout";
+import Layout from "./Layout/Layout";
 import { ShoppingCart } from "./components/cart/ShoppingCart";
 import { OrderSummary } from "./components/cart/OrderSummary";
 import ProductList from "./components/product/ProductList";
