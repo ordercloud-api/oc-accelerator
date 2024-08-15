@@ -91,7 +91,7 @@ export const SearchableInput = ({
   )
 
   const parentDataQuery = useOcResourceList(
-    parentResource || resource, //TODO: fix, hack
+    parentResource || resource, 
     { search: parentResourceInputValue, pageSize: '5' },
     parentParamsObj,
     {

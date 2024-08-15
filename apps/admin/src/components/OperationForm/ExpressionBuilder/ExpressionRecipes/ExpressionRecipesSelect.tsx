@@ -22,6 +22,7 @@ import approvalRuleRecipes from './approval-rule-recipes.json'
 import promoRecipes from './promo-recipes.json'
 import { usePromoExpressions } from '@rwatt451/ordercloud-react'
 import { InfoOutlineIcon } from "@chakra-ui/icons";
+import { transformFunctions } from './transformFunctions'
 
 interface RecipeVariables {
   label: string
@@ -94,7 +95,7 @@ export function ExpressionRecipesSelect({ onChange, type }: ExpressionRecipesSel
     recipeVariables.forEach((variables: any) => {
       let updatedValue = variables.value
       if (variables.transformFunctionName) {
-        updatedValue = variables.value / 100 //TODO: update 
+        updatedValue = (transformFunctions as any)[variables.transformFunctionName](variables.value)
       }
       recipeStringified = recipeStringified.replace(
         new RegExp(`"${variables.token}"`, 'g'),
