@@ -11,10 +11,8 @@ import {
   VStack,
   useDisclosure,
 } from '@chakra-ui/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Select } from 'chakra-react-select'
-import { debounce } from 'lodash'
-import pluralize from 'pluralize'
 
 interface SearchableInputProps {
   showInModal: boolean
@@ -32,9 +30,9 @@ export const SearchableInput = ({
   onUpdate,
   parentResource,
   resource,
-  params,
-  formatResourceOptions,
-  formatParentResourceOptions,
+  // params,
+  // formatResourceOptions,
+  // formatParentResourceOptions,
   value,
   isDisabled,
 }: SearchableInputProps) => {
@@ -42,15 +40,15 @@ export const SearchableInput = ({
 
   // resource state methods
   const [resourceId, setResourceId] = useState<string>()
-  const [resourceInputValue, setResourceInputValue] = useState('')
-  const [resourceOptions, setResourceOptions] = useState<any[]>([])
-  const [resourceLoading, setResourceLoading] = useState(false)
+  const [_resourceInputValue, setResourceInputValue] = useState('')
+  const [resourceOptions, _setResourceOptions] = useState<any[]>([])
+  const [resourceLoading, _setResourceLoading] = useState(false)
 
   // parent resource state methods
   const [parentResourceId, setParentResourceId] = useState<string>()
-  const [parentResourceInputValue, setParentResourceInputValue] = useState('')
-  const [parentResourceOptions, setParentResourceOptions] = useState<any[]>([])
-  const [parentResourceLoading, setParentResourceLoading] = useState(false)
+  const [_parentResourceInputValue, setParentResourceInputValue] = useState('')
+  const [parentResourceOptions, _setParentResourceOptions] = useState<any[]>([])
+  const [parentResourceLoading, _setParentResourceLoading] = useState(false)
 
   const handleAdd = () => {
     onUpdate(resourceId)

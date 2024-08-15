@@ -52,7 +52,7 @@ export function formatQuery(ruleGroup: RuleGroupTypeIC, isLineItemLevelPromo: bo
         ) {
           return fallbackExpression
         }
-        return ruleProcessor(rule, rg, {
+        return ruleProcessor(rule as any, rg, {
           parseNumbers: false, // represent numbers without quotes
           escapeQuotes: (rule.valueSource ?? "value") === "value"
         })
@@ -65,7 +65,7 @@ export function formatQuery(ruleGroup: RuleGroupTypeIC, isLineItemLevelPromo: bo
     return expression ? `${prefix}${expression}${suffix}` : fallbackExpression
 
     function getPrefixSuffix(rg: RuleGroupTypeIC, outermost?: boolean) {
-      const operator = rg["operator"]
+      const operator = (rg as any)["operator"]
       if (operator) {
         return [`${operator}(`, `)`]
       }
@@ -78,7 +78,7 @@ export function formatQuery(ruleGroup: RuleGroupTypeIC, isLineItemLevelPromo: bo
 
   function validateRule(rule: RuleType) {
     let validationResult: boolean | ValidationResult | undefined = undefined
-    let fieldValidator: RuleValidator | undefined = undefined
+    const fieldValidator: RuleValidator | undefined = undefined
     if (rule.id) {
       validationResult = validationMap[rule.id]
     }

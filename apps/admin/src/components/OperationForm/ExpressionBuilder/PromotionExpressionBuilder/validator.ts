@@ -40,12 +40,12 @@ function validateGroup(group: RuleGroupTypeAny, result: ValidationMap, isLineIte
   }
 
   // Note: combinators are considered rules, thats why we are checking 3 instead of 2
-  if (group['operator'] === 'min' && group.rules.length !== 3) {
+  if ((group as any)['operator'] === 'min' && group.rules.length !== 3) {
     reasons.push({ code: 'min', message: 'Min must have exactly two rules' })
   }
 
   // Note: combinators are considered rules, thats why we are checking 3 instead of 2
-  if (group['operator'] === 'max' && group.rules.length !== 3) {
+  if ((group as any)['operator'] === 'max' && group.rules.length !== 3) {
     reasons.push({ code: 'max', message: 'Max must have exactly two rules' })
   }
 
@@ -75,7 +75,7 @@ function validateRule(
 ) {
   const reasons: any[] = []
   if (!isLineItemLevel) {
-    if (rule['modelPath'].startsWith('LineItem.') && !group['operator']?.startsWith('items.')) {
+    if ((rule as any)['modelPath'].startsWith('LineItem.') && !(group as any)['operator']?.startsWith('items.')) {
       reasons.push({
         code: 'lineItemFieldWithoutItemsGroup',
         message:
@@ -84,9 +84,9 @@ function validateRule(
     }
 
     if (
-      group['operator']?.startsWith('items.') &&
-      !rule['modelPath'].startsWith('LineItem') &&
-      !rule['modelPath'].startsWith('CostCenter')
+      (group as any)['operator']?.startsWith('items.') &&
+      !(rule as any)['modelPath'].startsWith('LineItem') &&
+      !(rule as any)['modelPath'].startsWith('CostCenter')
     ) {
       reasons.push({
         code: 'invalidFieldForItemsGroup',
@@ -95,7 +95,7 @@ function validateRule(
       })
     }
 
-    if (!group['operator']?.startsWith('items.') && rule['modelPath'].startsWith('CostCenter')) {
+    if (!(group as any)['operator']?.startsWith('items.') && (rule as any)['modelPath'].startsWith('CostCenter')) {
       reasons.push({
         code: 'invalidFieldForItemsGroup',
         message:
@@ -103,7 +103,7 @@ function validateRule(
       })
     }
 
-    if (group['operator']?.startsWith('order') && !rule['field'].includes('ApprovalRule')) {
+    if ((group as any)['operator']?.startsWith('order') && !(rule as any)['field'].includes('ApprovalRule')) {
       reasons.push({
         code: 'invalidRuleForOrderGroup',
         message:
@@ -111,7 +111,7 @@ function validateRule(
       })
     }
 
-    if (!group['operator'] && rule['field'].includes('ApprovalRule')) {
+    if (!(group as any)['operator'] && rule['field'].includes('ApprovalRule')) {
       reasons.push({
         code: 'invalidRuleForOrderGroup',
         message:

@@ -30,10 +30,11 @@ export function CustomAddRuleAction({
     o.appliesToExpressionType.includes(context.expressionType)
   )
 
+  const groupOperator = useMemo(()=> (ruleOrGroup as any)['operator'],[ruleOrGroup])
+
   const handleMenuClick = (modelName: string, modelPath: string) => (e: MouseEvent) => {
     // we're passing modelPath as context, then in onAddRule we will use that context to add it to the rule
     // this will allow us to filter the options based on the selected model
-    const groupOperator = ruleOrGroup['operator']
     handleOnClick(e, { modelName, modelPath, groupOperator })
   }
 
@@ -41,7 +42,7 @@ export function CustomAddRuleAction({
     let updatedQuery: any
     const operator = e.target.value
     const wasPreviouslyMinOrMax =
-      ruleOrGroup['operator'] === 'min' || ruleOrGroup['operator'] === 'max'
+    groupOperator === 'min' || groupOperator === 'max'
     const willBeMinOrMax = operator === 'min' || operator === 'max'
     const combinatorIndices = (ruleOrGroup as RuleGroupType).rules
       .map((r, index) => {
@@ -72,13 +73,13 @@ export function CustomAddRuleAction({
   }
 
   const isAddRuleDisabled = useMemo(() => {
-    const isMinOrMax = ruleOrGroup['operator'] === 'min' || ruleOrGroup['operator'] === 'max'
+    const isMinOrMax = groupOperator === 'min' || groupOperator === 'max'
     // Max number of rules is 2 for min/max
     // Note: combinators are considered rules, thats why we are checking 3 instead of 2
     const result = isMinOrMax && (ruleOrGroup as RuleGroupType)?.rules?.length >= 3
 
     return result
-  }, [ruleOrGroup])
+  }, [groupOperator, ruleOrGroup])
 
   return (
     <HStack
@@ -97,13 +98,13 @@ export function CustomAddRuleAction({
             fontSize="sm"
             color="chakra-subtle-text"
           >
-            {applicableGroupOperators.find((o) => o.name === ruleOrGroup['operator'])
+            {applicableGroupOperators.find((o) => o.name === groupOperator)
               ?.description || 'Optionally apply an operator to all the rules in the group'}
           </FormLabel>
           <Select
             onChange={updateGroup}
             maxW="md"
-            value={ruleOrGroup['operator']}
+            value={groupOperator}
             isDisabled={context?.isDisabled}
           >
             <option value="">Select Operator</option>
@@ -145,7 +146,7 @@ export function CustomAddRuleAction({
         </MenuButton>
         <MenuList>
           <MenuOptionGroup title="Add New Rule">
-            {options?.map((option) => (
+            {options?.map((option: any) => (
               <MenuItemOption
                 key={option.value}
                 icon={<></>}

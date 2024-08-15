@@ -33,7 +33,7 @@ export function CustomFieldSelector({
   const [xp, setXp] = useState<string>('')
   const [xpLabel, setXpLabel] = useState<string>('')
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const fieldOptions = (options as any).filter((o) => o['modelPath'] === rule['modelPath'])
+  const fieldOptions = (options as any).filter((o: any) => o['modelPath'] === (rule as any)['modelPath'])
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value
@@ -45,7 +45,7 @@ export function CustomFieldSelector({
   }
 
   const handleXpSelect = () => {
-    handleOnChange(`${rule['modelPath']}.xp.${xp}`)
+    handleOnChange(`${(rule as any)['modelPath']}.xp.${xp}`)
     onClose()
   }
 
@@ -117,7 +117,7 @@ export function CustomFieldSelector({
           <Tag
             minWidth="fit-content"
             colorScheme="gray"
-          >{`${rule['modelName']}`}</Tag>
+          >{`${(rule as any)['modelName']}`}</Tag>
           <Select
             className={className}
             value={value}
@@ -132,10 +132,10 @@ export function CustomFieldSelector({
                 {option.label}
               </option>
             ))}
-            {rule['modelName'] === 'Product' && (
+            {(rule as any)['modelName'] === 'Product' && (
               <option value="LineItem.Product.Category">Category</option>
             )}
-            {xp && <option value={`${rule['modelPath']}.xp.${xp}`}>{xpLabel}</option>}
+            {xp && <option value={`${(rule as any)['modelPath']}.xp.${xp}`}>{xpLabel}</option>}
             <option value=".xp.">xp</option>
           </Select>
         </HStack>

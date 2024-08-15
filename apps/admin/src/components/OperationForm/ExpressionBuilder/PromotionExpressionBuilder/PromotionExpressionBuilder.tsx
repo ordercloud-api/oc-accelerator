@@ -110,10 +110,11 @@ export function PromotionExpressionBuilder({
             query={query}
             context={{ query, setQuery, lineItemLevel, expressionType, isDisabled }}
             onQueryChange={setQuery}
-            onAddRule={(rule, parentPath, query, context) => {
+            onAddRule={(rule, _parentPath, _query, context) => {
               // add the modelPath to the rule so we can filter the fields in the fieldSelector
-              rule['modelPath'] = context.modelPath
-              rule['modelName'] = context.modelName
+              (rule as any)['modelPath'] = context.modelPath
+              // eslint-disable-next-line no-unexpected-multiline
+              (rule as any)['modelName'] = context.modelName
 
               if (context['groupOperator'] === 'min' || context['groupOperator'] === 'max') {
                 // For min/max we always want the ',' operator
@@ -121,10 +122,10 @@ export function PromotionExpressionBuilder({
               }
 
               // set the field to the first field in the list
-              rule['field'] = fields.find((f) => f['modelPath'] === context.modelPath)?.name || ''
+              rule['field'] = fields.find((f: any) => f['modelPath'] === context.modelPath)?.name || ''
               return rule
             }}
-            onAddGroup={(group, parentPath, query, context) => {
+            onAddGroup={(group, _parentPath, _query, _context) => {
               group.rules = [] // clear out rules, we want to force them to pick an entity first so we can filter fields/operators accordingly
               return group
             }}
@@ -143,7 +144,7 @@ export function PromotionExpressionBuilder({
               const split = fieldName.split('.')
               const name = split[split.length - 1]
               const modelPath = split.slice(0, split.length - 1).join('.')
-              const definition = fields.find((f) => f.name === `${modelPath}.${name}`)
+              const definition = fields.find((f: any) => f.name === `${modelPath}.${name}`)
               if (!definition) {
                 throw new Error('no definition found for field: ' + fieldName)
               }

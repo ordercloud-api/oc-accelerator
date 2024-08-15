@@ -3,7 +3,6 @@ import {
   ButtonGroup,
   FormControl,
   FormLabel,
-  Icon,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -21,7 +20,6 @@ import { ValueEditorProps } from 'react-querybuilder'
 import { CustomValueEditor } from '../PromotionExpressionBuilder/components/CustomValueEditor'
 import approvalRuleRecipes from './approval-rule-recipes.json'
 import promoRecipes from './promo-recipes.json'
-import { transformFunctions } from './transformFunctions'
 import { usePromoExpressions } from '@rwatt451/ordercloud-react'
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 
@@ -96,7 +94,7 @@ export function ExpressionRecipesSelect({ onChange, type }: ExpressionRecipesSel
     recipeVariables.forEach((variables: any) => {
       let updatedValue = variables.value
       if (variables.transformFunctionName) {
-        updatedValue = transformFunctions[variables.transformFunctionName](variables.value)
+        updatedValue = variables.value / 100 //TODO: update 
       }
       recipeStringified = recipeStringified.replace(
         new RegExp(`"${variables.token}"`, 'g'),
@@ -151,7 +149,7 @@ export function ExpressionRecipesSelect({ onChange, type }: ExpressionRecipesSel
           <ModalCloseButton />
           <ModalBody>
             {recipeVariables.map((variables) => {
-              const fieldData = fields?.find((f) => f.name === variables.ordercloudProperty)
+              const fieldData = fields?.find((f: any) => f.name === variables.ordercloudProperty)
               const valueEditorProps = {
                 operator: '=',
                 field: variables.ordercloudProperty,

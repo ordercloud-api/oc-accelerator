@@ -15,7 +15,7 @@ export const ruleProcessor: CustomRuleProcessor = (
   rg,
   { escapeQuotes, parseNumbers }
 ) => {
-  const groupOperator = rg['operator']
+  const groupOperator = (rg as any)['operator']
   const valueIsField = valueSource === 'field'
   const useBareValue =
     typeof value === 'boolean' ||
@@ -81,7 +81,7 @@ export const ruleProcessor: CustomRuleProcessor = (
     case 'in':
       return `${formattedField}.${operator}(${value
         .split(',')
-        .map((v) => `'${v}'`)
+        .map((v: any) => `'${v}'`)
         .join(', ')})`
 
     case 'any':

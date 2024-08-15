@@ -20,7 +20,7 @@ export function CustomCombinatorSelector({
       isDisabled={context?.isDisabled}
     >
       {(options as any)
-        .filter((o) => o.label !== "COMMA") // comma is used for min/max but should not be visible in the UI
+        .filter((o: any) => o.label !== "COMMA") // comma is used for min/max but should not be visible in the UI
         .map((option: any) => (
           <option key={option["name"]} value={option["name"]}>
             {option.label}

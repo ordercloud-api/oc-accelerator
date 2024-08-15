@@ -10,7 +10,7 @@ export function CustomOperatorSelector({
   rule,
   context
 }: OperatorSelectorProps) {
-  if (!rule["modelPath"]) {
+  if (!(rule as any)["modelPath"]) {
     // This is a raw value, so we don't need to show the operator selector
     return
   }

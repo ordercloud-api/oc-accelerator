@@ -1,13 +1,14 @@
 import { ValueEditorProps } from 'react-querybuilder'
 import { SearchableInput } from './SearchableInput'
 import { useCallback } from 'react'
-import { Address, ApprovalRule, Buyer, Catalog, CostCenter, LineItem, Order, Product, User } from 'ordercloud-javascript-sdk'
+import { Address, ApprovalRule, Buyer, CostCenter, LineItem, Order, Product, User } from 'ordercloud-javascript-sdk'
 
 const getModelName = (props: ValueEditorProps): string => {
   const modelParts = props.field.split('.')
   return modelParts[modelParts.length - 2]
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const hasSearchableField = (props: ValueEditorProps): boolean => {
   const modelName = getModelName(props)
   if (modelName === 'Variant') {
@@ -35,10 +36,10 @@ export const SearchableField = (props: SearchableFieldProps) => {
     (variant: Product) => ({ value: variant.ID, label: `${variant.Name} | ${variant.ID}` }),
     []
   )
-  const formatCatalogOptions = useCallback(
-    (catalog: Catalog) => ({ value: catalog.ID, label: `${catalog.Name} | ${catalog.ID}` }),
-    []
-  )
+  // const formatCatalogOptions = useCallback(
+  //   (catalog: Catalog) => ({ value: catalog.ID, label: `${catalog.Name} | ${catalog.ID}` }),
+  //   []
+  // )
   const formatOrderOptions = useCallback((order: Order) => ({ value: order.ID, label: order.ID }), [])
   const formatBuyerOptions = useCallback(
     (buyer: Buyer) => ({ value: buyer.ID, label: `${buyer.Name} | ${buyer.ID}` }),
