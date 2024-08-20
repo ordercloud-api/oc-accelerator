@@ -6,6 +6,9 @@ const {definePartsStyle, defineMultiStyleConfig} = createMultiStyleConfigHelpers
 // define the base component styles
 const baseStyle = definePartsStyle({
   // define the part you're going to style
+  list:{
+    rounded: "none",
+  },
   button: {
     lineHeight: 0
   }

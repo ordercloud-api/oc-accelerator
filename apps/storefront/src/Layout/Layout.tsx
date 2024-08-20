@@ -7,11 +7,12 @@ import {
 } from "@chakra-ui/react";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import { FC, useEffect } from "react";
-import { Outlet } from "react-router-dom";
-import LoginModal from "./Login/LoginModal";
-import MainMenu from "../Layout/MainMenu";
+import { Outlet, useLocation } from "react-router-dom";
+import LoginModal from "../components/Login/LoginModal";
+import MainMenu from "./MainMenu";
 
 const Layout: FC = () => {
+  const { pathname } = useLocation();
   const { allowAnonymous, isAuthenticated, isLoggedIn } =
     useOrderCloudContext();
   const loginDisclosure = useDisclosure();
@@ -29,16 +30,15 @@ const Layout: FC = () => {
       <LoginModal disclosure={loginDisclosure} />
       <MainMenu loginDisclosure={loginDisclosure} />
       <VStack
-        mt={location.pathname === "/" ? -12 : 0} // header height
         alignItems="flex-start"
         w="full"
-        h="100dvh"
+        minH="100dvh"
         sx={{ "&>*": { width: "full" } }}
         bgColor="chakra-subtle-bg"
       >
         <Container
-          maxW={location.pathname === "/" ? "full" : "container.3xl"}
-          px={0} // set padding on child component containers
+          maxW={pathname === "/" ? "full" : "container.4xl"}
+          mx="auto"
           flex="1"
         >
           <Outlet />

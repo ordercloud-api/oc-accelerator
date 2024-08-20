@@ -7,7 +7,7 @@ const {definePartsStyle, defineMultiStyleConfig} = createMultiStyleConfigHelpers
 const baseStyle = (props:any) =>
   definePartsStyle({
     container: {
-      borderRadius: "md",
+      borderRadius: "none",
       backgroundColor: mode("white", "whiteAlpha.100")(props)
     }
   })

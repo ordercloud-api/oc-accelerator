@@ -16,11 +16,17 @@ import { useNavigate } from "react-router-dom";
 interface MegaMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  selectedCatalog: string;
+  setSelectedCatalog: (catalogID: string) => void;
 }
 
-const MegaMenu: FC<MegaMenuProps> = ({ isOpen, onClose }) => {
+const MegaMenu: FC<MegaMenuProps> = ({
+  isOpen,
+  onClose,
+  selectedCatalog,
+  setSelectedCatalog,
+}) => {
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
-  const [selectedCatalog, setSelectedCatalog] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -65,7 +71,7 @@ const MegaMenu: FC<MegaMenuProps> = ({ isOpen, onClose }) => {
       }
     };
     fetchCatalogs();
-  }, []);
+  }, [setSelectedCatalog]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -86,7 +92,7 @@ const MegaMenu: FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   }, [selectedCatalog]);
 
   const handleCategoryClick = (categoryId: string | undefined) => {
-    if (!categoryId || !selectedCatalog) return null;
+    if (!categoryId || !selectedCatalog) return;
     navigate(`/product-list/${selectedCatalog}/${categoryId}`);
     onClose();
   };
@@ -94,17 +100,17 @@ const MegaMenu: FC<MegaMenuProps> = ({ isOpen, onClose }) => {
   return (
     <Container
       as={SlideFade}
-      minH="30vh"
+      minH="20vh"
       maxH="45vh"
       display="flex"
       flexDirection="column"
       offsetY={-12}
       in={isOpen}
       position="absolute"
-      top={12}
+      top={14}
       maxW="container.4xl"
       py={4}
-      bgColor="whiteAlpha.400"
+      bgColor="whiteAlpha.600"
       borderBottom="1px solid"
       borderColor="whiteAlpha.400"
       backdropFilter="auto"
@@ -127,6 +133,8 @@ const MegaMenu: FC<MegaMenuProps> = ({ isOpen, onClose }) => {
             display="grid"
             alignContent="flex-start"
             gap={3}
+            maxH="500px"
+            overflowY="auto"
             gridTemplateColumns={
               !loading ? "repeat( auto-fit, minmax(300px, 1fr))" : "1fr"
             }
@@ -145,15 +153,18 @@ const MegaMenu: FC<MegaMenuProps> = ({ isOpen, onClose }) => {
           </Container>
         )}
       </>
-      <FormControl ml="4">
+      <FormControl ml="12">
         <FormLabel fontSize="xs" mb={1}>
           Switch catalogs
         </FormLabel>
         <Select
           size="sm"
           value={selectedCatalog}
-          onChange={(e) => setSelectedCatalog(e.target.value)}
+          onChange={(e) => setSelectedCatalog(e.target.value)} // Update the selected catalog
           w="fit-content"
+          variant="outline"
+          bgColor="transparent"
+          fontSize=".8rem"
         >
           {catalogs.map((catalog) => (
             <option key={catalog.ID} value={catalog.ID}>
