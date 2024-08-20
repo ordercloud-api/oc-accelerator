@@ -18,7 +18,7 @@ import { FC, Fragment, PropsWithChildren, forwardRef, useEffect, useMemo, useRef
 import { TbPalette } from 'react-icons/tb'
 import { Link, matchPath, Outlet, useLocation } from 'react-router-dom'
 import { resources } from '../../routes/resources'
-import LoginModal from '../Login/LoginModal'
+import LoginModal from '../Authentication/LoginModal'
 import AdminBreadcrumbs from './AdminBreadcrumbs'
 import { ThemeDrawer } from './ThemeDrawer'
 import { HeaderLogo } from '../Shared/branding/HeaderLogo'
