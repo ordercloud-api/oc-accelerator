@@ -28,8 +28,8 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
       const result = await Me.ListProducts({
         catalogID: catalogId,
         categoryID: categoryId,
-        filters: { "xp.Images": "*" },
-        pageSize: 100, // Adjust as needed
+        filters: { }, // Add filters as needed
+        pageSize: 20, // Adjust as needed
       });
       setProducts(result?.Items || []);
 
