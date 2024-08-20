@@ -5,7 +5,6 @@ import { OrderSummary } from "./components/cart/OrderSummary";
 import ProductList from "./components/product/ProductList";
 import ProductDetailWrapper from "./components/product/ProductDetailWrapper";
 import Dashboard from './components/Dashboard';
-// import CategoryList from "./components/category/CategoryList";
 
 const routes: RouteObject[] = [
   {
@@ -25,10 +24,10 @@ const routes: RouteObject[] = [
         path: "/products",
         element: <ProductList />,
       },
-      // {
-      //   path: "/products/:catalogId",
-      //   element: <ProductList />,
-      // },
+      {
+        path: "/product-list/:catalogId",
+        element: <ProductList />,
+      },
       {
         path: "/product-list/:catalogId/:categoryId",
         element: <ProductList />,
