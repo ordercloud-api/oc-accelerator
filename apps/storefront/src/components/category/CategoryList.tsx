@@ -61,4 +61,3 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({
 };
 
 export default CategoryList;
-∏

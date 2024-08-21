@@ -1,5 +1,3 @@
-import {getColor} from "@chakra-ui/theme-tools"
-import {theme as defaultTheme} from "@chakra-ui/theme"
 
 
 const borders = {

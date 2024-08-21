@@ -5,7 +5,6 @@ import { OrderSummary } from "./components/cart/OrderSummary";
 import ProductList from "./components/product/ProductList";
 import ProductDetailWrapper from "./components/product/ProductDetailWrapper";
 import Dashboard from './components/Dashboard';
-// import CategoryList from "./components/category/CategoryList";
 
 const routes: RouteObject[] = [
   {
@@ -26,7 +25,7 @@ const routes: RouteObject[] = [
         element: <ProductList />,
       },
       {
-        path: "/products/:catalogId",
+        path: "/product-list/:catalogId",
         element: <ProductList />,
       },
       {
