@@ -1,5 +1,5 @@
 import { Heading, SimpleGrid, Spinner, Center } from "@chakra-ui/react";
-import { BuyerProduct, Me, Category } from "ordercloud-javascript-sdk";
+import { BuyerProduct, Me } from "ordercloud-javascript-sdk";
 import React, {
   FunctionComponent,
   useCallback,
@@ -19,7 +19,6 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     categoryId: string;
   }>();
   const [products, setProducts] = useState<BuyerProduct[]>([]);
-  const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
 
   const getProducts = useCallback(async () => {
@@ -28,15 +27,10 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
       const result = await Me.ListProducts({
         catalogID: catalogId,
         categoryID: categoryId,
-        filters: { "xp.Images": "*" },
-        pageSize: 100, // Adjust as needed
+        filters: { }, // Add filters as needed
+        pageSize: 20, // Adjust as needed
       });
       setProducts(result?.Items || []);
-
-      if (categoryId) {
-        const categoryResult = await Me.GetCategory(categoryId);
-        setCategory(categoryResult);
-      }
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
