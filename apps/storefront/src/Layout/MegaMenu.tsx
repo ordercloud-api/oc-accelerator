@@ -4,6 +4,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  HStack,
   Select,
   SlideFade,
   Spinner,
@@ -153,26 +154,43 @@ const MegaMenu: FC<MegaMenuProps> = ({
           </Container>
         )}
       </>
-      <FormControl ml="12">
-        <FormLabel fontSize="xs" mb={1}>
-          Switch catalogs
-        </FormLabel>
-        <Select
-          size="sm"
-          value={selectedCatalog}
-          onChange={(e) => setSelectedCatalog(e.target.value)} // Update the selected catalog
-          w="fit-content"
-          variant="outline"
-          bgColor="transparent"
-          fontSize=".8rem"
+      {!loading && (
+        <Container
+          maxW="container.4xl"
+          display="flex"
+          alignItems="flex-end"
+          justifyContent="flex-end"
+          gap={6}
+          mt={6}
         >
-          {catalogs.map((catalog) => (
-            <option key={catalog.ID} value={catalog.ID}>
-              {catalog.Name}
-            </option>
-          ))}
-        </Select>
-      </FormControl>
+          <Button size="xs" variant="ghost" colorScheme="primary">
+            View all categories
+          </Button>
+          {catalogs.length > 1 && (
+            <FormControl w="auto">
+              <FormLabel fontSize=".7rem" color="chakra-subtle-text" mb={0}>
+                Switch catalogs
+              </FormLabel>
+              <Select
+                size="sm"
+                h="24px"
+                value={selectedCatalog}
+                onChange={(e) => setSelectedCatalog(e.target.value)} // Update the selected catalog
+                w="fit-content"
+                variant="outline"
+                bgColor="transparent"
+                fontSize=".7rem"
+              >
+                {catalogs.map((catalog) => (
+                  <option key={catalog.ID} value={catalog.ID}>
+                    {catalog.Name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        </Container>
+      )}
     </Container>
   );
 };
