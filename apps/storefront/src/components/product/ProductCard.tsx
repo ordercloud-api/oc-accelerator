@@ -63,6 +63,7 @@ const ProductCard: FunctionComponent<ProductCardProps> = ({ product }) => {
                     objectFit="cover"
                     src={product.xp.Images[0].Url}
                     zIndex={1}
+                    bgColor="white"
                     onError={(e) => {
                       e.currentTarget.src = ""; // Prevent the broken image from rendering
                       e.currentTarget.style.display = "none"; // Hide the broken image
