@@ -1,11 +1,9 @@
+import { Heading, SimpleGrid, Spinner, Center, Box } from "@chakra-ui/react";
 import {
-  Heading,
-  SimpleGrid,
-  Spinner,
-  Center,
-  Box,
-} from "@chakra-ui/react";
-import { BuyerProduct, Me } from "ordercloud-javascript-sdk";
+  BuyerProduct,
+  Me,
+  ListPageWithFacets,
+} from "ordercloud-javascript-sdk";
 import React, {
   FunctionComponent,
   useCallback,
@@ -13,10 +11,18 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import ProductCard from "./ProductCard";
-import FilterSearchMenu, { ServiceListOptions } from "../shared/FilterSearchMenu";
-import { parse } from 'querystring'
+import FilterSearchMenu, {
+  ServiceListOptions,
+} from "../shared/FilterSearchMenu";
+import { parse } from "querystring";
+import Pagination from "../shared/pagination/Pagination";
 
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;
@@ -27,11 +33,16 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     catalogId: string;
     categoryId: string;
   }>();
-  const [products, setProducts] = useState<BuyerProduct[]>([]);
+  const [productList, setProductList] =
+    useState<ListPageWithFacets<BuyerProduct>>();
   const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams()
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
+
+  const currentPage = useMemo(() => {
+    return Number(searchParams.get("page")) || 1;
+  }, [searchParams]);
 
   const getProducts = useCallback(async () => {
     setLoading(true);
@@ -43,15 +54,16 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
         categoryID: categoryId,
         filters: {}, // Add filters as needed
         pageSize: 20, // Adjust as needed
-        search
+        page: currentPage, 
+        search,
       });
-      setProducts(result?.Items || []);
+      setProductList(result);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
       setLoading(false);
     }
-  }, [catalogId, categoryId, searchParams]);
+  }, [catalogId, categoryId, currentPage, searchParams]);
 
   useEffect(() => {
     getProducts();
@@ -72,7 +84,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
         } else if (prevValue) {
           searchParams.delete(queryKey);
         }
- 
+
         navigate(
           { pathname: location.pathname, search: searchParams.toString() },
           { state: { shallow: true } }
@@ -82,8 +94,8 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
   );
 
   const listOptions = useMemo(() => {
-    return parse(location.search.slice(1)) as ServiceListOptions
-  }, [location.search])
+    return parse(location.search.slice(1)) as ServiceListOptions;
+  }, [location.search]);
 
   if (loading) {
     return (
@@ -106,17 +118,26 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
         gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
         spacing={4}
       >
-        {products.map((p) => (
+        {productList?.Items?.map((p) => (
           <React.Fragment key={p.ID}>
             {renderItem ? renderItem(p) : <ProductCard product={p} />}
           </React.Fragment>
         ))}
       </SimpleGrid>
-      {products.length === 0 && (
+      {productList?.Items?.length === 0 && (
         <Center h="20vh">
           <Heading as="h2" size="md">
             No products found
           </Heading>
+        </Center>
+      )}
+      {productList?.Meta?.TotalPages && productList.Meta.TotalPages > 1 && (
+        <Center>
+          <Pagination
+            page={currentPage}
+            totalPages={productList.Meta.TotalPages}
+            onChange={handleRoutingChange("page")}
+          />
         </Center>
       )}
     </>
