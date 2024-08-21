@@ -1,7 +1,6 @@
 import {
   Card,
   CardBody,
-  CardFooter,
   Center,
   Heading,
   Icon,

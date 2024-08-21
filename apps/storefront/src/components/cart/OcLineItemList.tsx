@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Card, CardBody, Text, VStack } from "@chakra-ui/react";
 import { LineItem } from "ordercloud-javascript-sdk";
-import React, { FunctionComponent, useMemo } from "react";
+import { FunctionComponent } from "react";
 import OcLineItemCard from "./OcLineItemCard";
 
 interface OcLineItemListProps {
