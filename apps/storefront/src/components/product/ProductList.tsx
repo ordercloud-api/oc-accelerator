@@ -1,4 +1,12 @@
-import { Heading, SimpleGrid, Spinner, Center, Box } from "@chakra-ui/react";
+import {
+  Heading,
+  SimpleGrid,
+  Spinner,
+  Center,
+  Box,
+  Grid,
+  GridItem,
+} from "@chakra-ui/react";
 import {
   BuyerProduct,
   Me,
@@ -53,9 +61,9 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     const filtersObj = {} as any;
     for (const key of searchParams.keys()) {
       if (!["search", "page", "pageSize"].includes(key)) {
-        filtersObj[key] = searchParams.getAll(key)
+        filtersObj[key] = searchParams.getAll(key);
       }
-      searchParams.getAll(key)
+      searchParams.getAll(key);
     }
     return filtersObj;
   }, [searchParams]);
@@ -135,34 +143,50 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
 
   return (
     <>
-      <Box m={5}>
-        <FilterSearchMenu
-          listOptions={listOptions}
-          handleRoutingChange={handleRoutingChange}
-        />
-      </Box>
-      <FacetList
-        facets={productList?.Meta?.Facets}
-        onChange={handleRoutingChange}
-      />
-      <SimpleGrid
-        py={12}
-        gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
-        spacing={4}
+      <Grid
+        templateAreas={`"search search"
+                  "facets main"`}
+        gridTemplateRows={"75px 1fr 30px"}
+        gridTemplateColumns="300px 1fr"
+        gap="1"
+        color="blackAlpha.700"
+        fontWeight="bold"
       >
-        {productList?.Items?.map((p) => (
-          <React.Fragment key={p.ID}>
-            {renderItem ? renderItem(p) : <ProductCard product={p} />}
-          </React.Fragment>
-        ))}
-      </SimpleGrid>
-      {productList?.Items?.length === 0 && (
-        <Center h="20vh">
-          <Heading as="h2" size="md">
-            No products found
-          </Heading>
-        </Center>
-      )}
+        <GridItem pl="2" area={"search"}>
+          <Box m={5}>
+            <FilterSearchMenu
+              listOptions={listOptions}
+              handleRoutingChange={handleRoutingChange}
+            />
+          </Box>
+        </GridItem>
+        <GridItem pl="2" area={"facets"}>
+          <FacetList
+            facets={productList?.Meta?.Facets}
+            onChange={handleRoutingChange}
+          />
+        </GridItem>
+        <GridItem pl="2" area={"main"}>
+          <SimpleGrid
+            py={12}
+            gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
+            spacing={4}
+          >
+            {productList?.Items?.map((p) => (
+              <React.Fragment key={p.ID}>
+                {renderItem ? renderItem(p) : <ProductCard product={p} />}
+              </React.Fragment>
+            ))}
+          </SimpleGrid>
+          {productList?.Items?.length === 0 && (
+            <Center h="20vh">
+              <Heading as="h2" size="md">
+                No products found
+              </Heading>
+            </Center>
+          )}
+        </GridItem>
+      </Grid>
       {productList?.Meta?.TotalPages && productList.Meta.TotalPages > 1 && (
         <Center>
           <Pagination
