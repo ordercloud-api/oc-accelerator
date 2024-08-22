@@ -4,14 +4,13 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  HStack,
   Select,
   SlideFade,
   Spinner,
-  useOutsideClick,
+  useOutsideClick
 } from "@chakra-ui/react";
 import { Catalog, Category, ListPage, Me } from "ordercloud-javascript-sdk";
-import { FC, useEffect, useState, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface MegaMenuProps {
@@ -97,6 +96,12 @@ const MegaMenu: FC<MegaMenuProps> = ({
     navigate(`/product-list/${selectedCatalog}/${categoryId}`);
     onClose();
   };
+  
+  const handleViewAllCategoryClick = (categoryId: string | undefined) => {
+    if (!categoryId || !selectedCatalog) return;
+    navigate(`/categories/${selectedCatalog}`);
+    onClose();
+  };
 
   return (
     <Container
@@ -163,7 +168,12 @@ const MegaMenu: FC<MegaMenuProps> = ({
           gap={6}
           mt={6}
         >
-          <Button size="xs" variant="ghost" colorScheme="primary">
+          <Button
+            onClick={() => handleViewAllCategoryClick(selectedCatalog)}
+            size="xs"
+            variant="ghost"
+            colorScheme="primary"
+          >
             View all categories
           </Button>
           {catalogs.length > 1 && (
