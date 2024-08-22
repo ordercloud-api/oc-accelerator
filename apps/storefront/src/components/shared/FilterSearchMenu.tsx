@@ -43,7 +43,7 @@ const FilterSearchMenu: FC<FilterSearchMenuProps> = ({
           pl={10}
           placeholder={`Search Products...`}
           value={(listOptions['search'] as string) || ''}
-          onChange={(v: any) => {
+          onChange={(v: string | number) => {
             handleRoutingChange('search', true)(v)
           }}
         />

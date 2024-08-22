@@ -23,6 +23,7 @@ import FilterSearchMenu, {
 } from "../shared/FilterSearchMenu";
 import { parse } from "querystring";
 import Pagination from "../shared/pagination/Pagination";
+import FacetList from "./FacetList";
 
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;
@@ -40,22 +41,35 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const searchTerm = useMemo(() => {
+    return searchParams.get("search") || undefined;
+  }, [searchParams]);
+
   const currentPage = useMemo(() => {
     return Number(searchParams.get("page")) || 1;
   }, [searchParams]);
 
+  const filters = useMemo(() => {
+    const filtersObj = {} as any;
+    for (const key of searchParams.keys()) {
+      if (!["search", "page", "pageSize"].includes(key)) {
+        filtersObj[key] = searchParams.getAll(key)
+      }
+      searchParams.getAll(key)
+    }
+    return filtersObj;
+  }, [searchParams]);
+
   const getProducts = useCallback(async () => {
     setLoading(true);
-    const search = searchParams.get("search") || undefined;
-
     try {
       const result = await Me.ListProducts({
         catalogID: catalogId,
         categoryID: categoryId,
-        filters: {}, // Add filters as needed
+        filters,
         pageSize: 20, // Adjust as needed
-        page: currentPage, 
-        search,
+        page: currentPage,
+        search: searchTerm,
       });
       setProductList(result);
     } catch (error) {
@@ -63,26 +77,40 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     } finally {
       setLoading(false);
     }
-  }, [catalogId, categoryId, currentPage, searchParams]);
+  }, [catalogId, categoryId, currentPage, filters, searchTerm]);
 
   useEffect(() => {
     getProducts();
   }, [getProducts]);
 
   const handleRoutingChange = useCallback(
-    (queryKey: string, resetPage?: boolean) =>
+    (queryKey: string, resetPage?: boolean, index?: number) =>
       (value?: string | boolean | number) => {
         const searchParams = new URLSearchParams(location.search);
         const hasPageParam = Boolean(searchParams.get("page"));
-        const prevValue = searchParams.get(queryKey);
+        const isFilterParam = !["search", "page", "pageSize"].includes(
+          queryKey
+        );
+
+        // filters can have multiple values for one key i.e. SpecCount > 0 AND SpecCount < 2
+        const prevValue = isFilterParam
+          ? searchParams.getAll(queryKey)
+          : searchParams.get(queryKey);
         if (!value && !prevValue) return;
         if (value) {
-          if (prevValue !== value) {
+          if (!isFilterParam && prevValue !== value) {
             searchParams.set(queryKey, value.toString());
-            if (hasPageParam && resetPage) searchParams.delete("page"); // reset page on filter change
+          } else if (isFilterParam) {
+            prevValue?.includes(value.toString())
+              ? searchParams.delete(queryKey, value.toString())
+              : searchParams.append(queryKey, value.toString());
           }
+          if (hasPageParam && resetPage) searchParams.delete("page"); // reset page on filter change
         } else if (prevValue) {
-          searchParams.delete(queryKey);
+          searchParams.delete(
+            queryKey,
+            index !== undefined ? prevValue[index] : undefined
+          );
         }
 
         navigate(
@@ -113,6 +141,10 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
           handleRoutingChange={handleRoutingChange}
         />
       </Box>
+      <FacetList
+        facets={productList?.Meta?.Facets}
+        onChange={handleRoutingChange}
+      />
       <SimpleGrid
         py={12}
         gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
