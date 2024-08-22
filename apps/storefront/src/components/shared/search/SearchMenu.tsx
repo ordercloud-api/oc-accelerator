@@ -8,11 +8,11 @@ import {
 } from '@chakra-ui/react'
 import { FC } from 'react'
 import { TbSearch } from 'react-icons/tb'
-import { DebouncedInput } from './DebouncedInput'
+import { DebouncedInput } from '../DebouncedInput'
 
 export type ServiceListOptions = { [key: string]: ServiceListOptions | string }
 
-interface FilterSearchMenuProps {
+interface SearchMenuProps {
   listOptions: ServiceListOptions
   handleRoutingChange: (
     queryKey: string,
@@ -21,7 +21,7 @@ interface FilterSearchMenuProps {
   ) => (value?: string | boolean | number) => void
 }
 
-const FilterSearchMenu: FC<FilterSearchMenuProps> = ({
+const SearchMenu: FC<SearchMenuProps> = ({
   listOptions,
   handleRoutingChange,
 }) => {
@@ -64,4 +64,4 @@ const FilterSearchMenu: FC<FilterSearchMenuProps> = ({
   )
 }
 
-export default FilterSearchMenu
+export default SearchMenu

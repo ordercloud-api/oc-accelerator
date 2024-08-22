@@ -10,7 +10,7 @@ import {
 import { ListFacet, ListFacetValue } from "ordercloud-javascript-sdk";
 import { useSearchParams } from "react-router-dom";
 
-interface FacetListValueProps {
+interface FacetListValuesProps {
   facetList: ListFacet | undefined;
   onChange: (
     queryKey: string,
@@ -19,7 +19,7 @@ interface FacetListValueProps {
   ) => (value?: string | boolean | number) => void;
 }
 
-const FacetListValue: FunctionComponent<FacetListValueProps> = ({
+const FacetListValues: FunctionComponent<FacetListValuesProps> = ({
   facetList,
   onChange,
 }) => {
@@ -52,4 +52,4 @@ const FacetListValue: FunctionComponent<FacetListValueProps> = ({
   );
 };
 
-export default FacetListValue;
+export default FacetListValues;

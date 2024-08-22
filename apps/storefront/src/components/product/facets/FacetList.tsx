@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { FunctionComponent } from "react";
 import { ListFacet } from "ordercloud-javascript-sdk";
-import FacetListValue from "./FacetListValue";
+import FacetListValue from "./FacetListValues";
 
 interface FacetListProps {
   facets: ListFacet[] | undefined;

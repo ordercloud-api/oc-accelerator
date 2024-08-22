@@ -26,12 +26,10 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import ProductCard from "./ProductCard";
-import FilterSearchMenu, {
-  ServiceListOptions,
-} from "../shared/FilterSearchMenu";
+import FilterSearchMenu, { ServiceListOptions } from "../shared/search/SearchMenu";
 import { parse } from "querystring";
 import Pagination from "../shared/pagination/Pagination";
-import FacetList from "./FacetList";
+import FacetList from "./facets/FacetList";
 
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;
@@ -58,7 +56,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
   }, [searchParams]);
 
   const filters = useMemo(() => {
-    const filtersObj = {} as any;
+    const filtersObj = {} as { [key: string]: string | string[] };
     for (const key of searchParams.keys()) {
       if (!["search", "page", "pageSize"].includes(key)) {
         filtersObj[key] = searchParams.getAll(key);
@@ -178,7 +176,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
               </React.Fragment>
             ))}
           </SimpleGrid>
-          {productList?.Items?.length === 0 && (
+          {productList?.Items && productList.Items.length === 0 && (
             <Center h="20vh">
               <Heading as="h2" size="md">
                 No products found
@@ -187,7 +185,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
           )}
         </GridItem>
       </Grid>
-      {productList?.Meta?.TotalPages && productList.Meta.TotalPages > 1 && (
+      {!!productList?.Meta?.TotalPages && productList.Meta.TotalPages > 1 && (
         <Center>
           <Pagination
             page={currentPage}
