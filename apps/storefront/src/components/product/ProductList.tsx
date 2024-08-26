@@ -1,17 +1,28 @@
 import {
+  Button,
+  Card,
+  CardBody,
+  Center,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  Grid,
+  GridItem,
   Heading,
   SimpleGrid,
   Spinner,
-  Center,
-  Box,
-  Grid,
-  GridItem,
+  VStack,
+  useDisclosure
 } from "@chakra-ui/react";
 import {
   BuyerProduct,
-  Me,
   ListPageWithFacets,
+  Me,
 } from "ordercloud-javascript-sdk";
+import { parse } from "querystring";
 import React, {
   FunctionComponent,
   useCallback,
@@ -25,11 +36,10 @@ import {
   useParams,
   useSearchParams,
 } from "react-router-dom";
-import ProductCard from "./ProductCard";
-import FilterSearchMenu, { ServiceListOptions } from "../shared/search/SearchMenu";
-import { parse } from "querystring";
 import Pagination from "../shared/pagination/Pagination";
+import FilterSearchMenu, { ServiceListOptions } from "../shared/search/SearchMenu";
 import FacetList from "./facets/FacetList";
+import ProductCard from "./ProductCard";
 
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;
@@ -46,6 +56,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
   const searchTerm = useMemo(() => {
     return searchParams.get("search") || undefined;
@@ -141,50 +152,73 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
 
   return (
     <>
-      <Grid
-        templateAreas={`"search search"
-                  "facets main"`}
-        gridTemplateRows={"75px 1fr 30px"}
-        gridTemplateColumns="300px 1fr"
-        gap="1"
-        color="blackAlpha.700"
-        fontWeight="bold"
-      >
-        <GridItem pl="2" area={"search"}>
-          <Box m={5}>
+      <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Filters</DrawerHeader>
+          <DrawerBody>
             <FilterSearchMenu
               listOptions={listOptions}
               handleRoutingChange={handleRoutingChange}
             />
-          </Box>
+            <FacetList
+              facets={productList?.Meta?.Facets}
+              onChange={handleRoutingChange}
+            />
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+
+      <Grid
+        gridTemplateColumns={{ md: "300px 1fr" }}
+        gap="4"
+        my={8}
+        alignItems="flex-start"
+      >
+        <Card
+          as={GridItem}
+          position="sticky"
+          top="20"
+          display={{ base: "none", md: "block" }}
+        >
+          <CardBody as={VStack} alignItems="stretch">
+            <FilterSearchMenu
+              listOptions={listOptions}
+              handleRoutingChange={handleRoutingChange}
+            />
+            <FacetList
+              facets={productList?.Meta?.Facets}
+              onChange={handleRoutingChange}
+            />
+          </CardBody>
+        </Card>
+        <GridItem display={{ base: "block", md: "none" }}>
+          <Button aria-label="Open Filters" onClick={onOpen} mb={4} size="sm">
+            Refine your search
+          </Button>
         </GridItem>
-        <GridItem pl="2" area={"facets"}>
-          <FacetList
-            facets={productList?.Meta?.Facets}
-            onChange={handleRoutingChange}
-          />
-        </GridItem>
-        <GridItem pl="2" area={"main"}>
-          <SimpleGrid
-            py={12}
-            gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
-            spacing={4}
-          >
-            {productList?.Items?.map((p) => (
-              <React.Fragment key={p.ID}>
-                {renderItem ? renderItem(p) : <ProductCard product={p} />}
-              </React.Fragment>
-            ))}
-          </SimpleGrid>
-          {productList?.Items && productList.Items.length === 0 && (
-            <Center h="20vh">
-              <Heading as="h2" size="md">
-                No products found
-              </Heading>
-            </Center>
-          )}
-        </GridItem>
+        <SimpleGrid
+          as={GridItem}
+          w="full"
+          gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
+          spacing={4}
+        >
+          {productList?.Items?.map((p) => (
+            <React.Fragment key={p.ID}>
+              {renderItem ? renderItem(p) : <ProductCard product={p} />}
+            </React.Fragment>
+          ))}
+        </SimpleGrid>
+        {productList?.Items && productList.Items.length === 0 && (
+          <Center h="20vh">
+            <Heading as="h2" size="md">
+              No products found
+            </Heading>
+          </Center>
+        )}
       </Grid>
+
       {!!productList?.Meta?.TotalPages && productList.Meta.TotalPages > 1 && (
         <Center>
           <Pagination

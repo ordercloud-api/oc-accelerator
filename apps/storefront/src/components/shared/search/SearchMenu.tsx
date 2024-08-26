@@ -1,5 +1,7 @@
 import {
   Button,
+  FormControl,
+  FormLabel,
   Icon,
   InputGroup,
   InputLeftElement,
@@ -25,43 +27,38 @@ const SearchMenu: FC<SearchMenuProps> = ({
   listOptions,
   handleRoutingChange,
 }) => {
-  const subtleIcon = useColorModeValue('blackAlpha.500', 'whiteAlpha.500')
+  const subtleIcon = useColorModeValue('gray.300', 'whiteAlpha.500')
 
   return (
-    <>
-      <InputGroup
-        w="400px"
-        maxW="100%"
-      >
+      <InputGroup w="100%" size="sm">
         <InputLeftElement pointerEvents="none">
-          <Icon
-            as={TbSearch}
-            color={subtleIcon}
-          />
+          <Icon boxSize="60%" as={TbSearch} color={subtleIcon} />
         </InputLeftElement>
         <DebouncedInput
           pl={10}
-          placeholder={`Search Products...`}
-          value={(listOptions['search'] as string) || ''}
+          placeholder={`Search by keyword`}
+          value={(listOptions["search"] as string) || ""}
           onChange={(v: string | number) => {
-            handleRoutingChange('search', true)(v)
+            handleRoutingChange("search", true)(v);
           }}
         />
-        {(listOptions['search'] as string)?.length > 0 && (
-          <InputRightElement width="4.5rem">
+        {(listOptions["search"] as string)?.length > 0 && (
+          <InputRightElement width="3.75rem">
             <Button
-              variant="outline"
-              h="1.75rem"
+              variant="ghost"
+              colorScheme="secondary"
+              h="70%"
+              fontSize="x-small"
+              px="2"
               size="sm"
-              onClick={() => handleRoutingChange('search', true)('')}
+              onClick={() => handleRoutingChange("search", true)("")}
             >
               Clear
             </Button>
           </InputRightElement>
         )}
       </InputGroup>
-    </>
-  )
+  );
 }
 
 export default SearchMenu
