@@ -19,8 +19,7 @@ import { TbShoppingCart } from "react-icons/tb";
 import { Link as RouterLink } from "react-router-dom";
 import { useCurrentUser } from "../hooks/currentUser";
 import MegaMenu from "./MegaMenu";
-// import logo from "../assets/oc-accelerator.svg";
-import { AcceleratorLogo } from "../assets/Icons";
+import { DEFAULT_BRAND } from "../assets/DEFAULT_BRAND";
 
 interface MainMenuProps {
   loginDisclosure: UseDisclosureProps;
@@ -108,7 +107,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
       <Container h="100%" maxW="full">
         <HStack h="100%" justify="flex-start" alignItems="center">
           <RouterLink to="/">
-            <AcceleratorLogo h="10" />
+            <DEFAULT_BRAND h="10" />
           </RouterLink>
           <HStack as="nav" flexGrow="1" ml={3}>
             <Button

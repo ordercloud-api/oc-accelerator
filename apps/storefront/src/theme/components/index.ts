@@ -43,6 +43,7 @@ import Spinner from "./spinner";
 // import Table from "./table"
 import Tabs from "./tabs";
 import { Tag } from "./tag";
+import { Icon } from "./Icon";
 // import Textarea from "./textarea"
 // import Tooltip from "./tooltip"
 
@@ -65,6 +66,7 @@ const components = {
   // FormError,
   // FormLabel,
   Heading,
+  Icon,
   // Input,
   // Kbd,
   Link,

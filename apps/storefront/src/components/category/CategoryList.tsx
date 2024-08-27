@@ -1,62 +1,81 @@
-import { Heading, SimpleGrid } from "@chakra-ui/react";
-import { Categories, Category } from "ordercloud-javascript-sdk";
+import { Center, Heading, SimpleGrid, Spinner } from "@chakra-ui/react";
+import { Category, ListPage, Me } from "ordercloud-javascript-sdk";
 import React, {
   FunctionComponent,
   useCallback,
   useEffect,
   useState,
 } from "react";
+import { useParams } from "react-router-dom";
 import CategoryCard from "./CategoryCard";
 
 export interface CategoryListProps {
   renderItem?: (category: Category) => JSX.Element;
-  catalogId?: string;
 }
 
-const CategoryList: FunctionComponent<CategoryListProps> = ({
-  renderItem,
-  catalogId,
-}) => {
-  const [categories, setCategories] = useState<Category[]>();
+const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
+  const { catalogId } = useParams<{ catalogId: string }>();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const getCategories = useCallback(async () => {
-    if (!catalogId) return; // Ensure catalogId is defined
-    const result = await Categories.List(catalogId);
-    setCategories(result?.Items);
+    if (!catalogId) {
+      console.error("No catalogId provided");
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const categoryResult: ListPage<Category> = await Me.ListCategories({
+        catalogID: catalogId,
+        pageSize: 20, // Adjust as needed
+      });
+      setCategories(categoryResult.Items || []);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
+    }
   }, [catalogId]);
 
   useEffect(() => {
     getCategories();
   }, [getCategories]);
 
+  if (loading) {
+    return (
+      <Center h="50vh">
+        <Spinner size="xl" thickness="10px" />
+      </Center>
+    );
+  }
+
+  if (categories.length === 0) {
+    return (
+      <Center h="50vh">
+        <Heading color="chakra-subtle-color">
+          No categories found
+        </Heading>
+      </Center>
+    );
+  }
+
   return (
-    <>
-      <Heading
-        as="h1"
-        size="xl"
-        flexGrow="1"
-        color="chakra-placeholder-color"
-        textTransform="uppercase"
-        fontWeight="300"
-        mb={8}
-        pb={2}
-        borderBottom="1px solid"
-        borderColor="chakra-border-color"
-      >
-        Browse Categories
-      </Heading>
-      <SimpleGrid
-        gridTemplateColumns="repeat(auto-fit, minmax(270px, 1fr))"
-        spacing={4}
-      >
-        {categories &&
-          categories?.map((c) => (
-            <React.Fragment key={c.ID}>
-              {renderItem ? renderItem(c) : <CategoryCard category={c} />}
-            </React.Fragment>
-          ))}
-      </SimpleGrid>
-    </>
+    <SimpleGrid
+      py={12}
+      gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
+      spacing={4}
+    >
+      {categories.map((category) => (
+        <React.Fragment key={category.ID}>
+          {renderItem ? (
+            renderItem(category)
+          ) : (
+            <CategoryCard category={category} catalogId={catalogId} />
+          )}
+        </React.Fragment>
+      ))}
+    </SimpleGrid>
   );
 };
 

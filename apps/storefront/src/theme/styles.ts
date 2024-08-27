@@ -33,9 +33,6 @@ const styles = {
     ".discover-logo-foreground": {
       fill: "st.discoverForeground"
     },
-    "path":{
-      fill: 'inherit !important'
-    },
     body: {
       fontSize: "md",
       "& #__next": {

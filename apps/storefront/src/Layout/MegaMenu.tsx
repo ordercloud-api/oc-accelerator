@@ -7,10 +7,10 @@ import {
   Select,
   SlideFade,
   Spinner,
-  useOutsideClick,
+  useOutsideClick
 } from "@chakra-ui/react";
 import { Catalog, Category, ListPage, Me } from "ordercloud-javascript-sdk";
-import { FC, useEffect, useState, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface MegaMenuProps {
@@ -96,6 +96,12 @@ const MegaMenu: FC<MegaMenuProps> = ({
     navigate(`/product-list/${selectedCatalog}/${categoryId}`);
     onClose();
   };
+  
+  const handleViewAllCategoryClick = (categoryId: string | undefined) => {
+    if (!categoryId || !selectedCatalog) return;
+    navigate(`/categories/${selectedCatalog}`);
+    onClose();
+  };
 
   return (
     <Container
@@ -153,26 +159,48 @@ const MegaMenu: FC<MegaMenuProps> = ({
           </Container>
         )}
       </>
-      <FormControl ml="12">
-        <FormLabel fontSize="xs" mb={1}>
-          Switch catalogs
-        </FormLabel>
-        <Select
-          size="sm"
-          value={selectedCatalog}
-          onChange={(e) => setSelectedCatalog(e.target.value)} // Update the selected catalog
-          w="fit-content"
-          variant="outline"
-          bgColor="transparent"
-          fontSize=".8rem"
+      {!loading && (
+        <Container
+          maxW="container.4xl"
+          display="flex"
+          alignItems="flex-end"
+          justifyContent="flex-end"
+          gap={6}
+          mt={6}
         >
-          {catalogs.map((catalog) => (
-            <option key={catalog.ID} value={catalog.ID}>
-              {catalog.Name}
-            </option>
-          ))}
-        </Select>
-      </FormControl>
+          <Button
+            onClick={() => handleViewAllCategoryClick(selectedCatalog)}
+            size="xs"
+            variant="ghost"
+            colorScheme="primary"
+          >
+            View all categories
+          </Button>
+          {catalogs.length > 1 && (
+            <FormControl w="auto">
+              <FormLabel fontSize=".7rem" color="chakra-subtle-text" mb={0}>
+                Switch catalogs
+              </FormLabel>
+              <Select
+                size="sm"
+                h="24px"
+                value={selectedCatalog}
+                onChange={(e) => setSelectedCatalog(e.target.value)} // Update the selected catalog
+                w="fit-content"
+                variant="outline"
+                bgColor="transparent"
+                fontSize=".7rem"
+              >
+                {catalogs.map((catalog) => (
+                  <option key={catalog.ID} value={catalog.ID}>
+                    {catalog.Name}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        </Container>
+      )}
     </Container>
   );
 };
