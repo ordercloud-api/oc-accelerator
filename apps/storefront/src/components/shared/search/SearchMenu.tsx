@@ -1,7 +1,5 @@
 import {
   Button,
-  FormControl,
-  FormLabel,
   Icon,
   InputGroup,
   InputLeftElement,
