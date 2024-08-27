@@ -7,10 +7,17 @@ import {
   Select,
   SlideFade,
   Spinner,
-  useOutsideClick
+  useOutsideClick,
 } from "@chakra-ui/react";
-import { Catalog, Category, ListPage, Me } from "ordercloud-javascript-sdk";
-import { FC, useEffect, useRef, useState } from "react";
+import { useOcResourceList } from "@rwatt451/ordercloud-react";
+import {
+  Catalog,
+  Category,
+  ListPage,
+  Me,
+  RequiredDeep,
+} from "ordercloud-javascript-sdk";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface MegaMenuProps {
@@ -26,9 +33,9 @@ const MegaMenu: FC<MegaMenuProps> = ({
   selectedCatalog,
   setSelectedCatalog,
 }) => {
-  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  // const [catalogs, setCatalogs] = useState<Catalog[]>([]);
+  // const [categories, setCategories] = useState<Category[]>([]);
+  // const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -55,48 +62,42 @@ const MegaMenu: FC<MegaMenuProps> = ({
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    const fetchCatalogs = async () => {
-      try {
-        setLoading(true);
-        const catalogResult: ListPage<Catalog> = await Me.ListCatalogs();
-        setCatalogs(catalogResult.Items || []);
-        if (catalogResult.Items && catalogResult.Items.length > 0) {
-          setSelectedCatalog(catalogResult.Items[0].ID || "");
-        }
-      } catch (error) {
-        console.error("Error fetching catalogs:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCatalogs();
-  }, [setSelectedCatalog]);
+  const { data: catalogResult, isLoading: loading } = useOcResourceList(
+    "Catalogs",
+    {},
+    {},
+    {
+      staleTime: 300000, // 5 min
+    },
+    true
+  );
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      if (!selectedCatalog) return;
-      try {
-        setLoading(true);
-        const categoryResult: ListPage<Category> = await Me.ListCategories({
-          catalogID: selectedCatalog,
-        });
-        setCategories(categoryResult.Items || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCategories();
-  }, [selectedCatalog]);
+  const { data: categoryResult } = useOcResourceList(
+    "Categories",
+    { catalogID: selectedCatalog },
+    { },
+    {
+      staleTime: 300000, // 5 min
+      enabled: !!selectedCatalog,
+    },
+    true
+  );
+
+  const catalogs = useMemo(
+    () => (catalogResult as RequiredDeep<ListPage<Catalog>>)?.Items,
+    [catalogResult]
+  );
+  const categories = useMemo(
+    () => (categoryResult as RequiredDeep<ListPage<Category>>)?.Items,
+    [categoryResult]
+  );
 
   const handleCategoryClick = (categoryId: string | undefined) => {
     if (!categoryId || !selectedCatalog) return;
     navigate(`/product-list/${selectedCatalog}/${categoryId}`);
     onClose();
   };
-  
+
   const handleViewAllCategoryClick = (categoryId: string | undefined) => {
     if (!categoryId || !selectedCatalog) return;
     navigate(`/categories/${selectedCatalog}`);
@@ -145,7 +146,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
               !loading ? "repeat( auto-fit, minmax(300px, 1fr))" : "1fr"
             }
           >
-            {categories.map((category) => (
+            {categories?.map((category) => (
               <Button
                 key={category.ID}
                 variant="ghost"
@@ -191,7 +192,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
                 bgColor="transparent"
                 fontSize=".7rem"
               >
-                {catalogs.map((catalog) => (
+                {catalogs?.map((catalog) => (
                   <option key={catalog.ID} value={catalog.ID}>
                     {catalog.Name}
                   </option>

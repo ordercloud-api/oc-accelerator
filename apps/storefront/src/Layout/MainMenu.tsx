@@ -12,9 +12,9 @@ import {
   useDisclosure,
   UseDisclosureProps
 } from "@chakra-ui/react";
-import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
-import { Catalog, ListPage, Me } from "ordercloud-javascript-sdk";
-import { FC, useEffect, useState } from "react";
+import { useOcResourceList, useOrderCloudContext } from "@rwatt451/ordercloud-react";
+import { Catalog, ListPage, RequiredDeep } from "ordercloud-javascript-sdk";
+import { FC, useMemo, useState } from "react";
 import { TbShoppingCart } from "react-icons/tb";
 import { Link as RouterLink } from "react-router-dom";
 import { useCurrentUser } from "../hooks/currentUser";
@@ -29,27 +29,22 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const { data: user } = useCurrentUser();
   const { isLoggedIn, logout } = useOrderCloudContext();
   const megaMenuDisclosure = useDisclosure();
-  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
 
-  useEffect(() => {
-    const fetchCatalogs = async () => {
-      try {
-        const catalogResult: ListPage<Catalog> = await Me.ListCatalogs();
-        setCatalogs(catalogResult.Items || []);
-        if (catalogResult.Items && catalogResult.Items.length > 0) {
-          setSelectedCatalog(catalogResult.Items[0].ID || "");
-        }
-      } catch (error) {
-        console.error("Error fetching catalogs:", error);
-      }
-    };
+  const { data } = useOcResourceList(
+    "Catalogs",
+    { },
+    {},
+    {
+      staleTime: 300000, // 5 min
+    },
+    true
+  );
 
-    fetchCatalogs();
-  }, []);
+  const catalogs = useMemo(() => (data as RequiredDeep<ListPage<Catalog>>)?.Items, [data]);
 
   const renderCatalogMenu = () => {
-    if (catalogs.length > 1) {
+    if (catalogs?.length > 1) {
       return (
         <Menu>
           <MenuButton
@@ -61,7 +56,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
             Shop by catalog
           </MenuButton>
           <MenuList>
-            {catalogs.map((catalog) => (
+            {catalogs?.map((catalog) => (
               <MenuItem
                 key={catalog.ID}
                 onClick={() => setSelectedCatalog(catalog.ID || "")}
@@ -74,7 +69,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
           </MenuList>
         </Menu>
       );
-    } else if (catalogs.length === 1) {
+    } else if (catalogs?.length === 1) {
       return (
         <Button
           as={RouterLink}

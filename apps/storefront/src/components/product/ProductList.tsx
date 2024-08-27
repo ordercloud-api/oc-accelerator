@@ -20,15 +20,13 @@ import {
 import {
   BuyerProduct,
   ListPageWithFacets,
-  Me,
+  RequiredDeep,
 } from "ordercloud-javascript-sdk";
 import { parse } from "querystring";
 import React, {
   FunctionComponent,
   useCallback,
-  useEffect,
   useMemo,
-  useState,
 } from "react";
 import {
   useLocation,
@@ -40,6 +38,7 @@ import Pagination from "../shared/pagination/Pagination";
 import FilterSearchMenu, { ServiceListOptions } from "../shared/search/SearchMenu";
 import FacetList from "./facets/FacetList";
 import ProductCard from "./ProductCard";
+import { useOcResourceList } from "@rwatt451/ordercloud-react";
 
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;
@@ -50,13 +49,10 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     catalogId: string;
     categoryId: string;
   }>();
-  const [productList, setProductList] =
-    useState<ListPageWithFacets<BuyerProduct>>();
-  const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const searchTerm = useMemo(() => {
     return searchParams.get("search") || undefined;
@@ -77,28 +73,18 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     return filtersObj;
   }, [searchParams]);
 
-  const getProducts = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await Me.ListProducts({
-        catalogID: catalogId,
-        categoryID: categoryId,
-        filters,
-        pageSize: 20, // Adjust as needed
-        page: currentPage,
-        search: searchTerm,
-      });
-      setProductList(result);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [catalogId, categoryId, currentPage, filters, searchTerm]);
+  const { data, isLoading} = useOcResourceList(
+    'Products',
+    { search: searchTerm, page: currentPage.toString(), catalogId, categoryId, ...filters },
+    {},
+    {
+      staleTime: 300000, // 5 min
+    },
+    true
+  )
 
-  useEffect(() => {
-    getProducts();
-  }, [getProducts]);
+  const items = useMemo(()=> (data as RequiredDeep<ListPageWithFacets<BuyerProduct>>)?.Items ,[data])
+  const meta = useMemo(()=> (data as RequiredDeep<ListPageWithFacets<BuyerProduct>>)?.Meta ,[data])
 
   const handleRoutingChange = useCallback(
     (queryKey: string, resetPage?: boolean, index?: number) =>
@@ -142,7 +128,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     return parse(location.search.slice(1)) as ServiceListOptions;
   }, [location.search]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Center h="50vh">
         <Spinner size="xl" />
@@ -163,7 +149,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
               handleRoutingChange={handleRoutingChange}
             />
             <FacetList
-              facets={productList?.Meta?.Facets}
+              facets={meta?.Facets}
               onChange={handleRoutingChange}
             />
           </DrawerBody>
@@ -188,7 +174,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
               handleRoutingChange={handleRoutingChange}
             />
             <FacetList
-              facets={productList?.Meta?.Facets}
+              facets={meta?.Facets}
               onChange={handleRoutingChange}
             />
           </CardBody>
@@ -204,13 +190,13 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
           gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
           spacing={4}
         >
-          {productList?.Items?.map((p) => (
+          {items?.map((p) => (
             <React.Fragment key={p.ID}>
               {renderItem ? renderItem(p) : <ProductCard product={p} />}
             </React.Fragment>
           ))}
         </SimpleGrid>
-        {productList?.Items && productList.Items.length === 0 && (
+        {items?.length === 0 && (
           <Center h="20vh">
             <Heading as="h2" size="md">
               No products found
@@ -219,11 +205,11 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
         )}
       </Grid>
 
-      {!!productList?.Meta?.TotalPages && productList.Meta.TotalPages > 1 && (
+      {meta?.TotalPages && meta.TotalPages > 1 && (
         <Center>
           <Pagination
             page={currentPage}
-            totalPages={productList.Meta.TotalPages}
+            totalPages={meta?.TotalPages}
             onChange={handleRoutingChange("page")}
           />
         </Center>

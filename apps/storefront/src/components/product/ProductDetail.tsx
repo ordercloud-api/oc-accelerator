@@ -29,6 +29,7 @@ import { useNavigate } from "react-router-dom";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "../cart/OcQuantityInput";
 import { IS_MULTI_LOCATION_INVENTORY } from "../../constants";
+import { useOcResourceList } from "@rwatt451/ordercloud-react";
 
 export interface ProductDetailProps {
   productId: string;
@@ -43,8 +44,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
   const toast = useToast();
   const [product, setProduct] = useState<BuyerProduct>();
   const [activeRecordId, setActiveRecordId] = useState<string>();
-  const [inventoryRecords, setInventoryRecords] =
-    useState<RequiredDeep<ListPage<InventoryRecord>>>();
+  // const [inventoryRecords, setInventoryRecords] =
+  //   useState<RequiredDeep<ListPage<InventoryRecord>>>();
   const [loading, setLoading] = useState<boolean>(true);
   const [addingToCart, setAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(
@@ -67,27 +68,20 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
     }
   }, [productId]);
 
-  const getProductInventory = useCallback(async () => {
-    try {
-      const result = await Me.ListProductInventoryRecords(productId);
-      setInventoryRecords(result);
-
-      const availableRecord = result.Items.find(
-        (item) => item.QuantityAvailable > 0
-      );
-
-      if (availableRecord) {
-        setActiveRecordId(availableRecord.ID);
-      }
-    } catch (error) {
-      console.error("Error fetching product inventory:", error);
-    }
-  }, [productId]);
-
   useEffect(() => {
     getProduct();
-    if (IS_MULTI_LOCATION_INVENTORY) getProductInventory();
-  }, [getProduct, getProductInventory]);
+  }, [getProduct]);
+
+  const { data: inventoryRecords } = useOcResourceList(
+    'ProductInventoryRecords',
+    {},
+    {productID: productId},
+    {
+      staleTime: 300000, // 5 min
+      enabled: IS_MULTI_LOCATION_INVENTORY
+    },
+    true
+  )
 
   const handleAddToCart = useCallback(async () => {
     if (!product) {
@@ -208,7 +202,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
               </Heading>
               <HStack spacing={4}>
                 {inventoryRecords?.Items.length &&
-                  inventoryRecords?.Items.map((item) => (
+                  (inventoryRecords as RequiredDeep<ListPage<InventoryRecord>>)?.Items?.map((item) => (
                     <Button
                       onClick={() => setActiveRecordId(item.ID)}
                       cursor="pointer"
