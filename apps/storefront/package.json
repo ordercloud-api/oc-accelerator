@@ -12,7 +12,7 @@
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
-    "@rwatt451/ordercloud-react": "^0.0.21",
+    "@rwatt451/ordercloud-react": "^0.0.23",
     "@sitecore/blok-theme": "^1.1.13",
     "@tanstack/react-query": "^5.24.1",
     "@tanstack/react-table": "^8.13.2",
@@ -21,7 +21,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.2.1",
-    "react-redux": "^8.1.2",
     "react-router-dom": "^6.22.2",
     "universal-cookie": "^7.2.0"
   },
