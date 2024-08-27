@@ -1,6 +1,4 @@
-import {
-  Checkbox,
-} from "@chakra-ui/react";
+import { Checkbox, Text } from "@chakra-ui/react";
 import {
   FunctionComponent,
   useCallback,
@@ -41,11 +39,13 @@ const FacetListValues: FunctionComponent<FacetListValuesProps> = ({
     <>
       {facetList?.Values?.map((v: ListFacetValue, idx: number) => (
         <Checkbox
+          size="md"
+          fontWeight="normal"
           key={v.Value}
           isChecked={checkedItems[idx]}
           onChange={() => onChange(`xp.${facetList.XpPath}`, true)(v.Value)}
         >
-          {v.Value} ({v?.Count})
+          {v.Value} <Text as="span" color="chakra-placeholder-color">({v?.Count})</Text>
         </Checkbox>
       ))}
     </>

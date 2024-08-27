@@ -4,11 +4,11 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  Box,
-  VStack,
+  Heading,
+  VStack
 } from "@chakra-ui/react";
-import { FunctionComponent } from "react";
 import { ListFacet } from "ordercloud-javascript-sdk";
+import { FunctionComponent } from "react";
 import FacetListValue from "./FacetListValues";
 
 interface FacetListProps {
@@ -23,33 +23,31 @@ interface FacetListProps {
 const FacetList: FunctionComponent<FacetListProps> = ({ facets, onChange }) => {
 
   return (
-    <Box>
+    <>
       {facets && (
-        <Accordion defaultIndex={facets?.map((_f, idx) => idx)} allowMultiple>
+        <Accordion
+          defaultIndex={facets?.slice(0, 4).map((_f, idx) => idx)}
+          allowMultiple
+        >
           {facets?.map((f: ListFacet) => {
             return (
-              <>
-                <AccordionItem key={f.Name}>
-                  <h2>
-                    <AccordionButton>
-                      <Box as="span" flex="1" textAlign="left">
-                        {f.Name}
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                  </h2>
-                  <AccordionPanel pb={4}>
-                    <VStack alignItems={"left"}>
-                      <FacetListValue facetList={f} onChange={onChange} />
-                    </VStack>
-                  </AccordionPanel>
-                </AccordionItem>
-              </>
+              <AccordionItem border="none" key={f.Name} w="full">
+                  <AccordionButton>
+                    <Heading as="h3" size="sm" flex="1" textAlign="left"
+                    >
+                      {f.Name}
+                    </Heading>
+                    <AccordionIcon />
+                  </AccordionButton>
+                <AccordionPanel as={VStack} alignItems="stretch">
+                    <FacetListValue facetList={f} onChange={onChange} />
+                </AccordionPanel>
+              </AccordionItem>
             );
           })}
         </Accordion>
       )}
-    </Box>
+    </>
   );
 };
 
