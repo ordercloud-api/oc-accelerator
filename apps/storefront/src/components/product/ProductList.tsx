@@ -173,7 +173,6 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
       <Grid
         gridTemplateColumns={{ md: "300px 1fr" }}
         gap="4"
-        my={8}
         alignItems="flex-start"
       >
         <Card

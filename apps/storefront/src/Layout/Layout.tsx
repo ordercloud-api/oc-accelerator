@@ -39,6 +39,7 @@ const Layout: FC = () => {
         <Container
           maxW={pathname === "/" ? "full" : "container.4xl"}
           mx="auto"
+          my={8}
           flex="1"
         >
           <Outlet />

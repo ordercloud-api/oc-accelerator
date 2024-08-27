@@ -37,7 +37,7 @@ import Modal from "./modal";
 import Skeleton from "./skeleton";
 // import SkipLink from "./skip-link"
 // import Slider from "./slider"
-import Spinner from "./spinner";
+// import Spinner from "./spinner";
 // import Stat from "./stat"
 // import Switch from "./switch"
 // import Table from "./table"
@@ -82,7 +82,7 @@ const components = {
   Skeleton,
   // SkipLink,
   // Slider,
-  Spinner,
+  // Spinner,
   // Stat,
   // Switch,
   // Table,
