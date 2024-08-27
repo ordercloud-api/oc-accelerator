@@ -120,6 +120,7 @@ const OperationForm: FC<IOperationForm> = ({
   bodyFieldsToHide,
   operationInclusion,
   afterSubmit,
+  afterDelete
 }) => {
   const deleteDisclosure = useDisclosure()
 
@@ -184,7 +185,7 @@ const OperationForm: FC<IOperationForm> = ({
   useEffect(() => {
     const error = (saveError || deleteError || saveAssignmentError) as OrderCloudError
     if (error) {
-      const ocError = error?.response?.data?.Errors[0] as ApiError
+      const ocError = error?.response?.data?.Errors?.[0] as ApiError
       if (ocError && !toast.isActive(ocError.ErrorCode)) {
         toast({
           id: ocError.ErrorCode,
@@ -218,6 +219,12 @@ const OperationForm: FC<IOperationForm> = ({
       afterSubmit,
     ]
   )
+
+  const handleDelete = useCallback(async ()=> {
+    await deleteAsync(undefined)
+
+    if(afterDelete) afterDelete()
+  },[afterDelete, deleteAsync])
 
   // Reset the form when the operation changes.
   useEffect(() => {
@@ -289,7 +296,7 @@ const OperationForm: FC<IOperationForm> = ({
           <>
             <Portal containerRef={deleteButtonRef}>{renderDeleteButton}</Portal>
             <DeleteModal
-              onComplete={deleteAsync}
+              onComplete={handleDelete}
               resource={resourceId}
               item={initialValues?.body}
               disclosure={deleteDisclosure}

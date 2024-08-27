@@ -67,10 +67,18 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
   const requiredParams = useMemo(() => {
     const paramsObj = {} as { [key: string]: string }
     requiredParameters.forEach((p: string) => {
-      paramsObj[p] = (routeParams[p] as string) || actionItem?.ID
+      let otherID
+      if (actionItem) {
+        const matchingKey = Object.entries(actionItem).find(
+          ([i, _value]) => i.toLocaleLowerCase() === p.toLocaleLowerCase()
+        )
+        if (matchingKey) otherID = matchingKey[1]
+      }
+
+      paramsObj[p] = (routeParams[p] as string) || actionItem?.ID || otherID
     })
     return paramsObj
-  }, [actionItem?.ID, requiredParameters, routeParams])
+  }, [actionItem, requiredParameters, routeParams])
 
   const { mutateAsync: deleteAsync, error: deleteError } = useDeleteOcResource(resourceName, {
     ...routeParams,
@@ -203,6 +211,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
   const resolveHref = useCallback(
     (rowData: any) => {
+      if(!rowData?.ID) return ''
       if (hrefResolver) hrefResolver(rowData)
       return `${location.pathname}/${rowData?.ID}`
     },
