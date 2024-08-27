@@ -47,6 +47,8 @@ export const CreateModal: FC<CreateDrawerProps> = ({
           { pathname: `${pathname}/${newItem.ID}` },
           { state: { shallow: true } }
         );
+      } else {
+        if (onClose) onClose();
       }
     },
     [onClose, pathname, navigate]
