@@ -45,6 +45,7 @@ const ProductImageGallery: React.FC<ProductImageGalleryProps> = ({
       alignItems="flex-start"
       justifyContent="flex-start"
       gap={3}
+      zIndex={0}
     >
       {images.length > 1 && (
         <VStack
