@@ -9,11 +9,11 @@ import Alert from "./alert";
 // import Avatar from "./avatar"
 import Badge from "./badge";
 import Breadcrumb from "./breadcrumb";
-import Button from "./button"
+import Button from "./button";
+import { Card } from "./card";
 import { Checkbox } from "./checkbox";
 import CloseButton from "./close-button";
 import Code from "./code";
-import { Card } from "./card";
 import Container from "./container";
 import Divider from "./divider";
 // import Drawer from "./drawer"
@@ -41,9 +41,9 @@ import Skeleton from "./skeleton";
 // import Stat from "./stat"
 // import Switch from "./switch"
 // import Table from "./table"
+import { Icon } from "./Icon";
 import Tabs from "./tabs";
 import { Tag } from "./tag";
-import { Icon } from "./Icon";
 // import Textarea from "./textarea"
 // import Tooltip from "./tooltip"
 

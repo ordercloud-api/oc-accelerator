@@ -28,6 +28,7 @@ import { IS_MULTI_LOCATION_INVENTORY } from "../../constants";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "../cart/OcQuantityInput";
 import ProductImageGallery from "./product-detail/ProductImageGallery";
+import pluralize from "pluralize";
 
 export interface ProductDetailProps {
   productId: string;
@@ -93,6 +94,12 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
       console.warn("[ProductDetail.tsx] Product not found for ID:", productId);
       return <div>Product not found for ID: {productId}</div>;
     }
+    toast({
+      title: `${quantity} ${pluralize('item', quantity)} added to cart`,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
 
     if (IS_MULTI_LOCATION_INVENTORY && !activeRecordId) {
       toast({
@@ -137,8 +144,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
       }
     }
   }, [product, productId, quantity, navigate, toast, activeRecordId]);
-  
-  console.log(product)
 
   return loading ? (
     <Center h="50vh">
@@ -148,10 +153,18 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
     renderProductDetail ? (
       renderProductDetail(product)
     ) : (
-      <SimpleGrid as={Container} gridTemplateColumns={{ lg: "1.5fr 2fr" }} gap={12} w="full" maxW="container.4xl">
+      <SimpleGrid
+        as={Container}
+        gridTemplateColumns={{ lg: "1.5fr 2fr" }}
+        gap={12}
+        w="full"
+        maxW="container.4xl"
+      >
         <ProductImageGallery images={product.xp?.Images || []} />
         <VStack alignItems="flex-start" maxW="4xl" gap={4}>
-          <Heading  maxW="2xl" size="xl">{product.Name}</Heading>
+          <Heading maxW="2xl" size="xl">
+            {product.Name}
+          </Heading>
           <Text color="chakra-subtle-text" fontSize="sm">
             {product.ID}
           </Text>
