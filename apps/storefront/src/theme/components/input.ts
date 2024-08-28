@@ -1,10 +1,15 @@
-import {inputAnatomy as parts} from "@chakra-ui/anatomy"
-import {createMultiStyleConfigHelpers} from "@chakra-ui/styled-system"
+import { inputAnatomy } from "@chakra-ui/anatomy";
+import { createMultiStyleConfigHelpers } from "@chakra-ui/react";
 
-const {defineMultiStyleConfig} = createMultiStyleConfigHelpers(parts.keys)
+const { definePartsStyle, defineMultiStyleConfig } =
+  createMultiStyleConfigHelpers(inputAnatomy.keys);
+
+const baseStyle = definePartsStyle({
+  field: {
+    rounded: "none",
+  },
+});
 
 export const Input = defineMultiStyleConfig({
-  defaultProps: {
-    size: "sm"
-  }
-})
+  baseStyle,
+});

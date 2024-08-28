@@ -121,16 +121,16 @@ const basePalette = {
       900: "#252422",
     },
     blackAlpha: {
-      50: "rgba(0,0,0,0.02)",
-      100: "rgba(0,0,0,0.04)",
-      200: "rgba(0,0,0,0.10)",
-      300: "rgba(0,0,0,0.17)",
-      400: "rgba(0,0,0,0.42)" /* adjusted for 3:1 contrast ratio */,
-      500: "rgba(0,0,0,0.55)",
-      600: "rgba(0,0,0,0.68)",
-      700: "rgba(0,0,0,0.75)",
-      800: "rgba(0,0,0,0.85)",
-      900: "rgba(0,0,0,0.91)",
+      50: "rgba(244, 232, 224, 0.10)",
+      100: "rgba(228, 214, 200, 0.20)",
+      200: "rgba(212, 194, 181, 0.30)",
+      300: "rgba(158, 154, 149, 0.45)",
+      400: "rgba(140, 138, 131, 0.60)",
+      500: "rgba(111, 109, 102, 0.70)",
+      600: "rgba(88, 87, 77, 0.80)",
+      700: "rgba(59, 58, 50, 0.90)",
+      800: "rgba(37, 36, 34, 0.95)",
+      900: "rgba(25, 24, 22, 0.99)",
     },
     whiteAlpha: {
       50: "rgba(255,255,255,0.02)",
@@ -148,9 +148,9 @@ const basePalette = {
   },
 };
 
-export const DEFAULT_THEME_PRIMARY = basePalette.colors.green
-export const DEFAULT_THEME_SECONDARY = basePalette.colors.gray
-export const DEFAULT_THEME_ACCENT = basePalette.colors.gray
+export const DEFAULT_THEME_PRIMARY = basePalette.colors.green;
+export const DEFAULT_THEME_SECONDARY = basePalette.colors.gray;
+export const DEFAULT_THEME_ACCENT = basePalette.colors.gray;
 
 const colors = {
   primary: DEFAULT_THEME_PRIMARY,
@@ -162,7 +162,7 @@ const colors = {
   success: basePalette.colors.green,
   danger: basePalette.colors.red,
 
-  ...basePalette.colors
-}
+  ...basePalette.colors,
+};
 
-export default colors
+export default colors;

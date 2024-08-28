@@ -80,7 +80,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
     <>
       <HStack
         id="lineItemRow"
-        flexWrap="wrap"
+        flexWrap={{base:"wrap", lg: "nowrap"}}
         p={{ base: 3, md: "unset" }}
         gap={9}
         w="full"

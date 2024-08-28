@@ -36,10 +36,14 @@ const Layout: FC = () => {
         sx={{ "&>*": { width: "full" } }}
         bgColor="chakra-subtle-bg"
       >
-        <Container
-          maxW={pathname === "/" ? "full" : "container.4xl"}
+        <Container id="outletWrapper"
+          display="flex"
+          flexFlow="column nowrap"
+          maxW={
+            pathname === "/" || pathname === "/cart" ? "full" : "container.4xl"
+          }
           mx="auto"
-          my={8}
+          my={pathname === "/" || pathname === "/cart" ? 0 : 8}
           flex="1"
         >
           <Outlet />
