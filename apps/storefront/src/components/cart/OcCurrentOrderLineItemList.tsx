@@ -1,6 +1,6 @@
+import { LineItem } from 'ordercloud-javascript-sdk'
 import { FunctionComponent } from 'react'
 import OcLineItemList from './OcLineItemList'
-import { LineItem } from 'ordercloud-javascript-sdk'
 
 interface OcCurrentOrderLineItemListProps {
   emptyMessage?: string

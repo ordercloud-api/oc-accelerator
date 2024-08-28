@@ -54,9 +54,9 @@ const Layout: FC = () => {
           as="footer"
           py={3}
           zIndex="12"
-          bg="gray.50"
+          bg="gray.400"
         >
-          <Text fontWeight="normal" fontSize="sm">
+          <Text fontWeight="normal" fontSize="sm" color="whiteAlpha.800">
             © Sitcore Inc. 2024
           </Text>
         </HStack>
