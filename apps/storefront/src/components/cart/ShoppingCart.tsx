@@ -41,6 +41,7 @@ export const ShoppingCart = (): JSX.Element => {
   const getOrder = useCallback(async () => {
     const result = await Cart.Get();
     setOrder(result);
+    setLoading(false);
   }, []);
 
   const getLineItems = useCallback(async () => {
