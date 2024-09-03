@@ -14,10 +14,9 @@ import {
   Catalog,
   Category,
   ListPage,
-  Me,
   RequiredDeep,
 } from "ordercloud-javascript-sdk";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface MegaMenuProps {
@@ -33,9 +32,6 @@ const MegaMenu: FC<MegaMenuProps> = ({
   selectedCatalog,
   setSelectedCatalog,
 }) => {
-  // const [catalogs, setCatalogs] = useState<Catalog[]>([]);
-  // const [categories, setCategories] = useState<Category[]>([]);
-  // const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +71,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
   const { data: categoryResult } = useOcResourceList(
     "Categories",
     { catalogID: selectedCatalog },
-    { },
+    {},
     {
       staleTime: 300000, // 5 min
       enabled: !!selectedCatalog,

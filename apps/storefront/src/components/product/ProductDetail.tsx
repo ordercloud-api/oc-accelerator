@@ -19,17 +19,19 @@ import {
   Cart,
   InventoryRecord,
   ListPage,
-  Me,
   OrderCloudError,
   RequiredDeep,
 } from "ordercloud-javascript-sdk";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { TbPhoto } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "../cart/OcQuantityInput";
 import { IS_MULTI_LOCATION_INVENTORY } from "../../constants";
-import { useOcResourceList } from "@rwatt451/ordercloud-react";
+import {
+  useOcResourceGet,
+  useOcResourceList,
+} from "@rwatt451/ordercloud-react";
 
 export interface ProductDetailProps {
   productId: string;
@@ -42,12 +44,20 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
 }) => {
   const navigate = useNavigate();
   const toast = useToast();
-  const [product, setProduct] = useState<BuyerProduct>();
   const [activeRecordId, setActiveRecordId] = useState<string>();
-  // const [inventoryRecords, setInventoryRecords] =
-  //   useState<RequiredDeep<ListPage<InventoryRecord>>>();
-  const [loading, setLoading] = useState<boolean>(true);
   const [addingToCart, setAddingToCart] = useState(false);
+
+  const { data, isLoading } = useOcResourceGet(
+    "Products",
+    { productID: productId! },
+    {
+      staleTime: 300000, // 5 min
+      enabled: !!productId,
+    },
+    true
+  );
+
+  const product = useMemo(() => data as BuyerProduct, [data]);
   const [quantity, setQuantity] = useState(
     product?.PriceSchedule?.MinQuantity ?? 1
   );
@@ -56,32 +66,16 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
     [product?.Inventory?.QuantityAvailable]
   );
 
-  const getProduct = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await Me.GetProduct(productId);
-      setProduct(result);
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-      setLoading(false);
-    }
-  }, [productId]);
-
-  useEffect(() => {
-    getProduct();
-  }, [getProduct]);
-
   const { data: inventoryRecords } = useOcResourceList(
-    'ProductInventoryRecords',
+    "ProductInventoryRecords",
     {},
-    {productID: productId},
+    { productID: productId },
     {
       staleTime: 300000, // 5 min
-      enabled: IS_MULTI_LOCATION_INVENTORY
+      enabled: IS_MULTI_LOCATION_INVENTORY,
     },
     true
-  )
+  );
 
   const handleAddToCart = useCallback(async () => {
     if (!product) {
@@ -133,7 +127,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
     }
   }, [product, productId, quantity, navigate, toast, activeRecordId]);
 
-  return loading ? (
+  return isLoading ? (
     <Spinner />
   ) : product ? (
     renderProductDetail ? (
@@ -202,7 +196,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
               </Heading>
               <HStack spacing={4}>
                 {inventoryRecords?.Items.length &&
-                  (inventoryRecords as RequiredDeep<ListPage<InventoryRecord>>)?.Items?.map((item) => (
+                  (
+                    inventoryRecords as RequiredDeep<ListPage<InventoryRecord>>
+                  )?.Items?.map((item) => (
                     <Button
                       onClick={() => setActiveRecordId(item.ID)}
                       cursor="pointer"

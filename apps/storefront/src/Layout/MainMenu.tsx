@@ -56,16 +56,18 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
             Shop by catalog
           </MenuButton>
           <MenuList>
-            {catalogs?.map((catalog) => (
+            {catalogs?.map((catalog) => {
+            return (
               <MenuItem
                 key={catalog.ID}
-                onClick={() => setSelectedCatalog(catalog.ID || "")}
+                onClick={() => setSelectedCatalog(catalog.ID)}
                 as={RouterLink}
-                to={`/product-list/${selectedCatalog}`}
+                to={`/product-list/${catalog.ID}`}
               >
                 {catalog.Name}
               </MenuItem>
-            ))}
+            )
+          })}
           </MenuList>
         </Menu>
       );

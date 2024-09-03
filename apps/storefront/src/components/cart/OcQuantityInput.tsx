@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { ChangeEvent, FunctionComponent, useCallback, useEffect, useState } from 'react'
+import { ChangeEvent, FunctionComponent, useMemo } from "react";
 
 import {
   NumberDecrementStepper,
@@ -10,61 +10,59 @@ import {
   NumberInputStepper,
   Select,
   VStack,
-} from '@chakra-ui/react'
-import { Me, PriceSchedule } from 'ordercloud-javascript-sdk'
+} from "@chakra-ui/react";
+import { PriceSchedule, BuyerProduct } from "ordercloud-javascript-sdk";
+import { useOcResourceGet } from "@rwatt451/ordercloud-react";
 
 interface OcQuantityInputProps {
-  controlId: string
-  priceSchedule?: PriceSchedule
+  controlId: string;
+  priceSchedule?: PriceSchedule;
   productId?: string;
-  label?: string
-  disabled?: boolean
-  quantity: number
-  onChange: (quantity: number) => void
+  label?: string;
+  disabled?: boolean;
+  quantity: number;
+  onChange: (quantity: number) => void;
 }
 
 const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
   controlId,
-  priceSchedule,
   productId,
+  priceSchedule,
   disabled,
   quantity,
   onChange,
 }) => {
+  const { data } = useOcResourceGet(
+    "Products",
+    { productID: productId! },
+    {
+      staleTime: 300000, // 5 min
+      enabled: !!productId && !priceSchedule,
+    },
+    true
+  );
 
-  const [ps, setPs] = useState(priceSchedule);
-  const [psLoad, setPsLoad] = useState(!!ps);
-
-  const retrievePriceSchedule = useCallback(async (pId:string) => {
-    setPsLoad(true);
-    const response = await Me.GetProduct(pId);
-    setPs(response.PriceSchedule);
-    setPsLoad(false);
-  }, [])
-
-  useEffect(() => {
-    if (productId && !ps && !psLoad) {
-      retrievePriceSchedule(productId)
-    }
-  }, [retrievePriceSchedule, productId, ps, psLoad])
+  const ps = useMemo(
+    () => priceSchedule ?? (data as BuyerProduct)?.PriceSchedule,
+    [data, priceSchedule]
+  );
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    onChange(Number(e.target.value))
-  }
+    onChange(Number(e.target.value));
+  };
 
-  const handleNumberInputChange = (_valAsString: string, valAsNumber: number) => {
-    if (typeof valAsNumber !== 'number') {
-      return
+  const handleNumberInputChange = (
+    _valAsString: string,
+    valAsNumber: number
+  ) => {
+    if (typeof valAsNumber !== "number") {
+      return;
     }
-    onChange(valAsNumber)
-  }
+    onChange(valAsNumber);
+  };
 
   return ps ? (
-    <VStack
-      alignItems="flex-start"
-      gap={0}
-    >
-      {/* <FormLabel>{label}</FormLabel> */}
+    <VStack alignItems="flex-start" gap={0}>
       {ps?.RestrictedQuantity ? (
         <Select
           maxW="100"
@@ -75,10 +73,7 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
           onChange={handleSelectChange}
         >
           {ps.PriceBreaks?.map((pb) => (
-            <option
-              key={pb.Quantity}
-              value={pb.Quantity}
-            >
+            <option key={pb.Quantity} value={pb.Quantity}>
               {pb.Quantity}
             </option>
           ))}
@@ -87,7 +82,7 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
         <NumberInput
           maxW="100"
           size="sm"
-          value={quantity || ''}
+          value={quantity || ""}
           defaultValue={quantity}
           onChange={handleNumberInputChange}
           isDisabled={disabled}
@@ -104,6 +99,6 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
       )}
     </VStack>
   ) : null;
-}
+};
 
-export default OcQuantityInput
+export default OcQuantityInput;
