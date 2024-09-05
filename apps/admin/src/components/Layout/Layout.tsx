@@ -23,6 +23,7 @@ import AdminBreadcrumbs from './AdminBreadcrumbs'
 import { ThemeDrawer } from './ThemeDrawer'
 import { HeaderLogo } from '../Shared/branding/HeaderLogo'
 import { useCurrentUser } from '../../hooks/currentUser'
+import 'overlayscrollbars/overlayscrollbars.css'
 
 interface NavButtonProps extends PropsWithChildren<ButtonProps> {
   to: string
