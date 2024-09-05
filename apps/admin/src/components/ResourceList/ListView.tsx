@@ -1,5 +1,5 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import { BuyerProduct, RequiredDeep } from 'ordercloud-javascript-sdk'
+import { RequiredDeep } from 'ordercloud-javascript-sdk'
 import { ReactElement, useMemo, useEffect } from 'react'
 import DataTable from './DataTable'
 import { ColumnDef, TableState } from '@tanstack/react-table'
@@ -53,7 +53,7 @@ const ListView = <T extends IDefaultResource>({
   onOptionChange,
   itemActions,
 }: IListView<T>) => {
-  const dataQuery = useOcResourceList<BuyerProduct>(resourceName, listOptions, parameters, {
+  const dataQuery = useOcResourceList(resourceName, listOptions, parameters, {
     staleTime: 300000, // 5 min
     disabled: !(!preloadAssignments && !listAssignments ? hasAccess : !!listOptions?.ID),
   })
