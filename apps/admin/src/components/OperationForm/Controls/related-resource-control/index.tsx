@@ -46,7 +46,7 @@ export const RelatedResourceControl: FC<IRelatedResourceControl> = ({
     operationInfo?.parameters,
     {
       staleTime: 300000, // 5 min
-      disabled: operationInfo?.pauseOperation && hasAccess,
+      disabled: operationInfo?.pauseOperation || !hasAccess,
     }
   )
 
