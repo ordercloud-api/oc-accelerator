@@ -131,7 +131,7 @@ export const resources: ResourceRoute[] = [
     children: [
       {
         path: "/shipments/:shipmentID/shipment-items",
-        element: <ResourceList resourceName="ShipmentItems" readOnly={true} />,
+        element: <ResourceList resourceName="ShipmentItems" />,
       },
     ],
   },

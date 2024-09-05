@@ -56,13 +56,19 @@ const ProductCard: FunctionComponent<ProductCardProps> = ({ product }) => {
                 maxH="300px"
                 borderTopRadius="md"
               >
-                {product.xp?.Images && product.xp.Images[0]?.Url ? (
+                {product.xp?.Images &&
+                (product.xp.Images[0]?.ThumbnailUrl ||
+                  product.xp.Images[0]?.Url) ? (
                   <Image
                     borderTopRadius="md"
                     boxSize="full"
                     objectFit="cover"
-                    src={product.xp.Images[0].Url}
+                    src={
+                      product.xp.Images[0]?.ThumbnailUrl ||
+                      product.xp.Images[0]?.Url
+                    }
                     zIndex={1}
+                    bgColor="white"
                     onError={(e) => {
                       e.currentTarget.src = ""; // Prevent the broken image from rendering
                       e.currentTarget.style.display = "none"; // Hide the broken image
@@ -79,18 +85,13 @@ const ProductCard: FunctionComponent<ProductCardProps> = ({ product }) => {
                 />
               </Center>
 
-              <VStack
-                w="full"
-                minH={"120px"}
-                alignItems="flex-start"
-                p={6}
-              >
+              <VStack w="full" minH={"120px"} alignItems="flex-start" p={6}>
                 <Text fontSize="xs" color="chakra-subtle-text">
                   {product.ID}
                 </Text>
-                <Heading size="md">{product.Name}</Heading>
+                <Heading size="lg">{product.Name}</Heading>
                 {product.PriceSchedule?.PriceBreaks && (
-                  <Text fontSize="lg" fontWeight="normal">
+                  <Text fontSize="md" fontWeight="normal">
                     {formatPrice(
                       product?.PriceSchedule?.PriceBreaks[0].Price ?? 0
                     )}

@@ -8,25 +8,25 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { title } from 'case'
+import { cloneDeep } from 'lodash'
+import { OpenAPIV3 } from 'openapi-types'
 import pluralize from 'pluralize'
 import { parse } from 'querystring'
 import { FC, useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router'
 import { useSearchParams } from 'react-router-dom'
-import { flattenNestedProperties } from '../../utils/spec.utils'
-import { CreateModal } from './modals/CreateModal'
-import ListView, { ServiceListOptions } from './ListView'
-import ResourceTableCell from './ResourceTableCell'
 import SCHEMA_SORT_ORDER from '../../config/schemaSortOrder.config'
-import { OpenAPIV3 } from 'openapi-types'
-import ActionMenu from './ActionMenu'
-import DeleteModal from './modals/DeleteModal'
-import { ApiError } from '../OperationForm'
-import FilterSearchMenu from './FilterSearchMenu'
-import NoAccessMessage from '../Shared/NoAccessMessage'
 import { tableOverrides } from '../../config/tableOverrides'
-import { cloneDeep } from 'lodash'
+import { flattenNestedProperties } from '../../utils/spec.utils'
+import { ApiError } from '../OperationForm'
+import NoAccessMessage from '../Shared/NoAccessMessage'
+import ActionMenu from './ActionMenu'
 import DirectionMenu from './DirectionMenu'
+import FilterSearchMenu from './FilterSearchMenu'
+import ListView, { ServiceListOptions } from './ListView'
+import { CreateModal } from './modals/CreateModal'
+import DeleteModal from './modals/DeleteModal'
+import ResourceTableCell from './ResourceTableCell'
 
 interface ResourceListProps {
   resourceName: string
@@ -67,10 +67,18 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
   const requiredParams = useMemo(() => {
     const paramsObj = {} as { [key: string]: string }
     requiredParameters.forEach((p: string) => {
-      paramsObj[p] = (routeParams[p] as string) || actionItem?.ID
+      let otherID
+      if (actionItem) {
+        const matchingKey = Object.entries(actionItem).find(
+          ([i, _value]) => i.toLocaleLowerCase() === p.toLocaleLowerCase()
+        )
+        if (matchingKey) otherID = matchingKey[1]
+      }
+
+      paramsObj[p] = (routeParams[p] as string) || actionItem?.ID || otherID
     })
     return paramsObj
-  }, [actionItem?.ID, requiredParameters, routeParams])
+  }, [actionItem, requiredParameters, routeParams])
 
   const { mutateAsync: deleteAsync, error: deleteError } = useDeleteOcResource(resourceName, {
     ...routeParams,
@@ -203,6 +211,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
   const resolveHref = useCallback(
     (rowData: any) => {
+      if(!rowData?.ID) return ''
       if (hrefResolver) hrefResolver(rowData)
       return `${location.pathname}/${rowData?.ID}`
     },

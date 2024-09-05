@@ -4,15 +4,14 @@ import {
   CardBody,
   CardFooter,
   Center,
+  Container,
   Heading,
   HStack,
-  Icon,
-  Image,
   SimpleGrid,
   Spinner,
   Text,
   useToast,
-  VStack,
+  VStack
 } from "@chakra-ui/react";
 import {
   BuyerProduct,
@@ -23,12 +22,13 @@ import {
   OrderCloudError,
   RequiredDeep,
 } from "ordercloud-javascript-sdk";
+import pluralize from "pluralize";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { TbPhoto } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
+import { IS_MULTI_LOCATION_INVENTORY } from "../../constants";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "../cart/OcQuantityInput";
-import { IS_MULTI_LOCATION_INVENTORY } from "../../constants";
+import ProductImageGallery from "./product-detail/ProductImageGallery";
 
 export interface ProductDetailProps {
   productId: string;
@@ -94,6 +94,12 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
       console.warn("[ProductDetail.tsx] Product not found for ID:", productId);
       return <div>Product not found for ID: {productId}</div>;
     }
+    toast({
+      title: `${quantity} ${pluralize('item', quantity)} added to cart`,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
 
     if (IS_MULTI_LOCATION_INVENTORY && !activeRecordId) {
       toast({
@@ -140,52 +146,33 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
   }, [product, productId, quantity, navigate, toast, activeRecordId]);
 
   return loading ? (
-    <Spinner />
+    <Center h="50vh">
+      <Spinner size="xl" thickness="10px" />
+    </Center>
   ) : product ? (
     renderProductDetail ? (
       renderProductDetail(product)
     ) : (
-      <SimpleGrid gridTemplateColumns={{ lg: "1fr 2fr" }} gap={12}>
-        <Center
-          bgColor="chakra-subtle-bg"
-          aspectRatio="1 / 1"
-          objectFit="cover"
-          boxSize="100%"
-          maxH="300px"
-          borderTopRadius="md"
-        >
-          {product.xp?.Images && product.xp.Images[0]?.Url ? (
-            <Image
-              borderTopRadius="md"
-              boxSize="full"
-              objectFit="cover"
-              src={product.xp.Images[0].Url}
-              zIndex={1}
-              onError={(e) => {
-                e.currentTarget.src = ""; // Prevent the broken image from rendering
-                e.currentTarget.style.display = "none"; // Hide the broken image
-              }}
-            />
-          ) : (
-            <Icon fontSize="5rem" color="gray.300" as={TbPhoto} />
-          )}
-          <Icon
-            fontSize="5rem"
-            color="gray.300"
-            as={TbPhoto}
-            position="absolute"
-          />
-        </Center>
+      <SimpleGrid
+        as={Container}
+        gridTemplateColumns={{ lg: "1.5fr 2fr" }}
+        gap={12}
+        w="full"
+        maxW="container.4xl"
+      >
+        <ProductImageGallery images={product.xp?.Images || []} />
         <VStack alignItems="flex-start" maxW="4xl" gap={4}>
-          <HStack alignItems="center" color="chakra-subtle-text" fontSize="sm">
-            <Text>{product.ID}</Text>
-          </HStack>
-          <Heading size="lg">{product.Name}</Heading>
+          <Heading maxW="2xl" size="xl">
+            {product.Name}
+          </Heading>
+          <Text color="chakra-subtle-text" fontSize="sm">
+            {product.ID}
+          </Text>
           <Text maxW="prose">{product.Description}</Text>
-          <Text fontSize="xl" fontWeight="bold">
+          <Text fontSize="3xl" fontWeight="medium">
             {formatPrice(product?.PriceSchedule?.PriceBreaks?.[0].Price)}
           </Text>
-          <HStack alignItems="center" gap={4} my={4}>
+          <HStack alignItems="center" gap={4} my={3}>
             <Button
               colorScheme="primary"
               type="button"

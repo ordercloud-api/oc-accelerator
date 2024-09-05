@@ -2,32 +2,32 @@ import {
   Card,
   CardBody,
   CardFooter,
-  Center,
   Heading,
-  Icon,
-  Image,
   Text,
-  VStack,
+  VStack
 } from "@chakra-ui/react";
 import { Category } from "ordercloud-javascript-sdk";
 import { FunctionComponent } from "react";
-import { TbPhoto } from "react-icons/tb";
 import { Link as RouterLink } from "react-router-dom";
 
 interface CategoryCardProps {
   category: Category;
+  catalogId?: string;
 }
 
-const CategoryCard: FunctionComponent<CategoryCardProps> = ({ category }) => {
+const CategoryCard: FunctionComponent<CategoryCardProps> = ({
+  category,
+  catalogId,
+}) => {
   return (
     <>
       {category && (
         <RouterLink
-          to={`/categories/${category.ID}`}
+          to={`/product-list/${catalogId}/${category.ID}`}
           style={{ textDecoration: "none" }}
         >
           <Card
-            minH="333px"
+            minH="133px"
             p={0}
             m={0}
             display="flex"
@@ -41,43 +41,19 @@ const CategoryCard: FunctionComponent<CategoryCardProps> = ({ category }) => {
             }}
           >
             <CardBody
-              m={0}
-              p={0}
               display="flex"
               flexDirection="column"
-              alignItems="center"
-              justifyContent="stretch"
+              alignItems="flex-start"
+              justifyContent="flex-end"
             >
-              <Center
-                bgColor="chakra-subtle-bg"
-                aspectRatio="1 / 1"
-                objectFit="cover"
-                boxSize="100%"
-                maxH="300px"
-                borderTopRadius="md"
-              >
-                {category.xp?.ImageUrl ? (
-                  <Image
-                    borderTopRadius="md"
-                    boxSize="full"
-                    objectFit="cover"
-                    src={category.xp.ImageUrl}
-                    zIndex={1}
-                    onError={(e) => {
-                      e.currentTarget.src = ""; // Prevent the broken image from rendering
-                      e.currentTarget.style.display = "none"; // Hide the broken image
-                    }}
-                  />
-                ) : (
-                  <Icon fontSize="5rem" color="gray.300" as={TbPhoto} />
-                )}
-              </Center>
-
-              <VStack w="full" minH="120px" alignItems="flex-start" p={6}>
-                <Text fontSize="xs" color="chakra-subtle-text">
-                  {category.ID}
-                </Text>
-                <Heading size="md">{category.Name}</Heading>
+              <VStack alignItems="flex-start" gap={0}>
+                <Heading size="lg" fontWeight="medium" lineHeight="1.1">
+                  {category.Name}
+                </Heading>
+                {/* TODO: would be cool to get the product list length here but not necessary */}
+                {/* <Text color="chakra-subtle-text">
+                  {category.ChildCount} items
+                </Text> */}
               </VStack>
             </CardBody>
             {category.xp?.Description && (

@@ -1,5 +1,6 @@
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   Container,
   Heading,
@@ -9,18 +10,24 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Text,
   useDisclosure,
-  UseDisclosureProps
+  UseDisclosureProps,
 } from "@chakra-ui/react";
 import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
-import { Catalog, ListPage, Me } from "ordercloud-javascript-sdk";
-import { FC, useEffect, useState } from "react";
-import { TbShoppingCart } from "react-icons/tb";
-import { Link as RouterLink } from "react-router-dom";
+import {
+  Cart,
+  Catalog,
+  LineItem,
+  ListPage,
+  Me,
+} from "ordercloud-javascript-sdk";
+import { FC, useCallback, useEffect, useState } from "react";
+import { TbShoppingCartFilled } from "react-icons/tb";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { DEFAULT_BRAND } from "../assets/DEFAULT_BRAND";
 import { useCurrentUser } from "../hooks/currentUser";
 import MegaMenu from "./MegaMenu";
-// import logo from "../assets/oc-accelerator.svg";
-import { AcceleratorLogo } from "../assets/Icons";
 
 interface MainMenuProps {
   loginDisclosure: UseDisclosureProps;
@@ -32,6 +39,10 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const megaMenuDisclosure = useDisclosure();
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
+  const [lineItems, setLineItems] = useState<LineItem[]>();
+  const [totalQuantity, setTotalQuantity] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCatalogs = async () => {
@@ -48,6 +59,20 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
 
     fetchCatalogs();
   }, []);
+
+  const getTotalLineItemQuantity = useCallback(async () => {
+    const result = await Cart.ListLineItems();
+    const totalQuantity = result.Items.reduce(
+      (sum, item) => sum + item.Quantity,
+      0
+    );
+    setLineItems(result.Items);
+    setTotalQuantity(totalQuantity);
+  }, []);
+
+  useEffect(() => {
+    getTotalLineItemQuantity();
+  }, [getTotalLineItemQuantity, navigate]);
 
   const renderCatalogMenu = () => {
     if (catalogs.length > 1) {
@@ -108,7 +133,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
       <Container h="100%" maxW="full">
         <HStack h="100%" justify="flex-start" alignItems="center">
           <RouterLink to="/">
-            <AcceleratorLogo h="10" />
+            <DEFAULT_BRAND h="10" />
           </RouterLink>
           <HStack as="nav" flexGrow="1" ml={3}>
             <Button
@@ -122,17 +147,46 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
             {renderCatalogMenu()}
           </HStack>
           <HStack>
-            <Heading size="sm">
-              {isLoggedIn
-                ? `Welcome, ${user?.FirstName} ${user?.LastName}`
-                : "Welcome"}
-            </Heading>
+            {isLoggedIn && (
+              <Heading size="sm">
+                `Welcome, ${user?.FirstName} ${user?.LastName}`
+              </Heading>
+            )}
             <Button
               as={RouterLink}
               to="/cart"
               variant="outline"
               size="sm"
-              leftIcon={<Icon as={TbShoppingCart} />}
+              leftIcon={totalQuantity !== 0 ?
+                    <Box position="relative" mt="2px" mr="2px" lineHeight="1">
+                      <Box
+                        id="cartCountFrame"
+                        top="5px"
+                        left="6px"
+                        position="absolute"
+                        height="9px"
+                        width="15px"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Text
+                          fontSize=".5rem"
+                          color="white"
+                          fontWeight="bold"
+                          letterSpacing="-.5px"
+                        >
+                          {totalQuantity}
+                        </Text>
+                      </Box>
+
+                      <Icon
+                        fontSize="lg"
+                        as={TbShoppingCartFilled}
+                        color="gray.500"
+                      />
+                    </Box>: undefined
+              }
               aria-label={`Link to cart`}
             >
               Cart
