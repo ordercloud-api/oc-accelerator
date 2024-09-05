@@ -1,29 +1,27 @@
 import {
   Button,
   ButtonProps,
-  Center,
   Container,
   Drawer,
-  Grid,
   GridItem,
   HStack,
   Icon,
   IconButton,
   Text,
   VStack,
-  useDisclosure,
+  useDisclosure
 } from '@chakra-ui/react'
 import { useOrderCloudContext } from '@rwatt451/ordercloud-react'
+import 'overlayscrollbars/overlayscrollbars.css'
 import { FC, Fragment, PropsWithChildren, forwardRef, useEffect, useMemo, useRef } from 'react'
 import { TbPalette } from 'react-icons/tb'
-import { Link, matchPath, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, matchPath, useLocation } from 'react-router-dom'
+import { useCurrentUser } from '../../hooks/currentUser'
 import { resources } from '../../routes/resources'
 import LoginModal from '../Authentication/LoginModal'
+import { HeaderLogo } from '../Shared/branding/HeaderLogo'
 import AdminBreadcrumbs from './AdminBreadcrumbs'
 import { ThemeDrawer } from './ThemeDrawer'
-import { HeaderLogo } from '../Shared/branding/HeaderLogo'
-import { useCurrentUser } from '../../hooks/currentUser'
-import 'overlayscrollbars/overlayscrollbars.css'
 
 interface NavButtonProps extends PropsWithChildren<ButtonProps> {
   to: string

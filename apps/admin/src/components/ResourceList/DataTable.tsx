@@ -20,15 +20,16 @@ import {
 import { UseQueryResult } from '@tanstack/react-query'
 import {
   ColumnDef,
+  Header,
+  HeaderGroup,
+  Row,
   TableState,
   flexRender,
   getCoreRowModel,
   useReactTable,
-  Header,
-  HeaderGroup,
-  Row,
 } from '@tanstack/react-table'
 import { ListPage, RequiredDeep } from 'ordercloud-javascript-sdk'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   TbChevronDown,
@@ -42,7 +43,6 @@ import {
 import { Link } from 'react-router-dom'
 import { getHeaderNameOverride, getPropertyLabel } from '../../utils/spec.utils'
 import { IDefaultResource } from './ListView'
-import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 
 export interface IDataTable<TData = unknown, TColumn = unknown> {
   resource: string
