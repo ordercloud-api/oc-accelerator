@@ -55,12 +55,12 @@ const ListView = <T extends IDefaultResource>({
 }: IListView<T>) => {
   const dataQuery = useOcResourceList(resourceName, listOptions, parameters, {
     staleTime: 300000, // 5 min
-    enabled: !preloadAssignments && !listAssignments ? hasAccess : !!listOptions?.ID,
+    disabled: !(!preloadAssignments && !listAssignments ? hasAccess : !!listOptions?.ID),
   })
 
   const assignmentDataQuery = useListAssignments(resourceName, undefined, listOptions, parameters, {
     staleTime: 300000, // 5 min
-    enabled: !!listAssignments && hasAccess,
+    disabled: !(!!listAssignments && hasAccess),
   })
 
   const toast = useToast()

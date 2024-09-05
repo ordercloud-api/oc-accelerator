@@ -295,7 +295,7 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
     operationParams,
     {
       // staleTime: 300000, // 5 min
-      enabled: switcherResourceName ? !!switcherResourceID : allowed,
+      disabled: switcherResourceName ? !switcherResourceID : !allowed,
     }
   )
 
