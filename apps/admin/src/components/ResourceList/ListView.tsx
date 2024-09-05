@@ -1,10 +1,10 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import { RequiredDeep } from 'ordercloud-javascript-sdk'
-import { ReactElement, useMemo, useEffect } from 'react'
-import DataTable from './DataTable'
-import { ColumnDef, TableState } from '@tanstack/react-table'
 import { useListAssignments, useOcResourceList } from '@rwatt451/ordercloud-react'
+import { ColumnDef, TableState } from '@tanstack/react-table'
+import { RequiredDeep } from 'ordercloud-javascript-sdk'
+import { ReactElement, useEffect, useMemo } from 'react'
 import { ApiError } from '../OperationForm'
+import DataTable from './DataTable'
 
 export interface IDefaultResource {
   ID?: string

@@ -36,9 +36,14 @@ const Layout: FC = () => {
         sx={{ "&>*": { width: "full" } }}
         bgColor="chakra-subtle-bg"
       >
-        <Container
-          maxW={pathname === "/" ? "full" : "container.4xl"}
+        <Container id="outletWrapper"
+          display="flex"
+          flexFlow="column nowrap"
+          maxW={
+            pathname === "/" || pathname === "/cart" ? "full" : "container.4xl"
+          }
           mx="auto"
+          my={pathname === "/" || pathname === "/cart" ? 0 : 8}
           flex="1"
         >
           <Outlet />
@@ -49,9 +54,9 @@ const Layout: FC = () => {
           as="footer"
           py={3}
           zIndex="12"
-          bg="gray.50"
+          bg="gray.400"
         >
-          <Text fontWeight="normal" fontSize="sm">
+          <Text fontWeight="normal" fontSize="sm" color="whiteAlpha.800">
             © Sitcore Inc. 2024
           </Text>
         </HStack>

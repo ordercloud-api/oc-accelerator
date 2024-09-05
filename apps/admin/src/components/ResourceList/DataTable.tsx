@@ -20,15 +20,16 @@ import {
 import { UseQueryResult } from '@tanstack/react-query'
 import {
   ColumnDef,
+  Header,
+  HeaderGroup,
+  Row,
   TableState,
   flexRender,
   getCoreRowModel,
   useReactTable,
-  Header,
-  HeaderGroup,
-  Row,
 } from '@tanstack/react-table'
 import { ListPage, RequiredDeep } from 'ordercloud-javascript-sdk'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   TbChevronDown,
@@ -221,7 +222,7 @@ const DataTable = <T extends IDefaultResource>({
   )
 
   const tableHeaderRow = useCallback(
-    (headerGroup: HeaderGroup<unknown>) => (
+    (headerGroup: HeaderGroup<RequiredDeep<T>>) => (
       <Tr
         _notLast={{ zIndex: -1 }}
         key={headerGroup.id}
@@ -317,9 +318,13 @@ const DataTable = <T extends IDefaultResource>({
   return !query.data && query.isLoading ? null : (
     <>
       <TableContainer
+        as={OverlayScrollbarsComponent}
         overflowY="auto"
-        maxHeight={`calc(100vh - 224px)`}
-        flexGrow="1"
+        sx={{
+          '& div[data-overlayscrollbars-contents]': {
+            maxHeight: 'calc(100vh - 224px)',
+          },
+        }}
       >
         <Table>
           <Thead>{table.getHeaderGroups()?.map(tableHeaderRow)}</Thead>
@@ -334,6 +339,7 @@ const DataTable = <T extends IDefaultResource>({
         </Table>
       </TableContainer>
       <HStack
+        id="pagination-nav"
         fontSize="sm"
         fontWeight="normal"
         p={3}
@@ -341,7 +347,7 @@ const DataTable = <T extends IDefaultResource>({
         position="sticky"
         bottom={0}
         left={0}
-        h="60px"
+        h="60px !important"
         borderTop="1px solid"
         borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
         alignItems="center"

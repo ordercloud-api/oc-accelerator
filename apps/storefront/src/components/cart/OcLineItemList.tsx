@@ -18,7 +18,6 @@ const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
 }) => {
   return lineItems && lineItems.length ? (
     <VStack gap={6} alignItems="flex-start" w="full">
-      return (
       <Card
         variant="outline"
         w="full"
@@ -38,7 +37,6 @@ const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
           ))}
         </CardBody>
       </Card>
-      );
     </VStack>
   ) : (
     <Text alignSelf="flex-start">{emptyMessage}</Text>

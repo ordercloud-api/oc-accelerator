@@ -1,28 +1,27 @@
 import {
   Button,
   ButtonProps,
-  Center,
   Container,
   Drawer,
-  Grid,
   GridItem,
   HStack,
   Icon,
   IconButton,
   Text,
   VStack,
-  useDisclosure,
+  useDisclosure
 } from '@chakra-ui/react'
 import { useOrderCloudContext } from '@rwatt451/ordercloud-react'
+import 'overlayscrollbars/overlayscrollbars.css'
 import { FC, Fragment, PropsWithChildren, forwardRef, useEffect, useMemo, useRef } from 'react'
 import { TbPalette } from 'react-icons/tb'
-import { Link, matchPath, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, matchPath, useLocation } from 'react-router-dom'
+import { useCurrentUser } from '../../hooks/currentUser'
 import { resources } from '../../routes/resources'
 import LoginModal from '../Authentication/LoginModal'
+import { HeaderLogo } from '../Shared/branding/HeaderLogo'
 import AdminBreadcrumbs from './AdminBreadcrumbs'
 import { ThemeDrawer } from './ThemeDrawer'
-import { HeaderLogo } from '../Shared/branding/HeaderLogo'
-import { useCurrentUser } from '../../hooks/currentUser'
 
 interface NavButtonProps extends PropsWithChildren<ButtonProps> {
   to: string
@@ -75,15 +74,8 @@ const Layout: FC = () => {
   return (
     <>
       <LoginModal disclosure={loginDisclosure} />
-      <Grid
-        templateAreas={`"header header"
-            "nav main"
-            "nav footer"`}
-        gridTemplateRows="50px 1fr 50px"
-        gridTemplateColumns="300px 1fr"
-        h="100vh"
-      >
         <GridItem
+          as="header"
           area="header"
           zIndex={2}
           borderBottom="1px"
@@ -133,6 +125,7 @@ const Layout: FC = () => {
         </GridItem>
         <GridItem
           area="nav"
+          as="aside"
           zIndex={1}
           borderRight="1px solid"
           borderColor="chakra-border-color"
@@ -187,6 +180,7 @@ const Layout: FC = () => {
           </VStack>
         </GridItem>
         <GridItem
+          as="main"
           area="main"
           overflowY="auto"
           overflowX="hidden"
@@ -195,7 +189,10 @@ const Layout: FC = () => {
           <Outlet />
         </GridItem>
         <GridItem
-          as={Center}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          as="footer"
           area="footer"
           bg="blackAlpha.50"
         >
@@ -206,7 +203,6 @@ const Layout: FC = () => {
             © Sitecore Inc. {new Date().getFullYear()}
           </Text>
         </GridItem>
-      </Grid>
       <Drawer
         isOpen={isOpen}
         placement="right"
