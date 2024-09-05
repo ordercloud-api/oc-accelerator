@@ -221,7 +221,7 @@ const DataTable = <T extends IDefaultResource>({
   )
 
   const tableHeaderRow = useCallback(
-    (headerGroup: HeaderGroup<unknown>) => (
+    (headerGroup: HeaderGroup<RequiredDeep<T>>) => (
       <Tr
         _notLast={{ zIndex: -1 }}
         key={headerGroup.id}

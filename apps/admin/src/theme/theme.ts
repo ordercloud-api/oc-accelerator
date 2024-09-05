@@ -7,6 +7,19 @@ const acceleratorAdminTheme = extendTheme({
     useSystemColorMode: true,
     cssVarPrefix: 'schra',
   },
+  styles:{
+    global:{
+      "#root":{
+        display: 'grid',
+         gridTemplateAreas: `"header header"
+                          "nav main"
+                         "nav footer"`,
+        gridTemplateRows: "50px 1fr 50px",
+        gridTemplateColumns: "300px 1fr",
+        h: "100vh"
+      }
+    }
+  },
   ...foundations,
 })
 

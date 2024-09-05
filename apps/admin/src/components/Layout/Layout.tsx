@@ -75,15 +75,8 @@ const Layout: FC = () => {
   return (
     <>
       <LoginModal disclosure={loginDisclosure} />
-      <Grid
-        templateAreas={`"header header"
-            "nav main"
-            "nav footer"`}
-        gridTemplateRows="50px 1fr 50px"
-        gridTemplateColumns="300px 1fr"
-        h="100vh"
-      >
         <GridItem
+          as="header"
           area="header"
           zIndex={2}
           borderBottom="1px"
@@ -133,6 +126,7 @@ const Layout: FC = () => {
         </GridItem>
         <GridItem
           area="nav"
+          as="aside"
           zIndex={1}
           borderRight="1px solid"
           borderColor="chakra-border-color"
@@ -187,6 +181,7 @@ const Layout: FC = () => {
           </VStack>
         </GridItem>
         <GridItem
+          as="main"
           area="main"
           overflowY="auto"
           overflowX="hidden"
@@ -195,7 +190,10 @@ const Layout: FC = () => {
           <Outlet />
         </GridItem>
         <GridItem
-          as={Center}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          as="footer"
           area="footer"
           bg="blackAlpha.50"
         >
@@ -206,7 +204,6 @@ const Layout: FC = () => {
             © Sitecore Inc. {new Date().getFullYear()}
           </Text>
         </GridItem>
-      </Grid>
       <Drawer
         isOpen={isOpen}
         placement="right"
