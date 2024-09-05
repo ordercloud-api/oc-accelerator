@@ -1,5 +1,5 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import { RequiredDeep } from 'ordercloud-javascript-sdk'
+import { BuyerProduct, RequiredDeep } from 'ordercloud-javascript-sdk'
 import { ReactElement, useMemo, useEffect } from 'react'
 import DataTable from './DataTable'
 import { ColumnDef, TableState } from '@tanstack/react-table'
@@ -53,14 +53,14 @@ const ListView = <T extends IDefaultResource>({
   onOptionChange,
   itemActions,
 }: IListView<T>) => {
-  const dataQuery = useOcResourceList(resourceName, listOptions, parameters, {
+  const dataQuery = useOcResourceList<BuyerProduct>(resourceName, listOptions, parameters, {
     staleTime: 300000, // 5 min
-    enabled: !preloadAssignments && !listAssignments ? hasAccess : !!listOptions?.ID,
+    disabled: !(!preloadAssignments && !listAssignments ? hasAccess : !!listOptions?.ID),
   })
 
   const assignmentDataQuery = useListAssignments(resourceName, undefined, listOptions, parameters, {
     staleTime: 300000, // 5 min
-    enabled: !!listAssignments && hasAccess,
+    disabled: !(!!listAssignments && hasAccess),
   })
 
   const toast = useToast()
