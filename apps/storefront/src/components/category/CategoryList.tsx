@@ -14,7 +14,7 @@ export interface CategoryListProps {
 }
 
 const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
-  const { catalogId } = useParams<{ catalogId: string }>();
+  const { catalogId, categoryId } = useParams<{ catalogId: string, categoryId?: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -26,8 +26,13 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
     }
     try {
       setLoading(true);
+      const filters:any = {};
+      if (categoryId) {
+        filters['ParentID'] = categoryId;
+      }
       const categoryResult: ListPage<Category> = await Me.ListCategories({
         catalogID: catalogId,
+        filters,
         pageSize: 20, // Adjust as needed
       });
       setCategories(categoryResult.Items || []);
@@ -36,7 +41,7 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
     } finally {
       setLoading(false);
     }
-  }, [catalogId]);
+  }, [catalogId, categoryId]);
 
   useEffect(() => {
     getCategories();
