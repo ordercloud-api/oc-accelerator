@@ -14,7 +14,7 @@ import {
   ModalOverlay,
   Text,
   Textarea,
-  VStack
+  VStack,
 } from "@chakra-ui/react";
 import { Cart, LineItem } from "ordercloud-javascript-sdk";
 import React, {
@@ -29,17 +29,20 @@ import { Link as RouterLink } from "react-router-dom";
 import useDebounce from "../../hooks/useDebounce";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "./OcQuantityInput";
+import { TABS } from "./ShoppingCart";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;
   editable?: boolean;
   onChange?: (newLi: LineItem) => void;
+  tabIndex?: number;
 }
 
 const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   lineItem,
   editable,
   onChange,
+  tabIndex,
 }) => {
   const [quantity, _setQuantity] = useState(lineItem.Quantity);
 
@@ -113,14 +116,16 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
               position="absolute"
             />
           </Center>
-          <Button
-            size="xs"
-            fontSize=".75rem"
-            variant="link"
-            colorScheme="accent"
-          >
-            Remove
-          </Button>
+          {tabIndex !== TABS.CONFIRMATION && (
+            <Button
+              size="xs"
+              fontSize=".75rem"
+              variant="link"
+              colorScheme="accent"
+            >
+              Remove
+            </Button>
+          )}
         </VStack>
         <VStack alignItems="flex-start" gap={3} flexGrow="1">
           <Link as={RouterLink} to={`/products/${lineItem?.Product?.ID}`}>
@@ -160,7 +165,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
           </VStack>
         ) : (
           <Text ml="auto" color="chakra-subtle-text">
-            Qty: {' '}
+            Qty:{" "}
             <Text as="span" fontWeight="bold" color="chakra-body-text">
               {lineItem.Quantity}
             </Text>

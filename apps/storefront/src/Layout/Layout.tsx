@@ -33,6 +33,7 @@ const Layout: FC = () => {
         alignItems="flex-start"
         w="full"
         minH="100dvh"
+        gap={0}
         sx={{ "&>*": { width: "full" } }}
         bgColor="chakra-subtle-bg"
       >
