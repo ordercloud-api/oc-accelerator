@@ -39,7 +39,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const megaMenuDisclosure = useDisclosure();
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
-  const [lineItems, setLineItems] = useState<LineItem[]>();
+  const [, setLineItems] = useState<LineItem[]>();
   const [totalQuantity, setTotalQuantity] = useState(0);
 
   const navigate = useNavigate();

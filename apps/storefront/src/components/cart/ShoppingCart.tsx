@@ -29,10 +29,10 @@ import {
 } from "@chakra-ui/react";
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
+import { TbCheckbox } from "react-icons/tb";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
-import { TbCheckbox } from "react-icons/tb";
 
   export const TABS = {
     INFORMATION: 0,
@@ -44,7 +44,6 @@ import { TbCheckbox } from "react-icons/tb";
 export const ShoppingCart = (): JSX.Element => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [mockSubmitted, setMockSubmitted] = useState(false);
   const [lineItems, setLineItems] = useState<LineItem[]>();
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
   const [order, setOrder] = useState<RequiredDeep<Order>>();
@@ -105,7 +104,6 @@ export const ShoppingCart = (): JSX.Element => {
 
   const handleSubmitOrder = () => {
     setSubmitting(true);
-    setMockSubmitted(true);
     setTimeout(() => {
       setTabIndex(TABS.CONFIRMATION);
       setSubmitting(false);
@@ -154,19 +152,23 @@ export const ShoppingCart = (): JSX.Element => {
                     ml="auto"
                     p={{ base: 6, lg: 12 }}
                   >
+                    {tabIndex !== TABS.CONFIRMATION && (
                     <Heading mb={6}>Checkout</Heading>
+                    )}
                     <Tabs
                       size="sm"
                       index={tabIndex}
                       onChange={handleTabChange}
                       variant="soft-rounded"
                     >
-                      <TabList>
-                        <Tab>Information</Tab>
-                        <Tab>Shipping</Tab>
-                        <Tab>Payment</Tab>
-                        <Tab>Order Confirmation</Tab>
-                      </TabList>
+                      {tabIndex !== TABS.CONFIRMATION && (
+                        <TabList>
+                          <Tab>Information</Tab>
+                          <Tab>Shipping</Tab>
+                          <Tab>Payment</Tab>
+                          <Tab display="none">Order Confirmation</Tab>
+                        </TabList>
+                      )}
 
                       <TabPanels>
                         <TabPanel as={VStack} alignItems="stretch">
