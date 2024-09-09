@@ -86,7 +86,7 @@ export const SearchableInput = ({
     paramsObj,
     {
       staleTime: 300000, // 5 min
-      enabled: (!parentResource || (!!parentResource && !!parentResourceId)) && hasAccess,
+      disabled: !(!parentResource || (!!parentResource && !!parentResourceId)) || !hasAccess,
     }
   )
 
@@ -96,7 +96,7 @@ export const SearchableInput = ({
     parentParamsObj,
     {
       staleTime: 300000, // 5 min
-      enabled: !!parentResource && hasAccessToParent,
+      disabled: !parentResource || !hasAccessToParent,
     }
   )
 

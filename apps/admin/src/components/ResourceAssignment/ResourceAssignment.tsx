@@ -12,32 +12,32 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react'
-import Case from 'case'
-import { cloneDeep, kebabCase, mapKeys } from 'lodash'
-import pluralize from 'pluralize'
-import { FC, Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router'
-import { PrimaryActionRefContext } from '../ResourceDetail/ResourceDetail'
-import ListView, { ServiceListOptions } from '../ResourceList/ListView'
 import {
   useColumns,
   useDeleteAssignment,
-  useListAssignments,
   useHasAccess,
+  useListAssignments,
   useMutateAssignment,
 } from '@rwatt451/ordercloud-react'
-import SCHEMA_SORT_ORDER from '../../config/schemaSortOrder.config'
-import { cellCallback } from '../ResourceList/ResourceList'
 import { PaginationState, TableState, VisibilityState } from '@tanstack/react-table'
-import { useSearchParams } from 'react-router-dom'
-import ResourceAssignmentCreateEditModal from './modals/ResourceAssignmentCreateEditModal'
-import ActionMenu from '../ResourceList/ActionMenu'
-import DeleteModal from '../ResourceList/modals/DeleteModal'
-import ResourceSelector from './ResourceSelector'
-import { ApiError } from '../OperationForm'
+import Case from 'case'
+import { cloneDeep, kebabCase, mapKeys } from 'lodash'
 import { OrderCloudError } from 'ordercloud-javascript-sdk'
-import NoAccessMessage from '../Shared/NoAccessMessage'
+import pluralize from 'pluralize'
+import { FC, Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate, useParams } from 'react-router'
+import { useSearchParams } from 'react-router-dom'
+import SCHEMA_SORT_ORDER from '../../config/schemaSortOrder.config'
 import { tableOverrides } from '../../config/tableOverrides'
+import { ApiError } from '../OperationForm'
+import { PrimaryActionRefContext } from '../ResourceDetail/ResourceDetail'
+import ActionMenu from '../ResourceList/ActionMenu'
+import ListView, { ServiceListOptions } from '../ResourceList/ListView'
+import DeleteModal from '../ResourceList/modals/DeleteModal'
+import { cellCallback } from '../ResourceList/ResourceList'
+import NoAccessMessage from '../Shared/NoAccessMessage'
+import ResourceAssignmentCreateEditModal from './modals/ResourceAssignmentCreateEditModal'
+import ResourceSelector from './ResourceSelector'
 
 export interface IResourceAssignment {
   /** The resource that is being assigned to*/
@@ -295,7 +295,7 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
     operationParams,
     {
       // staleTime: 300000, // 5 min
-      enabled: switcherResourceName ? !!switcherResourceID : allowed,
+      disabled: switcherResourceName ? !switcherResourceID : !allowed,
     }
   )
 

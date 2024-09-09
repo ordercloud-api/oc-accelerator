@@ -1,5 +1,6 @@
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
+  Box,
   Button,
   Container,
   Heading,
@@ -9,17 +10,24 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Text,
   useDisclosure,
-  UseDisclosureProps
+  UseDisclosureProps,
 } from "@chakra-ui/react";
 import { useOcResourceList, useOrderCloudContext } from "@rwatt451/ordercloud-react";
-import { Catalog, ListPage, RequiredDeep } from "ordercloud-javascript-sdk";
-import { FC, useMemo, useState } from "react";
-import { TbShoppingCart } from "react-icons/tb";
-import { Link as RouterLink } from "react-router-dom";
+import {
+  Cart,
+  Catalog,
+  LineItem,
+  ListPage,
+  RequiredDeep
+} from "ordercloud-javascript-sdk";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { TbShoppingCartFilled } from "react-icons/tb";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { DEFAULT_BRAND } from "../assets/DEFAULT_BRAND";
 import { useCurrentUser } from "../hooks/currentUser";
 import MegaMenu from "./MegaMenu";
-import { DEFAULT_BRAND } from "../assets/DEFAULT_BRAND";
 
 interface MainMenuProps {
   loginDisclosure: UseDisclosureProps;
@@ -30,6 +38,9 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const { isLoggedIn, logout } = useOrderCloudContext();
   const megaMenuDisclosure = useDisclosure();
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
+  const [_lineItems, setLineItems] = useState<LineItem[]>();
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const navigate = useNavigate()
 
   const { data } = useOcResourceList(
     "Catalogs",
@@ -42,6 +53,20 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   );
 
   const catalogs = useMemo(() => (data as RequiredDeep<ListPage<Catalog>>)?.Items, [data]);
+
+  const getTotalLineItemQuantity = useCallback(async () => {
+    const result = await Cart.ListLineItems();
+    const totalQuantity = result.Items.reduce(
+      (sum, item) => sum + item.Quantity,
+      0
+    );
+    setLineItems(result.Items);
+    setTotalQuantity(totalQuantity);
+  }, []);
+
+  useEffect(() => {
+    getTotalLineItemQuantity();
+  }, [getTotalLineItemQuantity, navigate]);
 
   const renderCatalogMenu = () => {
     if (catalogs?.length > 1) {
@@ -118,17 +143,46 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
             {renderCatalogMenu()}
           </HStack>
           <HStack>
-            <Heading size="sm">
-              {isLoggedIn
-                ? `Welcome, ${user?.FirstName} ${user?.LastName}`
-                : "Welcome"}
-            </Heading>
+            {isLoggedIn && (
+              <Heading size="sm">
+                `Welcome, ${user?.FirstName} ${user?.LastName}`
+              </Heading>
+            )}
             <Button
               as={RouterLink}
               to="/cart"
               variant="outline"
               size="sm"
-              leftIcon={<Icon as={TbShoppingCart} />}
+              leftIcon={totalQuantity !== 0 ?
+                    <Box position="relative" mt="2px" mr="2px" lineHeight="1">
+                      <Box
+                        id="cartCountFrame"
+                        top="5px"
+                        left="6px"
+                        position="absolute"
+                        height="9px"
+                        width="15px"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Text
+                          fontSize=".5rem"
+                          color="white"
+                          fontWeight="bold"
+                          letterSpacing="-.5px"
+                        >
+                          {totalQuantity}
+                        </Text>
+                      </Box>
+
+                      <Icon
+                        fontSize="lg"
+                        as={TbShoppingCartFilled}
+                        color="gray.500"
+                      />
+                    </Box>: undefined
+              }
               aria-label={`Link to cart`}
             >
               Cart

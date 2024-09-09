@@ -15,7 +15,7 @@ import {
   SimpleGrid,
   Spinner,
   VStack,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import {
   BuyerProduct,
@@ -26,6 +26,7 @@ import { parse } from "querystring";
 import React, {
   FunctionComponent,
   useCallback,
+  useEffect,
   useMemo,
 } from "react";
 import {
@@ -35,10 +36,16 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import Pagination from "../shared/pagination/Pagination";
-import FilterSearchMenu, { ServiceListOptions } from "../shared/search/SearchMenu";
+import FilterSearchMenu, {
+  ServiceListOptions,
+} from "../shared/search/SearchMenu";
 import FacetList from "./facets/FacetList";
 import ProductCard from "./ProductCard";
-import { useOcResourceList } from "@rwatt451/ordercloud-react";
+import {
+  useDeleteOcResource,
+  useOcResourceList,
+  useOcResourceListWithFacets,
+} from "@rwatt451/ordercloud-react";
 
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;
@@ -73,18 +80,21 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     return filtersObj;
   }, [searchParams]);
 
-  const { data, isLoading} = useOcResourceList(
-    'Products',
-    { search: searchTerm, page: currentPage.toString(), catalogId, categoryId, ...filters },
+  const { data, isLoading } = useOcResourceListWithFacets<BuyerProduct>(
+    "Products",
+    {
+      search: searchTerm,
+      page: currentPage.toString(),
+      catalogId,
+      categoryId,
+      ...filters,
+    },
     {},
     {
       staleTime: 300000, // 5 min
     },
     true
-  )
-
-  const items = useMemo(()=> (data as RequiredDeep<ListPageWithFacets<BuyerProduct>>)?.Items ,[data])
-  const meta = useMemo(()=> (data as RequiredDeep<ListPageWithFacets<BuyerProduct>>)?.Meta ,[data])
+  );
 
   const handleRoutingChange = useCallback(
     (queryKey: string, resetPage?: boolean, index?: number) =>
@@ -148,10 +158,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
               listOptions={listOptions}
               handleRoutingChange={handleRoutingChange}
             />
-            <FacetList
-              facets={meta?.Facets}
-              onChange={handleRoutingChange}
-            />
+            <FacetList facets={data?.Meta?.Facets} onChange={handleRoutingChange} />
           </DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -159,7 +166,6 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
       <Grid
         gridTemplateColumns={{ md: "300px 1fr" }}
         gap="4"
-        my={8}
         alignItems="flex-start"
       >
         <Card
@@ -173,10 +179,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
               listOptions={listOptions}
               handleRoutingChange={handleRoutingChange}
             />
-            <FacetList
-              facets={meta?.Facets}
-              onChange={handleRoutingChange}
-            />
+            <FacetList facets={data?.Meta?.Facets} onChange={handleRoutingChange} />
           </CardBody>
         </Card>
         <GridItem display={{ base: "block", md: "none" }}>
@@ -190,13 +193,13 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
           gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
           spacing={4}
         >
-          {items?.map((p) => (
+          {data?.Items?.map((p) => (
             <React.Fragment key={p.ID}>
               {renderItem ? renderItem(p) : <ProductCard product={p} />}
             </React.Fragment>
           ))}
         </SimpleGrid>
-        {items?.length === 0 && (
+        {data?.Items?.length === 0 && (
           <Center h="20vh">
             <Heading as="h2" size="md">
               No products found
@@ -205,11 +208,11 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
         )}
       </Grid>
 
-      {meta?.TotalPages && meta.TotalPages > 1 && (
+      {data?.Meta?.TotalPages && data?.Meta?.TotalPages > 1 && (
         <Center>
           <Pagination
             page={currentPage}
-            totalPages={meta?.TotalPages}
+            totalPages={data?.Meta?.TotalPages}
             onChange={handleRoutingChange("page")}
           />
         </Center>

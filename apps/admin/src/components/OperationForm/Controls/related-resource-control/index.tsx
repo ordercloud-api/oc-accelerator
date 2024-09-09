@@ -35,7 +35,7 @@ export const RelatedResourceControl: FC<IRelatedResourceControl> = ({
   }, [operationInfo?.operationId])
 
   const placeholder = useMemo(() => {
-    return `Search ${relatedResourceName.toLocaleLowerCase()}...`
+    return `Search ${relatedResourceName?.toLocaleLowerCase()}...`
   }, [relatedResourceName])
 
   const { allowed: hasAccess } = useHasAccess(operationInfo?.operationId?.split('.')[0])
@@ -46,7 +46,7 @@ export const RelatedResourceControl: FC<IRelatedResourceControl> = ({
     operationInfo?.parameters,
     {
       staleTime: 300000, // 5 min
-      enabled: !operationInfo?.pauseOperation && hasAccess,
+      disabled: operationInfo?.pauseOperation || !hasAccess,
     }
   )
 
