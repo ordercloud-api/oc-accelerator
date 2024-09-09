@@ -13,15 +13,14 @@ export interface CategoryListProps {
 }
 
 const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
-  const { catalogId } = useParams<{ catalogId: string }>();
-
+  const { catalogId, categoryId } = useParams<{ catalogId: string, categoryId?: string }>();
   const { data, isLoading } = useOcResourceList(
     "Categories",
-    { catalogId },
+    { catalogId, ParentID: categoryId },
     {},
     {
       staleTime: 300000, // 5 min
-      enabled: !!catalogId
+      disabled: !catalogId
     },
     true
   );

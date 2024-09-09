@@ -329,10 +329,10 @@ const DataTable = <T extends IDefaultResource>({
         <Table>
           <Thead>{table.getHeaderGroups()?.map(tableHeaderRow)}</Thead>
           <Tbody>
-            {table.getRowModel().rows?.map(tableRow)}{' '}
+            {table.getRowModel().rows?.map(tableRow)}
             {noResults && (
               <Tr>
-                <Text p={3}>No results</Text>
+                <Text as="td" p={3}>No results</Text>
               </Tr>
             )}
           </Tbody>

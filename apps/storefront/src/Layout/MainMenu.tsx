@@ -64,6 +64,16 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
     setTotalQuantity(totalQuantity);
   }, []);
 
+  const getTotalLineItemQuantity = useCallback(async () => {
+    const result = await Cart.ListLineItems();
+    const totalQuantity = result.Items.reduce(
+      (sum, item) => sum + item.Quantity,
+      0
+    );
+    setLineItems(result.Items);
+    setTotalQuantity(totalQuantity);
+  }, []);
+
   useEffect(() => {
     getTotalLineItemQuantity();
   }, [getTotalLineItemQuantity, navigate]);
@@ -87,7 +97,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
                 key={catalog.ID}
                 onClick={() => setSelectedCatalog(catalog.ID)}
                 as={RouterLink}
-                to={`/product-list/${catalog.ID}`}
+                to={`/shop/${selectedCatalog}/products`}
               >
                 {catalog.Name}
               </MenuItem>
@@ -100,7 +110,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
       return (
         <Button
           as={RouterLink}
-          to={`/products/${catalogs[0].ID}`}
+          to={`/shop/${catalogs[0].ID}/products`}
           variant="ghost"
         >
           Shop All Products

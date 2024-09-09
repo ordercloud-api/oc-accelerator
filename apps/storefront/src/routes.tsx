@@ -26,15 +26,19 @@ const routes: RouteObject[] = [
         element: <ProductList />,
       },
       {
-        path: "/categories/:catalogId",
+        path: "/shop/:catalogId/categories",
         element: <CategoryList />,
       },
       {
-        path: "/product-list/:catalogId",
+        path: "/shop/:catalogId/categories/:categoryId",
+        element: <CategoryList />,
+      },
+      {
+        path: "/shop/:catalogId/categories/:categoryId/products",
         element: <ProductList />,
       },
       {
-        path: "/product-list/:catalogId/:categoryId",
+        path: "/shop/:catalogId/products",
         element: <ProductList />,
       },
       {
