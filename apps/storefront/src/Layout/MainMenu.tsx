@@ -18,9 +18,8 @@ import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import {
   Cart,
   Catalog,
-  LineItem,
   ListPage,
-  Me,
+  Me
 } from "ordercloud-javascript-sdk";
 import { FC, useCallback, useEffect, useState } from "react";
 import { TbShoppingCartFilled } from "react-icons/tb";
@@ -39,7 +38,6 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const megaMenuDisclosure = useDisclosure();
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
-  const [, setLineItems] = useState<LineItem[]>();
   const [totalQuantity, setTotalQuantity] = useState(0);
 
   const navigate = useNavigate();
@@ -66,7 +64,6 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
       (sum, item) => sum + item.Quantity,
       0
     );
-    setLineItems(result.Items);
     setTotalQuantity(totalQuantity);
   }, []);
 
