@@ -42,27 +42,19 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const [totalQuantity, setTotalQuantity] = useState(0);
   const navigate = useNavigate()
 
-  const { data } = useOcResourceList(
+  const { data } = useOcResourceList<Catalog>(
     "Catalogs",
-    { },
-    {},
+    undefined,
+    undefined,
     {
       staleTime: 300000, // 5 min
     },
     true
   );
 
-  const catalogs = useMemo(() => (data as RequiredDeep<ListPage<Catalog>>)?.Items, [data]);
+  const catalogs = useMemo(() => data?.Items, [data]);
 
-  const getTotalLineItemQuantity = useCallback(async () => {
-    const result = await Cart.ListLineItems();
-    const totalQuantity = result.Items.reduce(
-      (sum, item) => sum + item.Quantity,
-      0
-    );
-    setLineItems(result.Items);
-    setTotalQuantity(totalQuantity);
-  }, []);
+  useEffect(()=> {if(catalogs?.length) setSelectedCatalog(catalogs[0].ID)},[])
 
   const getTotalLineItemQuantity = useCallback(async () => {
     const result = await Cart.ListLineItems();
