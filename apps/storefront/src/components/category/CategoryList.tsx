@@ -1,9 +1,6 @@
 import { Center, Heading, SimpleGrid, Spinner } from "@chakra-ui/react";
-import { Category, ListPage, RequiredDeep } from "ordercloud-javascript-sdk";
-import React, {
-  FunctionComponent,
-  useMemo,
-} from "react";
+import { Category } from "ordercloud-javascript-sdk";
+import React, { FunctionComponent, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import CategoryCard from "./CategoryCard";
 import { useOcResourceList } from "@rwatt451/ordercloud-react";
@@ -13,19 +10,22 @@ export interface CategoryListProps {
 }
 
 const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
-  const { catalogId, categoryId } = useParams<{ catalogId: string, categoryId?: string }>();
-  const { data, isLoading } = useOcResourceList(
+  const { catalogId, categoryId } = useParams<{
+    catalogId: string;
+    categoryId?: string;
+  }>();
+  const { data, isLoading } = useOcResourceList<Category>(
     "Categories",
     { catalogId, ParentID: categoryId },
     {},
     {
       staleTime: 300000, // 5 min
-      disabled: !catalogId
+      disabled: !catalogId,
     },
     true
   );
 
-  const categories = useMemo(() => (data as RequiredDeep<ListPage<Category>>).Items, [data]);
+  const categories = useMemo(() => data?.Items, [data]);
 
   if (isLoading) {
     return (

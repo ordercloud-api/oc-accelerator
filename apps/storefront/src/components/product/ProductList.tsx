@@ -19,14 +19,11 @@ import {
 } from "@chakra-ui/react";
 import {
   BuyerProduct,
-  ListPageWithFacets,
-  RequiredDeep,
 } from "ordercloud-javascript-sdk";
 import { parse } from "querystring";
 import React, {
   FunctionComponent,
   useCallback,
-  useEffect,
   useMemo,
 } from "react";
 import {
@@ -42,8 +39,6 @@ import FilterSearchMenu, {
 import FacetList from "./facets/FacetList";
 import ProductCard from "./ProductCard";
 import {
-  useDeleteOcResource,
-  useOcResourceList,
   useOcResourceListWithFacets,
 } from "@rwatt451/ordercloud-react";
 

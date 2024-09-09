@@ -37,7 +37,7 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
     { productID: productId! },
     {
       staleTime: 300000, // 5 min
-      enabled: !!productId && !priceSchedule,
+      disabled: !productId || !!priceSchedule,
     },
     true
   );

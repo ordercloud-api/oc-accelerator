@@ -14,14 +14,11 @@ import {
   useDisclosure,
   UseDisclosureProps,
 } from "@chakra-ui/react";
-import { useOcResourceList, useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import {
-  Cart,
-  Catalog,
-  LineItem,
-  ListPage,
-  RequiredDeep
-} from "ordercloud-javascript-sdk";
+  useOcResourceList,
+  useOrderCloudContext,
+} from "@rwatt451/ordercloud-react";
+import { Cart, Catalog } from "ordercloud-javascript-sdk";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { TbShoppingCartFilled } from "react-icons/tb";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -38,9 +35,8 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const { isLoggedIn, logout } = useOrderCloudContext();
   const megaMenuDisclosure = useDisclosure();
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
-  const [_lineItems, setLineItems] = useState<LineItem[]>();
   const [totalQuantity, setTotalQuantity] = useState(0);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { data } = useOcResourceList<Catalog>(
     "Catalogs",
@@ -54,15 +50,12 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
 
   const catalogs = useMemo(() => data?.Items, [data]);
 
-  useEffect(()=> {if(catalogs?.length) setSelectedCatalog(catalogs[0].ID)},[])
-
   const getTotalLineItemQuantity = useCallback(async () => {
     const result = await Cart.ListLineItems();
     const totalQuantity = result.Items.reduce(
       (sum, item) => sum + item.Quantity,
       0
     );
-    setLineItems(result.Items);
     setTotalQuantity(totalQuantity);
   }, []);
 
@@ -71,7 +64,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   }, [getTotalLineItemQuantity, navigate]);
 
   const renderCatalogMenu = () => {
-    if (catalogs?.length > 1) {
+    if (catalogs?.length && catalogs.length > 1) {
       return (
         <Menu>
           <MenuButton
@@ -84,17 +77,17 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
           </MenuButton>
           <MenuList>
             {catalogs?.map((catalog) => {
-            return (
-              <MenuItem
-                key={catalog.ID}
-                onClick={() => setSelectedCatalog(catalog.ID)}
-                as={RouterLink}
-                to={`/shop/${selectedCatalog}/products`}
-              >
-                {catalog.Name}
-              </MenuItem>
-            )
-          })}
+              return (
+                <MenuItem
+                  key={catalog.ID}
+                  onClick={() => setSelectedCatalog(catalog.ID)}
+                  as={RouterLink}
+                  to={`/shop/${catalog.ID}/products`}
+                >
+                  {catalog.Name}
+                </MenuItem>
+              );
+            })}
           </MenuList>
         </Menu>
       );
@@ -155,35 +148,37 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
               to="/cart"
               variant="outline"
               size="sm"
-              leftIcon={totalQuantity !== 0 ?
-                    <Box position="relative" mt="2px" mr="2px" lineHeight="1">
-                      <Box
-                        id="cartCountFrame"
-                        top="5px"
-                        left="6px"
-                        position="absolute"
-                        height="9px"
-                        width="15px"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
+              leftIcon={
+                totalQuantity !== 0 ? (
+                  <Box position="relative" mt="2px" mr="2px" lineHeight="1">
+                    <Box
+                      id="cartCountFrame"
+                      top="5px"
+                      left="6px"
+                      position="absolute"
+                      height="9px"
+                      width="15px"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Text
+                        fontSize=".5rem"
+                        color="white"
+                        fontWeight="bold"
+                        letterSpacing="-.5px"
                       >
-                        <Text
-                          fontSize=".5rem"
-                          color="white"
-                          fontWeight="bold"
-                          letterSpacing="-.5px"
-                        >
-                          {totalQuantity}
-                        </Text>
-                      </Box>
+                        {totalQuantity}
+                      </Text>
+                    </Box>
 
-                      <Icon
-                        fontSize="lg"
-                        as={TbShoppingCartFilled}
-                        color="gray.500"
-                      />
-                    </Box>: undefined
+                    <Icon
+                      fontSize="lg"
+                      as={TbShoppingCartFilled}
+                      color="gray.500"
+                    />
+                  </Box>
+                ) : undefined
               }
               aria-label={`Link to cart`}
             >

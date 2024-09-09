@@ -60,8 +60,8 @@ const MegaMenu: FC<MegaMenuProps> = ({
 
   const { data: catalogResult, isLoading: loading } = useOcResourceList(
     "Catalogs",
-    {},
-    {},
+    undefined,
+    undefined,
     {
       staleTime: 300000, // 5 min
     },
@@ -74,7 +74,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
     {},
     {
       staleTime: 300000, // 5 min
-      enabled: !!selectedCatalog,
+      disabled: !selectedCatalog,
     },
     true
   );
