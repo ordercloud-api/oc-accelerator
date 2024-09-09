@@ -30,7 +30,7 @@ import {
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { TbCheckbox } from "react-icons/tb";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
 
@@ -47,7 +47,6 @@ export const ShoppingCart = (): JSX.Element => {
   const [lineItems, setLineItems] = useState<LineItem[]>();
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
   const [order, setOrder] = useState<RequiredDeep<Order>>();
-  const navigate = useNavigate();
 
   const getOrder = useCallback(async () => {
     const result = await Cart.Get();
@@ -63,14 +62,16 @@ export const ShoppingCart = (): JSX.Element => {
   }, [order]);
 
   const submitOrder = useCallback(async () => {
+    setSubmitting(true);
     if (!order?.ID) return;
     try {
       await Cart.Submit();
-      navigate("/order-summary");
+      setTabIndex(TABS.CONFIRMATION);
+      setSubmitting(false);
     } catch (err) {
       console.log(err);
     }
-  }, [navigate, order?.ID]);
+  }, [order?.ID]);
 
   const deleteOrder = useCallback(async () => {
     if (!order?.ID) return;
@@ -102,13 +103,7 @@ export const ShoppingCart = (): JSX.Element => {
     setTabIndex(index);
   };
 
-  const handleSubmitOrder = () => {
-    setSubmitting(true);
-    setTimeout(() => {
-      setTabIndex(TABS.CONFIRMATION);
-      setSubmitting(false);
-    }, 3000);
-  };
+  
   return (
     <>
       {loading ? (
@@ -404,7 +399,7 @@ export const ShoppingCart = (): JSX.Element => {
                           </VStack>
                           <Button
                             alignSelf="flex-end"
-                            onClick={handleSubmitOrder}
+                            onClick={submitOrder}
                             mt={6}
                             isDisabled={submitting}
                           >
