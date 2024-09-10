@@ -11,7 +11,6 @@ import {
   GridItem,
   Heading,
   HStack,
-  Icon,
   Input,
   Radio,
   RadioGroup,
@@ -25,12 +24,11 @@ import {
   TabPanels,
   Tabs,
   Text,
-  VStack,
+  VStack
 } from "@chakra-ui/react";
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
-import { TbCheckbox } from "react-icons/tb";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
 
@@ -47,6 +45,7 @@ export const ShoppingCart = (): JSX.Element => {
   const [lineItems, setLineItems] = useState<LineItem[]>();
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
   const [order, setOrder] = useState<RequiredDeep<Order>>();
+  const navigate = useNavigate();
 
   const getOrder = useCallback(async () => {
     const result = await Cart.Get();
@@ -68,10 +67,12 @@ export const ShoppingCart = (): JSX.Element => {
       await Cart.Submit();
       setTabIndex(TABS.CONFIRMATION);
       setSubmitting(false);
+      navigate("/order-confirmation");
+
     } catch (err) {
       console.log(err);
     }
-  }, [order?.ID]);
+  }, [navigate, order?.ID]);
 
   const deleteOrder = useCallback(async () => {
     if (!order?.ID) return;
@@ -103,7 +104,6 @@ export const ShoppingCart = (): JSX.Element => {
     setTabIndex(index);
   };
 
-  
   return (
     <>
       {loading ? (
@@ -147,23 +147,18 @@ export const ShoppingCart = (): JSX.Element => {
                     ml="auto"
                     p={{ base: 6, lg: 12 }}
                   >
-                    {tabIndex !== TABS.CONFIRMATION && (
                     <Heading mb={6}>Checkout</Heading>
-                    )}
                     <Tabs
                       size="sm"
                       index={tabIndex}
                       onChange={handleTabChange}
                       variant="soft-rounded"
                     >
-                      {tabIndex !== TABS.CONFIRMATION && (
                         <TabList>
                           <Tab>Information</Tab>
                           <Tab>Shipping</Tab>
                           <Tab>Payment</Tab>
-                          <Tab display="none">Order Confirmation</Tab>
                         </TabList>
-                      )}
 
                       <TabPanels>
                         <TabPanel as={VStack} alignItems="stretch">
@@ -405,57 +400,6 @@ export const ShoppingCart = (): JSX.Element => {
                           >
                             {submitting ? "Submitting" : "Submit Order"}
                           </Button>
-                        </TabPanel>
-                        {/* Order Confirmation */}
-                        <TabPanel>
-                          <VStack alignItems="flex-start" flex="1" minH="500px">
-                            <HStack gap="3" alignItems="center">
-                              <Icon
-                                layerStyle="icon.subtle"
-                                boxSize="icon.2xl"
-                                color="primary"
-                                as={TbCheckbox}
-                              />
-                              <VStack alignItems="flex-start" gap="0">
-                                <Heading size="xl">Order confirmed</Heading>
-                                <Text color="chakra-subtle-text">
-                                  Order #0001
-                                </Text>
-                              </VStack>
-                            </HStack>
-                            <Divider my="3" />
-                            <VStack
-                              justifyContent="flex-start"
-                              alignItems="flex-start"
-                            >
-                              <HStack alignItems="flex-start">
-                                <VStack alignItems="flex-start" gap="0">
-                                  <Text fontWeight="bold">
-                                    [FIRSTNAME] [LASTNAME]
-                                  </Text>
-                                  <Text>[ADDRESS1] [ADDRESS2]</Text>
-                                  <Text>[CITY] [STATE] [ZIP]</Text>
-                                  <Text mt="3">[PHONE] | [EMAIL]</Text>
-                                </VStack>
-                              </HStack>
-                            </VStack>
-                            <Divider my="3" />
-                            <Text>[SHIPPING METHOD]</Text>
-                            <Text>[PAYMENT SUMMARY]</Text>
-                          </VStack>
-                          <Divider my="3" />
-                          <HStack mt="auto">
-                            <Text color="chakra-subtle-text">
-                              Need help with your order?
-                            </Text>
-                            <Text
-                              color="primary"
-                              fontWeight="bold"
-                              textDecoration="underline"
-                            >
-                              Contact us
-                            </Text>
-                          </HStack>
                         </TabPanel>
                       </TabPanels>
                     </Tabs>
