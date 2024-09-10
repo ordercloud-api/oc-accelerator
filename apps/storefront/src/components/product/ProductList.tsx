@@ -146,8 +146,8 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
 
   if (loading) {
     return (
-      <Center h="50vh">
-        <Spinner size="xl" />
+      <Center h="75vh">
+        <Spinner thickness="10px" size="xl" color="secondary.300" />
       </Center>
     );
   }

@@ -4,7 +4,6 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  Box,
   Center,
   Heading,
   Link,
@@ -64,7 +63,7 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
         const categoryResult: ListPage<Category> = await Me.ListCategories({
           catalogID: catalogId,
           filters,
-          pageSize: 100, // Adjust as needed
+          pageSize: 20, // Adjust as needed
         });
 
         const categoriesWithChildInfo = await Promise.all(
@@ -182,7 +181,7 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
               </VStack>
             ) : (
               <Center>
-                <Spinner size="sm" />
+                <Spinner size="sm" color="secondary.300" />
               </Center>
             )}
           </AccordionPanel>
@@ -193,29 +192,19 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
 
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="75vh"
-      >
-        <Spinner size="xl" thickness="4px" />
-      </Box>
+      <Center height="75vh">
+        <Spinner size="xl" thickness="10px" color="secondary.300" />
+      </Center>
     );
   }
 
   if (categories.length === 0) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="75vh"
-      >
-        <Heading size="lg" color="gray.500">
+      <Center height="75vh">
+        <Heading size="lg" color="chakra-subtle-text">
           No categories found
         </Heading>
-      </Box>
+      </Center>
     );
   }
 
