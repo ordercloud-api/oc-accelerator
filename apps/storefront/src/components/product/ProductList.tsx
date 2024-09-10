@@ -15,7 +15,7 @@ import {
   SimpleGrid,
   Spinner,
   VStack,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import {
   BuyerProduct,
@@ -37,7 +37,9 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import Pagination from "../shared/pagination/Pagination";
-import FilterSearchMenu, { ServiceListOptions } from "../shared/search/SearchMenu";
+import FilterSearchMenu, {
+  ServiceListOptions,
+} from "../shared/search/SearchMenu";
 import FacetList from "./facets/FacetList";
 import ProductCard from "./ProductCard";
 
@@ -56,7 +58,7 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-    const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const searchTerm = useMemo(() => {
     return searchParams.get("search") || undefined;
@@ -150,6 +152,16 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
     );
   }
 
+  if (productList?.Items && productList.Items.length === 0) {
+    return (
+      <Center h="75vh">
+        <Heading as="h2" size="md">
+          No products found
+        </Heading>
+      </Center>
+    );
+  }
+
   return (
     <>
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
@@ -209,13 +221,6 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
             </React.Fragment>
           ))}
         </SimpleGrid>
-        {productList?.Items && productList.Items.length === 0 && (
-          <Center h="20vh">
-            <Heading as="h2" size="md">
-              No products found
-            </Heading>
-          </Center>
-        )}
       </Grid>
 
       {!!productList?.Meta?.TotalPages && productList.Meta.TotalPages > 1 && (

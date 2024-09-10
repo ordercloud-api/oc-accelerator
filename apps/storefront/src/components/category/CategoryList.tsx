@@ -1,85 +1,232 @@
-import { Center, Heading, SimpleGrid, Spinner } from "@chakra-ui/react";
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Center,
+  Heading,
+  Link,
+  SimpleGrid,
+  Spinner,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { Category, ListPage, Me } from "ordercloud-javascript-sdk";
-import React, {
-  FunctionComponent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import { useParams } from "react-router-dom";
-import CategoryCard from "./CategoryCard";
+import { FunctionComponent, useCallback, useEffect, useState } from "react";
+import { Link as RouterLink, useParams } from "react-router-dom";
 
-export interface CategoryListProps {
-  renderItem?: (category: Category) => JSX.Element;
+interface CategoryNode extends Category {
+  children: CategoryNode[];
+  isLoaded: boolean;
+  hasChildren: boolean;
+}
+
+interface CategoryListProps {
+  renderItem?: (category: CategoryNode, depth: number) => JSX.Element;
 }
 
 const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
-  const { catalogId, categoryId } = useParams<{ catalogId: string, categoryId?: string }>();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { catalogId } = useParams<{ catalogId: string }>();
+  const [categories, setCategories] = useState<CategoryNode[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const getCategories = useCallback(async () => {
-    if (!catalogId) {
-      console.error("No catalogId provided");
-      setLoading(false);
-      return;
-    }
-    try {
-      setLoading(true);
-      const filters:any = {};
-      if (categoryId) {
-        filters['ParentID'] = categoryId;
+  const checkForChildren = useCallback(
+    async (categoryId: string): Promise<boolean> => {
+      if (!catalogId) return false;
+      try {
+        const childResult = await Me.ListCategories({
+          catalogID: catalogId,
+          filters: { ParentID: categoryId },
+          pageSize: 1,
+        });
+        return childResult.Items.length > 0;
+      } catch (error) {
+        console.error("Error checking for children:", error);
+        return false;
       }
-      const categoryResult: ListPage<Category> = await Me.ListCategories({
-        catalogID: catalogId,
-        filters,
-        pageSize: 20, // Adjust as needed
-      });
-      setCategories(categoryResult.Items || []);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [catalogId, categoryId]);
+    },
+    [catalogId]
+  );
+
+  const fetchCategories = useCallback(
+    async (parentId?: string): Promise<CategoryNode[]> => {
+      if (!catalogId) {
+        console.error("No catalogId provided");
+        return [];
+      }
+
+      try {
+        const filters: { ParentID?: string } = parentId
+          ? { ParentID: parentId }
+          : {};
+        const categoryResult: ListPage<Category> = await Me.ListCategories({
+          catalogID: catalogId,
+          filters,
+          pageSize: 100, // Adjust as needed
+        });
+
+        const categoriesWithChildInfo = await Promise.all(
+          (categoryResult.Items || []).map(async (category) => {
+            const childrenExist = await checkForChildren(category.ID as string);
+            return {
+              ...category,
+              children: [],
+              isLoaded: false,
+              hasChildren: childrenExist,
+            };
+          })
+        );
+
+        return categoriesWithChildInfo;
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        return [];
+      }
+    },
+    [catalogId, checkForChildren]
+  );
+
+  const getCategories = useCallback(async () => {
+    setLoading(true);
+    const rootCategories = await fetchCategories();
+    setCategories(rootCategories);
+    setLoading(false);
+  }, [fetchCategories]);
 
   useEffect(() => {
     getCategories();
   }, [getCategories]);
 
+  const loadChildren = async (categoryId: string) => {
+    const children = await fetchCategories(categoryId);
+    setCategories((prevCategories) => {
+      return updateCategoryChildren(prevCategories, categoryId, children);
+    });
+  };
+
+  const updateCategoryChildren = (
+    categories: CategoryNode[],
+    categoryId: string,
+    children: CategoryNode[]
+  ): CategoryNode[] => {
+    return categories.map((category) => {
+      if (category.ID === categoryId) {
+        return { ...category, children, isLoaded: true };
+      } else if (category.children.length > 0) {
+        return {
+          ...category,
+          children: updateCategoryChildren(
+            category.children,
+            categoryId,
+            children
+          ),
+        };
+      }
+      return category;
+    });
+  };
+
+  const renderCategory = (category: CategoryNode, depth: number = 0) => {
+    if (renderItem) {
+      return renderItem(category, depth);
+    }
+
+    if (!category.hasChildren) {
+      return (
+        <Link
+          py={3}
+          as={RouterLink}
+          to={`/shop/${catalogId}/categories/${category.ID}/products`}
+          key={category.ID}
+          fontWeight={depth === 0 ? "bold" : "normal"}
+          ml="auto"
+          w="full"
+        >
+          {category.Name}
+        </Link>
+      );
+    }
+
+    return (
+      <Accordion allowMultiple key={category.ID}>
+        <AccordionItem border="none">
+          <AccordionButton
+            px="0"
+            display="flex"
+            justifyContent="space-between"
+            onClick={() =>
+              !category.isLoaded && category.ID && loadChildren(category.ID)
+            }
+          >
+            <Link
+              as={RouterLink}
+              to={`/shop/${catalogId}/categories/${category.ID}/products`}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <Text fontWeight={depth === 0 ? "bold" : "normal"}>
+                {category.Name}
+              </Text>
+            </Link>
+            <AccordionIcon alignSelf="flex-end" />
+          </AccordionButton>
+          <AccordionPanel py={3}>
+            {category.isLoaded ? (
+              <VStack align="stretch" spacing={2}>
+                {category.children.map((child) =>
+                  renderCategory(child, depth + 1)
+                )}
+              </VStack>
+            ) : (
+              <Center>
+                <Spinner size="sm" />
+              </Center>
+            )}
+          </AccordionPanel>
+        </AccordionItem>
+      </Accordion>
+    );
+  };
+
   if (loading) {
     return (
-      <Center h="50vh">
-        <Spinner size="xl" thickness="10px" />
-      </Center>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="75vh"
+      >
+        <Spinner size="xl" thickness="4px" />
+      </Box>
     );
   }
 
   if (categories.length === 0) {
     return (
-      <Center h="50vh">
-        <Heading color="chakra-subtle-color">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="75vh"
+      >
+        <Heading size="lg" color="gray.500">
           No categories found
         </Heading>
-      </Center>
+      </Box>
     );
   }
 
   return (
     <SimpleGrid
       py={12}
-      gridTemplateColumns="repeat(auto-fill, minmax(270px, 1fr))"
-      spacing={4}
+      gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
+      spacing={12}
+      w="full"
     >
-      {categories.map((category) => (
-        <React.Fragment key={category.ID}>
-          {renderItem ? (
-            renderItem(category)
-          ) : (
-            <CategoryCard category={category} catalogId={catalogId} />
-          )}
-        </React.Fragment>
-      ))}
+      {categories.map((category) => renderCategory(category))}
     </SimpleGrid>
   );
 };
