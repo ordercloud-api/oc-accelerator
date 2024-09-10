@@ -29,6 +29,7 @@ import { Link as RouterLink } from "react-router-dom";
 import useDebounce from "../../hooks/useDebounce";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "./OcQuantityInput";
+import { useShopper } from "@rwatt451/ordercloud-react";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;
@@ -41,7 +42,8 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   editable,
   onChange,
 }) => {
-  const [quantity, _setQuantity] = useState(lineItem.Quantity);
+  const [quantity, setQuantity] = useState(lineItem.Quantity);
+  const { patchCartLineItem } = useShopper()
 
   const debouncedQuantity: number = useDebounce(quantity, 300);
 
@@ -52,14 +54,14 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   const updateLineItem = useCallback(
     async (quantity: number) => {
       if (lineItem.Quantity === quantity) return;
-      const response = await Cart.PatchLineItem(lineItem.ID!, {
+      const response = await patchCartLineItem({ID: lineItem.ID!, lineItem: {
         Quantity: quantity,
-      });
+      }});
       if (onChange) {
         onChange(response);
       }
     },
-    [lineItem, onChange]
+    [lineItem.ID, lineItem.Quantity, onChange, patchCartLineItem]
   );
 
   useEffect(() => {
@@ -154,7 +156,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
                 controlId="addToCart"
                 productId={lineItem.ProductID}
                 quantity={Number(quantity)}
-                onChange={_setQuantity}
+                onChange={setQuantity}
               />
             )}
           </VStack>

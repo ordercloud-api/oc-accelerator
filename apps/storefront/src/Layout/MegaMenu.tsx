@@ -79,14 +79,8 @@ const MegaMenu: FC<MegaMenuProps> = ({
     true
   );
 
-  const catalogs = useMemo(
-    () => (catalogResult as RequiredDeep<ListPage<Catalog>>)?.Items,
-    [catalogResult]
-  );
-  const categories = useMemo(
-    () => (categoryResult as RequiredDeep<ListPage<Category>>)?.Items,
-    [categoryResult]
-  );
+  const catalogs = useMemo(() => catalogResult?.Items, [catalogResult]);
+  const categories = useMemo(() => categoryResult?.Items, [categoryResult]);
 
   const handleCategoryClick = (categoryId: string | undefined) => {
     if (!categoryId || !selectedCatalog) return;

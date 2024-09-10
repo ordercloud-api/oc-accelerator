@@ -25,11 +25,12 @@ import {
   Text,
   VStack
 } from "@chakra-ui/react";
-import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
+import { LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
+import { useShopper } from "@rwatt451/ordercloud-react";
 
 export const ShoppingCart = (): JSX.Element => {
   const [loading, setLoading] = useState(true);
@@ -37,37 +38,36 @@ export const ShoppingCart = (): JSX.Element => {
   const [order, setOrder] = useState<RequiredDeep<Order>>();
   const [tabIndex, setTabIndex] = useState(0);
   const navigate = useNavigate();
+  const { orderWorksheet, deleteCart, submitCart } = useShopper()
 
   const getOrder = useCallback(async () => {
-    const result = await Cart.Get();
-    setOrder(result);
+    setOrder(orderWorksheet?.Order);
     setLoading(false);
-  }, []);
+  }, [orderWorksheet?.Order]);
 
   const getLineItems = useCallback(async () => {
     if (!order?.ID) return;
-    const result = await Cart.ListLineItems();
-    setLineItems(result.Items);
+    setLineItems(orderWorksheet?.LineItems);
     setLoading(false);
-  }, [order]);
+  }, [order?.ID, orderWorksheet?.LineItems]);
 
   const submitOrder = useCallback(async () => {
     if (!order?.ID) return;
     try {
-      await Cart.Submit();
+      await submitCart(undefined)
       navigate("/order-summary");
     } catch (err) {
       console.log(err);
     }
-  }, [navigate, order?.ID]);
+  }, [navigate, order?.ID, submitCart]);
 
   const deleteOrder = useCallback(async () => {
     if (!order?.ID) return;
-    await Cart.Delete();
+    await deleteCart()
 
     setOrder(undefined);
     setLineItems(undefined);
-  }, [order?.ID]);
+  }, [deleteCart, order?.ID]);
 
   useEffect(() => {
     getOrder();
@@ -334,6 +334,7 @@ export const ShoppingCart = (): JSX.Element => {
                       deleteOrder={deleteOrder}
                       order={order}
                       lineItems={lineItems}
+                      promotions={orderWorksheet?.OrderPromotions}
                       onSubmitOrder={submitOrder}
                     />
                   )}

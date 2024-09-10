@@ -17,8 +17,9 @@ import {
 import {
   useOcResourceList,
   useOrderCloudContext,
+  useShopper,
 } from "@rwatt451/ordercloud-react";
-import { Cart, Catalog } from "ordercloud-javascript-sdk";
+import { Catalog } from "ordercloud-javascript-sdk";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { TbShoppingCartFilled } from "react-icons/tb";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -35,8 +36,8 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const { isLoggedIn, logout } = useOrderCloudContext();
   const megaMenuDisclosure = useDisclosure();
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
-  const [totalQuantity, setTotalQuantity] = useState(0);
-  const navigate = useNavigate();
+
+  const { orderWorksheet } = useShopper();
 
   const { data } = useOcResourceList<Catalog>(
     "Catalogs",
@@ -50,18 +51,19 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
 
   const catalogs = useMemo(() => data?.Items, [data]);
 
-  const getTotalLineItemQuantity = useCallback(async () => {
-    const result = await Cart.ListLineItems();
-    const totalQuantity = result.Items.reduce(
-      (sum, item) => sum + item.Quantity,
-      0
-    );
-    setTotalQuantity(totalQuantity);
-  }, []);
-
   useEffect(() => {
-    getTotalLineItemQuantity();
-  }, [getTotalLineItemQuantity, navigate]);
+    if (!selectedCatalog && catalogs?.length)
+      setSelectedCatalog(catalogs[0].ID);
+  }, [catalogs, selectedCatalog]);
+
+  const totalQuantity = useMemo(() => {
+    return (
+      orderWorksheet?.LineItems?.reduce(
+        (sum, item) => sum + item.Quantity,
+        0
+      ) || 0
+    );
+  }, [orderWorksheet?.LineItems]);
 
   const renderCatalogMenu = () => {
     if (catalogs?.length && catalogs.length > 1) {
