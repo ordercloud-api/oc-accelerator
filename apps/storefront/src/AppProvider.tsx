@@ -1,7 +1,10 @@
 import { FC, useCallback } from "react";
 import routes from "./routes";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { IOrderCloudErrorContext, OrderCloudProvider } from "@rwatt451/ordercloud-react";
+import {
+  IOrderCloudErrorContext,
+  OrderCloudProvider,
+} from "@rwatt451/ordercloud-react";
 import {
   ALLOW_ANONYMOUS,
   BASE_API_URL,
@@ -12,6 +15,7 @@ import {
 import { useToast } from "@chakra-ui/react";
 import { OrderCloudError } from "ordercloud-javascript-sdk";
 import GlobalLoadingIndicator from "./components/GlobalLoadingIndicator";
+import { BreadCrumbItemsProvider } from "./hooks/useBreadcrumbItems";
 
 const basename = import.meta.env.VITE_APP_CONFIG_BASE;
 
@@ -20,15 +24,22 @@ const router = createBrowserRouter(routes, { basename });
 const AppProvider: FC = () => {
   const toast = useToast();
 
-  const defaultErrorHandler = useCallback((error: OrderCloudError, {logout}:IOrderCloudErrorContext) => {
-    if (error.status === 401) {
-      console.log('DEFAULT ERROR HANDLER', 401)
-      return logout()
-    }
-    if (!toast.isActive(error.errorCode)) {
-      toast({ id: error.errorCode, title: error.status === 403 ? 'Permission denied' : error.message, status: "error" });
-    }
-  }, [toast])
+  const defaultErrorHandler = useCallback(
+    (error: OrderCloudError, { logout }: IOrderCloudErrorContext) => {
+      if (error.status === 401) {
+        console.log("DEFAULT ERROR HANDLER", 401);
+        return logout();
+      }
+      if (!toast.isActive(error.errorCode)) {
+        toast({
+          id: error.errorCode,
+          title: error.status === 403 ? "Permission denied" : error.message,
+          status: "error",
+        });
+      }
+    },
+    [toast]
+  );
 
   return (
     <OrderCloudProvider
@@ -39,8 +50,9 @@ const AppProvider: FC = () => {
       allowAnonymous={ALLOW_ANONYMOUS}
       defaultErrorHandler={defaultErrorHandler}
     >
+      <BreadCrumbItemsProvider />
       <RouterProvider router={router} />
-      <GlobalLoadingIndicator/>
+      <GlobalLoadingIndicator />
     </OrderCloudProvider>
   );
 };
