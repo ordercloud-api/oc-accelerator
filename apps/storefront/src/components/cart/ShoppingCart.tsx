@@ -24,7 +24,8 @@ import {
   TabPanels,
   Tabs,
   Text,
-  VStack
+  useToast,
+  VStack,
 } from "@chakra-ui/react";
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
@@ -32,12 +33,11 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
 
-  export const TABS = {
-    INFORMATION: 0,
-    SHIPPING: 1,
-    PAYMENT: 2,
-    CONFIRMATION: 3,
-  };
+export const TABS = {
+  INFORMATION: 0,
+  SHIPPING: 1,
+  PAYMENT: 2,
+};
 
 export const ShoppingCart = (): JSX.Element => {
   const [loading, setLoading] = useState(true);
@@ -46,6 +46,7 @@ export const ShoppingCart = (): JSX.Element => {
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
   const [order, setOrder] = useState<RequiredDeep<Order>>();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const getOrder = useCallback(async () => {
     const result = await Cart.Get();
@@ -64,15 +65,22 @@ export const ShoppingCart = (): JSX.Element => {
     setSubmitting(true);
     if (!order?.ID) return;
     try {
-      await Cart.Submit();
-      setTabIndex(TABS.CONFIRMATION);
+      const submittedOrder = await Cart.Submit();
       setSubmitting(false);
-      navigate("/order-confirmation");
-
+      navigate(`/order-confirmation?orderID=${submittedOrder.ID}`);
     } catch (err) {
-      console.log(err);
+      console.error("Error submitting order:", err);
+      setSubmitting(false);
+      toast({
+        title: "Error submitting order",
+        description:
+          "There was an issue submitting your order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
-  }, [navigate, order?.ID]);
+  }, [navigate, order?.ID, toast]);
 
   const deleteOrder = useCallback(async () => {
     if (!order?.ID) return;
@@ -154,11 +162,11 @@ export const ShoppingCart = (): JSX.Element => {
                       onChange={handleTabChange}
                       variant="soft-rounded"
                     >
-                        <TabList>
-                          <Tab>Information</Tab>
-                          <Tab>Shipping</Tab>
-                          <Tab>Payment</Tab>
-                        </TabList>
+                      <TabList>
+                        <Tab>Information</Tab>
+                        <Tab>Shipping</Tab>
+                        <Tab>Payment</Tab>
+                      </TabList>
 
                       <TabPanels>
                         <TabPanel as={VStack} alignItems="stretch">

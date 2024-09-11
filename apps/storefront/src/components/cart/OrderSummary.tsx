@@ -5,7 +5,7 @@ import {
   Flex,
   Stack,
   Text,
-  VStack
+  VStack,
 } from "@chakra-ui/react";
 import { LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import React from "react";
@@ -17,30 +17,27 @@ interface OrderSummaryProps {
   lineItems: LineItem[];
 }
 
-const OrderSummary: React.FC<OrderSummaryProps> = ({
-  order,
-  lineItems,
-}) => {
+const OrderSummary: React.FC<OrderSummaryProps> = ({ order, lineItems }) => {
   const handleLineItemChange = (newLi: LineItem) => {
     // Implement the logic to update the line item
     console.log("Line item updated:", newLi);
   };
   return (
     <VStack align="stretch" spacing={6}>
-        <ButtonGroup alignSelf="flex-end" alignItems="center" gap={3} mt={-3}>
-          <Button
-            size="xs"
-            variant="outline"
-            alignSelf="flex-end"
-            as={RouterLink}
-            to="/products"
-          >
-            Continue shopping
-          </Button>
-        </ButtonGroup>
+      <ButtonGroup alignSelf="flex-end" alignItems="center" gap={3} mt={-3}>
+        <Button
+          size="xs"
+          variant="outline"
+          alignSelf="flex-end"
+          as={RouterLink}
+          to="/products"
+        >
+          Continue shopping
+        </Button>
+      </ButtonGroup>
       <OcCurrentOrderLineItemList
         lineItems={lineItems}
-        emptyMessage="Your cart is empty"
+        emptyMessage=""
         onChange={handleLineItemChange}
         editable={false}
       />
