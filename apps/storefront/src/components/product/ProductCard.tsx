@@ -3,6 +3,7 @@ import {
   CardBody,
   Center,
   Heading,
+  HStack,
   Icon,
   Image,
   Text,
@@ -49,7 +50,7 @@ const ProductCard: FunctionComponent<ProductCardProps> = ({ product }) => {
               justifyContent="stretch"
             >
               <Center
-                bgColor="chakra-subtle-bg"
+                bgColor="white"
                 aspectRatio="1 / 1"
                 objectFit="cover"
                 boxSize="100%"
@@ -85,15 +86,56 @@ const ProductCard: FunctionComponent<ProductCardProps> = ({ product }) => {
                 />
               </Center>
 
-              <VStack w="full" minH={"120px"} alignItems="flex-start" p={6}>
+              <VStack
+                boxSize="full"
+                minH={"120px"}
+                alignItems="flex-start"
+                p={6}
+              >
                 <Text fontSize="xs" color="chakra-subtle-text">
                   {product.ID}
                 </Text>
-                <Heading size="lg">{product.Name}</Heading>
-                {product.PriceSchedule?.PriceBreaks && (
-                  <Text fontSize="md" fontWeight="normal">
+                <Heading flexGrow="1" size="lg">
+                  {product.Name}
+                </Heading>
+                {product?.PriceSchedule?.IsOnSale ? (
+                  <VStack alignItems="flex-start">
+                    <HStack justifyContent="flex-end">
+                      <Text fontWeight="light" color="red.500">
+                        -
+                        {Math.round(
+                          (((product?.PriceSchedule?.PriceBreaks?.[0]?.Price ??
+                            0) -
+                            (product?.PriceSchedule?.PriceBreaks?.[0]
+                              ?.SalePrice ?? 0)) /
+                            (product?.PriceSchedule?.PriceBreaks?.[0]?.Price ??
+                              1)) *
+                            100
+                        )}
+                        %
+                      </Text>
+
+                      <Text fontSize="xs">
+                        {formatPrice(
+                          product?.PriceSchedule?.PriceBreaks?.[0].SalePrice
+                        )}
+                      </Text>
+                    </HStack>
+                    <Text
+                      fontSize="xs"
+                      color="chakra-placeholder-color"
+                      fontWeight="medium"
+                      textDecoration="line-through"
+                    >
+                      {formatPrice(
+                        product?.PriceSchedule?.PriceBreaks?.[0].Price
+                      )}
+                    </Text>
+                  </VStack>
+                ) : (
+                  <Text fontSize="xl">
                     {formatPrice(
-                      product?.PriceSchedule?.PriceBreaks[0].Price ?? 0
+                      product?.PriceSchedule?.PriceBreaks?.[0].Price
                     )}
                   </Text>
                 )}
