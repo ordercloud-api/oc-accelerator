@@ -135,7 +135,7 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
     if (!category.hasChildren) {
       return (
         <Link
-          py={3}
+          py={0}
           as={RouterLink}
           to={`/shop/${catalogId}/categories/${category.ID}/products`}
           key={category.ID}
@@ -153,6 +153,7 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
         <AccordionItem border="none">
           <AccordionButton
             px="0"
+            py={0}
             display="flex"
             justifyContent="space-between"
             onClick={() =>
@@ -210,7 +211,6 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
 
   return (
     <SimpleGrid
-      py={12}
       gridTemplateColumns="repeat(auto-fill, minmax(300px, 1fr))"
       spacing={12}
       w="full"

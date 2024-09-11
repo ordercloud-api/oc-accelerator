@@ -13,14 +13,11 @@ import {
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
 import { TbCheckbox } from "react-icons/tb";
-import { useNavigate } from "react-router-dom";
-import OrderSummary from "./OrderSummary";
 
 const OrderConfirmation = (): JSX.Element => {
   const [loading, setLoading] = useState(true);
-  const [lineItems, setLineItems] = useState<LineItem[]>();
+  const [, setLineItems] = useState<LineItem[]>();
   const [order, setOrder] = useState<RequiredDeep<Order>>();
-  const navigate = useNavigate();
 
   const getOrder = useCallback(async () => {
     const result = await Cart.Get();
@@ -46,8 +43,7 @@ const OrderConfirmation = (): JSX.Element => {
   return (
     <>
       <Grid
-        my={-8}
-        mx={8} // shamefully overriding the outletWrapper margin
+        my={-8} mx={8} // need to override the margin from #outletWrapper
         gridTemplateColumns={{ md: "3fr 2fr" }}
         w="full"
         justifyItems="stretch"
