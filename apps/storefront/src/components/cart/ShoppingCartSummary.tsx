@@ -5,8 +5,10 @@ import {
   Divider,
   Flex,
   FormControl,
+  HStack,
   Input,
   InputGroup,
+  Spacer,
   Stack,
   Text,
   VStack,
@@ -43,7 +45,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     // Implement the logic to update the line item
     console.log("Line item updated:", newLi);
   };
-  const toast = useToast()
+  const toast = useToast();
 
   const handleApplyPromotion = useCallback(
     (e: FormEvent) => {
@@ -57,7 +59,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           duration: 5000,
           isClosable: true,
         });
-        setPromoCode("")
+        setPromoCode("");
       } catch (error) {
         console.error(error);
       }
@@ -65,21 +67,24 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     [addCartPromo, promoCode, toast]
   );
 
-  const handleRemovePromotion = useCallback(async (promoCode: string | undefined)=>{
-    if(!promoCode) return
-    try {
-      await removeCartPromo(promoCode);
-      toast({
-        title: `Promotion '${promoCode}' removed from cart`,
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-      setPromoCode("")
-    } catch (error) {
-      console.error(error);
-    }
-  },[removeCartPromo, toast])
+  const handleRemovePromotion = useCallback(
+    async (promoCode: string | undefined) => {
+      if (!promoCode) return;
+      try {
+        await removeCartPromo(promoCode);
+        toast({
+          title: `Promotion '${promoCode}' removed from cart`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        setPromoCode("");
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    [removeCartPromo, toast]
+  );
 
   return (
     <VStack align="stretch" spacing={6}>
@@ -104,8 +109,9 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         editable={false}
       />
       <Divider />
-      <Flex>
-        <form id="APPLY_PROMO" onSubmit={handleApplyPromotion}>
+
+      <form id="APPLY_PROMO" onSubmit={handleApplyPromotion}>
+        <Flex justify="space-between">
           <FormControl isRequired mb={3}>
             <InputGroup>
               <Input
@@ -120,15 +126,19 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           <Button colorScheme="secondary" ml={2} type="submit">
             Apply
           </Button>
-        </form>
-      </Flex>
- 
-        {promotions.map((p) => (
-               <Flex justify="space-between">
-            <Text>Promo Code: {p.Code?.toLocaleUpperCase()}</Text>
-            <Button colorScheme="danger" onClick={() => handleRemovePromotion(p.Code)}>Remove</Button>
-            </Flex>))}
-  
+        </Flex>
+      </form>
+      {promotions.map((p) => (
+        <Flex justify="space-between">
+          <Text alignContent="center">{p.Code?.toLocaleUpperCase()}</Text>
+          <Button
+            colorScheme="danger"
+            onClick={() => handleRemovePromotion(p.Code)}
+          >
+            Remove
+          </Button>
+        </Flex>
+      ))}
       <Divider />
       <Stack spacing={3}>
         <Flex justify="space-between">
