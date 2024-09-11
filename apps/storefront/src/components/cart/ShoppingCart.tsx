@@ -35,12 +35,12 @@ import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
 import { useShopper } from "@rwatt451/ordercloud-react";
 
-  export const TABS = {
-    INFORMATION: 0,
-    SHIPPING: 1,
-    PAYMENT: 2,
-    CONFIRMATION: 3,
-  };
+export const TABS = {
+  INFORMATION: 0,
+  SHIPPING: 1,
+  PAYMENT: 2,
+  CONFIRMATION: 3,
+};
 
 export const ShoppingCart = (): JSX.Element => {
   const [loading, setLoading] = useState(true);
@@ -48,8 +48,7 @@ export const ShoppingCart = (): JSX.Element => {
   const [lineItems, setLineItems] = useState<LineItem[]>();
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
   const [order, setOrder] = useState<RequiredDeep<Order>>();
-  const { orderWorksheet, deleteCart, submitCart } = useShopper()
-
+  const { orderWorksheet, deleteCart, submitCart } = useShopper();
 
   const getOrder = useCallback(async () => {
     setOrder(orderWorksheet?.Order);
@@ -66,7 +65,7 @@ export const ShoppingCart = (): JSX.Element => {
     setSubmitting(true);
     if (!order?.ID) return;
     try {
-      await submitCart(undefined)
+      await submitCart();
       setTabIndex(TABS.CONFIRMATION);
       setSubmitting(false);
     } catch (err) {
@@ -74,10 +73,9 @@ export const ShoppingCart = (): JSX.Element => {
     }
   }, [order?.ID, submitCart]);
 
-
   const deleteOrder = useCallback(async () => {
     if (!order?.ID) return;
-    await deleteCart()
+    await deleteCart();
 
     setOrder(undefined);
     setLineItems(undefined);
@@ -105,7 +103,6 @@ export const ShoppingCart = (): JSX.Element => {
     setTabIndex(index);
   };
 
-  
   return (
     <>
       {loading ? (
@@ -150,7 +147,7 @@ export const ShoppingCart = (): JSX.Element => {
                     p={{ base: 6, lg: 12 }}
                   >
                     {tabIndex !== TABS.CONFIRMATION && (
-                    <Heading mb={6}>Checkout</Heading>
+                      <Heading mb={6}>Checkout</Heading>
                     )}
                     <Tabs
                       size="sm"
@@ -464,29 +461,28 @@ export const ShoppingCart = (): JSX.Element => {
                   </Container>
                 </GridItem>
 
-
-              <GridItem bgColor="blackAlpha.100" h="full">
-                <Container
-                  maxW="container.sm"
-                  mx="0"
-                  mr="auto"
-                  p={{ base: 6, lg: 12 }}
-                >
-                  {loading ? (
-                    <Spinner />
-                  ) : (
-                    <CartSummary
-                      deleteOrder={deleteOrder}
-                      order={order}
-                      lineItems={lineItems}
-                      promotions={orderWorksheet?.OrderPromotions}
-                      onSubmitOrder={submitOrder}
-                      tabIndex={tabIndex}
-                    />
-                  )}
-                </Container>
-              </GridItem>
-            </Grid>
+                <GridItem bgColor="blackAlpha.100" h="full">
+                  <Container
+                    maxW="container.sm"
+                    mx="0"
+                    mr="auto"
+                    p={{ base: 6, lg: 12 }}
+                  >
+                    {loading ? (
+                      <Spinner />
+                    ) : (
+                      <CartSummary
+                        deleteOrder={deleteOrder}
+                        order={order}
+                        lineItems={lineItems}
+                        promotions={orderWorksheet?.OrderPromotions}
+                        onSubmitOrder={submitOrder}
+                        tabIndex={tabIndex}
+                      />
+                    )}
+                  </Container>
+                </GridItem>
+              </Grid>
             </>
           ) : (
             <Center flex="1">

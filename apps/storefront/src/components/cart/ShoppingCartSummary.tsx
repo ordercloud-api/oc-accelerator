@@ -158,10 +158,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           </Flex>
         )}
         <Flex justify="space-between">
-          <Text>Promotion</Text>
-          <Text>${order.PromotionDiscount}</Text>
-        </Flex>
-        <Flex justify="space-between">
           <Text>Shipping</Text>
           {tabIndex !== TABS.SHIPPING || tabIndex !== TABS.INFORMATION && <Text></Text>}
           <Text>
