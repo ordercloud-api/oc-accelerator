@@ -10,12 +10,7 @@ import {
   useOutsideClick,
 } from "@chakra-ui/react";
 import { useOcResourceList } from "@rwatt451/ordercloud-react";
-import {
-  Catalog,
-  Category,
-  ListPage,
-  RequiredDeep,
-} from "ordercloud-javascript-sdk";
+import { Catalog, Category } from "ordercloud-javascript-sdk";
 import { FC, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -58,20 +53,21 @@ const MegaMenu: FC<MegaMenuProps> = ({
     };
   }, [isOpen, onClose]);
 
-  const { data: catalogResult, isLoading: loading } = useOcResourceList(
-    "Catalogs",
-    undefined,
-    undefined,
-    {
-      staleTime: 300000, // 5 min
-    },
-    true
-  );
+  const { data: catalogResult, isLoading: loading } =
+    useOcResourceList<Catalog>(
+      "Catalogs",
+      undefined,
+      undefined,
+      {
+        staleTime: 300000, // 5 min
+      },
+      true
+    );
 
-  const { data: categoryResult } = useOcResourceList(
+  const { data: categoryResult } = useOcResourceList<Category>(
     "Categories",
     { catalogID: selectedCatalog },
-    {},
+    undefined,
     {
       staleTime: 300000, // 5 min
       disabled: !selectedCatalog,
@@ -167,7 +163,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
           >
             View all categories
           </Button>
-          {catalogs.length > 1 && (
+          {catalogs?.length && catalogs.length > 1 && (
             <FormControl w="auto">
               <FormLabel fontSize=".7rem" color="chakra-subtle-text" mb={0}>
                 Switch catalogs
@@ -176,7 +172,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
                 size="sm"
                 h="24px"
                 value={selectedCatalog}
-                onChange={(e) => setSelectedCatalog(e.target.value)} // Update the selected catalog
+                onChange={(e) => setSelectedCatalog(e.target.value)}
                 w="fit-content"
                 variant="outline"
                 bgColor="transparent"

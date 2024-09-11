@@ -15,7 +15,6 @@ import {
 } from "@chakra-ui/react";
 import {
   BuyerProduct,
-  Cart,
   InventoryRecord,
   ListPage,
   Me,

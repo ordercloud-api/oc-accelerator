@@ -20,9 +20,9 @@ import {
   useShopper,
 } from "@rwatt451/ordercloud-react";
 import { Catalog } from "ordercloud-javascript-sdk";
-import { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { TbShoppingCartFilled } from "react-icons/tb";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { DEFAULT_BRAND } from "../assets/DEFAULT_BRAND";
 import { useCurrentUser } from "../hooks/currentUser";
 import MegaMenu from "./MegaMenu";

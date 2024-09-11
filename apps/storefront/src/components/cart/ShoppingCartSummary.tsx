@@ -1,14 +1,11 @@
 import {
-  Box,
   Button,
   ButtonGroup,
   Divider,
   Flex,
   FormControl,
-  HStack,
   Input,
   InputGroup,
-  Spacer,
   Stack,
   Text,
   VStack,
@@ -24,13 +21,15 @@ import React, { FormEvent, useCallback, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
 import { useShopper } from "@rwatt451/ordercloud-react";
+import { TABS } from "./ShoppingCart";
 
 interface CartSummaryProps {
   order: RequiredDeep<Order>;
   lineItems: LineItem[];
-  promotions: OrderPromotion[];
+  promotions?: OrderPromotion[];
   onSubmitOrder: () => void;
   deleteOrder: () => void;
+  tabIndex: number;
 }
 
 const CartSummary: React.FC<CartSummaryProps> = ({
@@ -38,6 +37,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   lineItems,
   promotions,
   deleteOrder,
+  tabIndex
 }) => {
   const { addCartPromo, removeCartPromo } = useShopper();
   const [promoCode, setPromoCode] = useState<string>("");
@@ -88,28 +88,32 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
   return (
     <VStack align="stretch" spacing={6}>
-      <ButtonGroup alignSelf="flex-end" alignItems="center" gap={3} mt={-3}>
-        <Button variant="link" size="xs" onClick={deleteOrder}>
-          Clear cart
-        </Button>
-        <Button
-          size="xs"
-          variant="outline"
-          alignSelf="flex-end"
-          as={RouterLink}
-          to="/products"
-        >
-          Continue shopping
-        </Button>
-      </ButtonGroup>
+      {tabIndex !== TABS.CONFIRMATION && (
+        <ButtonGroup alignSelf="flex-end" alignItems="center" gap={3} mt={-3}>
+          <Button variant="link" size="xs" onClick={deleteOrder}>
+            Clear cart
+          </Button>
+          <Button
+            size="xs"
+            variant="outline"
+            alignSelf="flex-end"
+            as={RouterLink}
+            to="/products"
+          >
+            Continue shopping
+          </Button>
+        </ButtonGroup>
+      )}
       <OcCurrentOrderLineItemList
         lineItems={lineItems}
         emptyMessage="Your cart is empty"
         onChange={handleLineItemChange}
         editable={false}
+        tabIndex={tabIndex}
       />
       <Divider />
-
+      {tabIndex !== TABS.CONFIRMATION && (
+      <>
       <form id="APPLY_PROMO" onSubmit={handleApplyPromotion}>
         <Flex justify="space-between">
           <FormControl isRequired mb={3}>
@@ -128,7 +132,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           </Button>
         </Flex>
       </form>
-      {promotions.map((p) => (
+      {promotions?.map((p) => (
         <Flex justify="space-between">
           <Text alignContent="center">{p.Code?.toLocaleUpperCase()}</Text>
           <Button
@@ -140,6 +144,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         </Flex>
       ))}
       <Divider />
+      </>
+      )}
       <Stack spacing={3}>
         <Flex justify="space-between">
           <Text>Subtotal</Text>
@@ -152,16 +158,22 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           </Flex>
         )}
         <Flex justify="space-between">
+          <Text>Promotion</Text>
+          <Text>${order.PromotionDiscount}</Text>
+        </Flex>
+        <Flex justify="space-between">
           <Text>Shipping</Text>
-          <Text>Calculated at next step</Text>
+          {tabIndex !== TABS.SHIPPING || tabIndex !== TABS.INFORMATION && <Text></Text>}
+          <Text>
+            {order.ShippingCost === 0
+              ? "FREE SHIPPING"
+              : "$" + order.ShippingCost}
+          </Text>
         </Flex>
         <Flex justify="space-between" fontWeight="bold" fontSize="lg">
           <Text>Total</Text>
           <Text>${order.Total?.toFixed(2)}</Text>
         </Flex>
-        {/* <Text fontSize="sm" color="gray.600">
-          Including ${(order.TaxTotal || 0).toFixed(2)} in taxes
-        </Text> */}
       </Stack>
     </VStack>
   );
