@@ -1,5 +1,5 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
-import Case from "case";
+import { startCase } from "lodash";
 import { useMemo } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import useBreadcrumbItems from "../../hooks/useBreadcrumbItems";
@@ -13,22 +13,26 @@ const Breadcrumbs = () => {
     const [path, query] = (location.pathname ?? "").split("?");
     const partials = path.split("/").slice(1);
 
-    return partials.map((partial, index) => {
+    const breadcrumbs = partials.map((partial, index) => {
       const partialPath = `/${partials.slice(0, index + 1).join("/")}${
-        partial === "orders" ? "/incoming" : ""
-      }${query ? `?${query}` : ""}`;
+        query ? `?${query}` : ""
+      }`;
 
       if (Object.values(params).includes(partial)) {
         const item = Object.values(items).find((item) => item?.ID === partial);
-        if (partial === "incoming") return null;
-        return { item: item || { ID: partial }, path: partialPath };
+        return {
+          item: item || { ID: startCase(partial) },
+          path: partialPath,
+        };
       } else {
         return {
-          item: { ID: Case.title(partial) },
+          item: { ID: startCase(partial) },
           path: partialPath,
         };
       }
     });
+
+    return breadcrumbs;
   }, [location, params, items]);
 
   if (parsedBreadcrumbs.length <= 1) {
@@ -44,9 +48,11 @@ const Breadcrumbs = () => {
       zIndex={6}
       background="blackAlpha.200"
       fontSize="sm"
-      sx={{"&>ol>li:last-of-type>a":{
-        color: "primary.400"
-      }}}
+      sx={{
+        "&>ol>li:last-of-type>a": {
+          color: "primary.400",
+        },
+      }}
     >
       {parsedBreadcrumbs.map((bi, i) => {
         if (!(bi && bi.item)) return null;
