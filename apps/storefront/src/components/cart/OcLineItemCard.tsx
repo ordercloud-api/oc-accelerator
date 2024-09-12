@@ -46,7 +46,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   tabIndex,
 }) => {
   const [quantity, setQuantity] = useState(lineItem.Quantity);
-  const { patchCartLineItem } = useShopper()
+  const { patchCartLineItem, deleteCartLineItem } = useShopper()
 
   const debouncedQuantity: number = useDebounce(quantity, 300);
 
@@ -124,6 +124,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
               fontSize=".75rem"
               variant="link"
               colorScheme="accent"
+              onClick={()=> deleteCartLineItem(lineItem.ID!)}
             >
               Remove
             </Button>
