@@ -55,24 +55,22 @@ const MegaMenu: FC<MegaMenuProps> = ({
 
   const { data: catalogResult, isLoading: loading } =
     useOcResourceList<Catalog>(
-      "Catalogs",
+      "Me.Catalogs",
       undefined,
       undefined,
       {
-        staleTime: 300000, // 5 min
-      },
-      true
+        staleTime: 300000,
+      }
     );
 
   const { data: categoryResult } = useOcResourceList<Category>(
-    "Categories",
+    "Me.Categories",
     { catalogID: selectedCatalog },
     undefined,
     {
-      staleTime: 300000, // 5 min
+      staleTime: 300000,
       disabled: !selectedCatalog,
-    },
-    true
+    }
   );
 
   const catalogs = useMemo(() => catalogResult?.Items, [catalogResult]);

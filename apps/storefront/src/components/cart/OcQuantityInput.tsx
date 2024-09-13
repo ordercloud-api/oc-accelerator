@@ -33,13 +33,11 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
   onChange,
 }) => {
   const { data } = useOcResourceGet(
-    "Products",
+    "Me.Products",
     { productID: productId! },
     {
-      staleTime: 300000, // 5 min
       disabled: !productId || !!priceSchedule,
-    },
-    true
+    }
   );
 
   const ps = useMemo(

@@ -40,13 +40,12 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const { orderWorksheet } = useShopper();
 
   const { data } = useOcResourceList<Catalog>(
-    "Catalogs",
+    "Me.Catalogs",
     undefined,
     undefined,
     {
-      staleTime: 300000, // 5 min
-    },
-    true
+      staleTime: 300000,
+    }
   );
 
   const catalogs = useMemo(() => data?.Items, [data]);

@@ -17,15 +17,9 @@ import {
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import {
-  BuyerProduct,
-} from "ordercloud-javascript-sdk";
+import { BuyerProduct } from "ordercloud-javascript-sdk";
 import { parse } from "querystring";
-import React, {
-  FunctionComponent,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { FunctionComponent, useCallback, useMemo } from "react";
 import {
   useLocation,
   useNavigate,
@@ -38,9 +32,7 @@ import FilterSearchMenu, {
 } from "../shared/search/SearchMenu";
 import FacetList from "./facets/FacetList";
 import ProductCard from "./ProductCard";
-import {
-  useOcResourceListWithFacets,
-} from "@rwatt451/ordercloud-react";
+import { useOcResourceListWithFacets } from "@rwatt451/ordercloud-react";
 
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;
@@ -76,19 +68,14 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
   }, [searchParams]);
 
   const { data, isLoading } = useOcResourceListWithFacets<BuyerProduct>(
-    "Products",
+    "Me.Products",
     {
       search: searchTerm,
       page: currentPage.toString(),
       catalogId,
       categoryId,
       ...filters,
-    },
-    {},
-    {
-      staleTime: 300000, // 5 min
-    },
-    true
+    }
   );
 
   const handleRoutingChange = useCallback(
@@ -153,7 +140,10 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
               listOptions={listOptions}
               handleRoutingChange={handleRoutingChange}
             />
-            <FacetList facets={data?.Meta?.Facets} onChange={handleRoutingChange} />
+            <FacetList
+              facets={data?.Meta?.Facets}
+              onChange={handleRoutingChange}
+            />
           </DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -174,7 +164,10 @@ const ProductList: FunctionComponent<ProductListProps> = ({ renderItem }) => {
               listOptions={listOptions}
               handleRoutingChange={handleRoutingChange}
             />
-            <FacetList facets={data?.Meta?.Facets} onChange={handleRoutingChange} />
+            <FacetList
+              facets={data?.Meta?.Facets}
+              onChange={handleRoutingChange}
+            />
           </CardBody>
         </Card>
         <GridItem display={{ base: "block", md: "none" }}>

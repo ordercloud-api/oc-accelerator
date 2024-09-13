@@ -15,14 +15,13 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
     categoryId?: string;
   }>();
   const { data, isLoading } = useOcResourceList<Category>(
-    "Categories",
+    "Me.Categories",
     { catalogId, ParentID: categoryId },
     {},
     {
-      staleTime: 300000, // 5 min
+      staleTime: 300000,
       disabled: !catalogId,
-    },
-    true
+    }
   );
 
   const categories = useMemo(() => data?.Items, [data]);
