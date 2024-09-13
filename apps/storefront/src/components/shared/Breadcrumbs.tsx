@@ -1,39 +1,23 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
-import { startCase } from "lodash";
 import { useMemo } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
-import useBreadcrumbItems from "../../hooks/useBreadcrumbItems";
+import { Link, useMatches } from "react-router-dom";
 
 const Breadcrumbs = () => {
-  const params = useParams();
-  const location = useLocation();
-  const { items } = useBreadcrumbItems();
+  const matches = useMatches();
 
   const parsedBreadcrumbs = useMemo(() => {
-    const [path, query] = (location.pathname ?? "").split("?");
-    const partials = path.split("/").slice(1);
+    return matches
+      .filter((match) => match.handle && match.handle.crumb)
+      .map((match) => {
+        const Crumb = match.handle.crumb;
+        const params = match.params;
 
-    const breadcrumbs = partials.map((partial, index) => {
-      const partialPath = `/${partials.slice(0, index + 1).join("/")}${
-        query ? `?${query}` : ""
-      }`;
-
-      if (Object.values(params).includes(partial)) {
-        const item = Object.values(items).find((item) => item?.ID === partial);
         return {
-          item: item || { ID: startCase(partial) },
-          path: partialPath,
+          element: <Crumb params={params} />,
+          path: match.pathname,
         };
-      } else {
-        return {
-          item: { ID: startCase(partial) },
-          path: partialPath,
-        };
-      }
-    });
-
-    return breadcrumbs;
-  }, [location, params, items]);
+      });
+  }, [matches]);
 
   if (parsedBreadcrumbs.length <= 1) {
     return null;
@@ -54,19 +38,16 @@ const Breadcrumbs = () => {
         },
       }}
     >
-      {parsedBreadcrumbs.map((bi, i) => {
-        if (!(bi && bi.item)) return null;
-        return (
-          <BreadcrumbItem
-            key={i}
-            isCurrentPage={i === parsedBreadcrumbs.length - 1}
-          >
-            <BreadcrumbLink as={Link} to={bi.path}>
-              {bi.item.ID}
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-        );
-      })}
+      {parsedBreadcrumbs.map((breadcrumb, idx) => (
+        <BreadcrumbItem
+          key={idx}
+          isCurrentPage={idx === parsedBreadcrumbs.length - 1}
+        >
+          <BreadcrumbLink as={Link} to={breadcrumb.path}>
+            {breadcrumb.element}
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+      ))}
     </Breadcrumb>
   );
 };
