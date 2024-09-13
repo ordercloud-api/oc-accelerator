@@ -161,7 +161,6 @@ const DataTable = <T extends IDefaultResource>({
           borderInline="1px"
           py="0"
           background="chakra-body-bg"
-          borderLeftWidth="0px !important"
           _last={{ borderRightWidth: '0px !important' }}
           borderTop="0px"
           borderBottomWidth={header.isPlaceholder ? '0px !important' : undefined}
@@ -225,6 +224,12 @@ const DataTable = <T extends IDefaultResource>({
     (headerGroup: HeaderGroup<RequiredDeep<T>>) => (
       <Tr
         _notLast={{ zIndex: -1 }}
+        _last={{
+          '& th:first-child': {
+            borderBottom: '1px solid !important',
+            borderColor: `${colorMode === 'dark' ? 'gray.700' : 'gray.100'} !important`,
+          },
+        }}
         key={headerGroup.id}
         position="sticky"
         top="-1px"
@@ -236,7 +241,6 @@ const DataTable = <T extends IDefaultResource>({
         {itemActions && (
           <Th
             key={headerGroup.id}
-            background="chakra-body-bg"
             borderBottomWidth="0px !important"
           ></Th>
         )}
