@@ -30,7 +30,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({ order, lineItems }) => {
           variant="outline"
           alignSelf="flex-end"
           as={RouterLink}
-          to="/products"
+          to="/shop"
         >
           Continue shopping
         </Button>

@@ -440,7 +440,7 @@ export const ShoppingCart = (): JSX.Element => {
             <Center flex="1">
               <VStack mt={-28}>
                 <Heading>Cart is empty</Heading>
-                <Button as={RouterLink} size="sm" to="/products">
+                <Button as={RouterLink} size="sm" to="/shop">
                   Continue shopping
                 </Button>
               </VStack>

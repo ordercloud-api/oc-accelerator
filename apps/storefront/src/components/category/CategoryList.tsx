@@ -137,7 +137,7 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
         <Link
           py={0}
           as={RouterLink}
-          to={`/shop/${catalogId}/categories/${category.ID}/products`}
+          to={`/shop/${catalogId}/categories/${category.ID}`}
           key={category.ID}
           fontWeight={depth === 0 ? "bold" : "normal"}
           ml="auto"
@@ -162,7 +162,7 @@ const CategoryList: FunctionComponent<CategoryListProps> = ({ renderItem }) => {
           >
             <Link
               as={RouterLink}
-              to={`/shop/${catalogId}/categories/${category.ID}/products`}
+              to={`/shop/${catalogId}/categories/${category.ID}`}
               onClick={(e) => {
                 e.stopPropagation();
               }}

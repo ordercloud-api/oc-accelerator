@@ -125,7 +125,7 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
           )}
         </VStack>
         <VStack alignItems="flex-start" gap={3} flexGrow="1">
-          <Link as={RouterLink} to={`/products/${lineItem?.Product?.ID}`}>
+          <Link as={RouterLink} to={`/shop/${lineItem?.Product?.ID}`}>
             <Text fontSize="sm" lineHeight="1.3" display="inline-block">
               {lineItem.Product?.Name}
             </Text>

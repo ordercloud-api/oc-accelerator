@@ -34,7 +34,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   };
   return (
     <VStack align="stretch" spacing={6}>
-      {tabIndex !== TABS.CONFIRMATION && (
         <ButtonGroup alignSelf="flex-end" alignItems="center" gap={3} mt={-3}>
           <Button variant="link" size="xs" onClick={deleteOrder}>
             Clear cart
@@ -44,12 +43,11 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             variant="outline"
             alignSelf="flex-end"
             as={RouterLink}
-            to="/products"
+            to="/shop"
           >
             Continue shopping
           </Button>
         </ButtonGroup>
-      )}
       <OcCurrentOrderLineItemList
         lineItems={lineItems}
         emptyMessage="Your cart is empty"
@@ -58,14 +56,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         tabIndex={tabIndex}
       />
       <Divider />
-      {tabIndex !== TABS.CONFIRMATION && (
         <Flex>
           <Input placeholder="Gift card or discount code" />
           <Button ml={2} colorScheme="secondary">
             Apply
           </Button>
         </Flex>
-      )}
       <Stack spacing={3}>
         <Flex justify="space-between">
           <Text>Subtotal</Text>
