@@ -27,20 +27,10 @@ const routes: RouteObject[] = [
       {
         path: "cart",
         element: <ShoppingCart />,
-        handle: {
-          crumb: () => (
-            <Link as={RouterLink} to="/card">
-              Cart
-            </Link>
-          ),
-        },
       },
       {
         path: "order-confirmation",
         element: <OrderConfirmation />,
-        handle: {
-          crumb: () => <span>Order Confirmation</span>,
-        },
       },
       {
         path: "shop",
