@@ -1,7 +1,8 @@
-import { IconButton, Menu, MenuButton, MenuItem, MenuList, Tooltip } from '@chakra-ui/react'
+import { Icon, IconButton, Menu, MenuButton, MenuItem, MenuList, Tooltip } from '@chakra-ui/react'
 import { FC, useCallback } from 'react'
 import { NavButton } from '../Layout/Layout'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { MdMoreHoriz } from 'react-icons/md'
 
 interface IActionMenu {
   item: any
@@ -42,10 +43,12 @@ const ActionMenu: FC<IActionMenu> = ({
           boundary="scrollParent"
         >
           <MenuButton
-            as={IconButton}
+            as={IconButton} color="chakra-subtle-text"
+            icon={<Icon fontSize="3xl" as={MdMoreHoriz}/>}
             aria-label={`Action menu for ${item.ID}`}
             variant="ghost"
-          >...</MenuButton>
+            
+          />
           <MenuList
             minW="150px"
             zIndex={11}
