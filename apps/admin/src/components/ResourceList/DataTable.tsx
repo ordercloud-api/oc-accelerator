@@ -227,12 +227,6 @@ const DataTable = <T extends IDefaultResource>({
     (headerGroup: HeaderGroup<RequiredDeep<T>>) => (
       <Tr
         _notLast={{ zIndex: -1 }}
-        // _last={{
-        //   '& th:first-child': {
-        //     borderBottom: '1px solid !important',
-        //     borderColor: `${colorMode === 'dark' ? 'gray.700' : 'gray.100'} !important`,
-        //   },
-        // }}
         key={headerGroup.id}
         position="sticky"
         top="-1px"
