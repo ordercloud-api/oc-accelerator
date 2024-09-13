@@ -1,4 +1,4 @@
-import { Link } from "@chakra-ui/react";
+import { BreadcrumbLink } from "@chakra-ui/react";
 import startCase from "lodash/startCase";
 import { RouteObject, Link as RouterLink } from "react-router-dom";
 import Layout from "./Layout/Layout";
@@ -36,9 +36,9 @@ const routes: RouteObject[] = [
         path: "shop",
         handle: {
           crumb: () => (
-            <Link as={RouterLink} to="/shop">
+            <BreadcrumbLink as={RouterLink} to="/shop">
               Shop
-            </Link>
+            </BreadcrumbLink>
           ),
         },
         children: [
@@ -50,9 +50,9 @@ const routes: RouteObject[] = [
             path: ":catalogId",
             handle: {
               crumb: ({ params }: { params: Params }) => (
-                <Link as={RouterLink} to={`/shop/${params.catalogId}`}>
+                <BreadcrumbLink as={RouterLink} to={`/shop/${params.catalogId}`}>
                   {startCase(params.catalogId)}
-                </Link>
+                </BreadcrumbLink>
               ),
             },
             children: [
@@ -64,12 +64,12 @@ const routes: RouteObject[] = [
                 path: "categories",
                 handle: {
                   crumb: ({ params }: { params: Params }) => (
-                    <Link
+                    <BreadcrumbLink
                       as={RouterLink}
                       to={`/shop/${params.catalogId}/categories`}
                     >
                       Categories
-                    </Link>
+                    </BreadcrumbLink>
                   ),
                 },
                 children: [
@@ -81,12 +81,12 @@ const routes: RouteObject[] = [
                     path: ":categoryId",
                     handle: {
                       crumb: ({ params }: { params: Params }) => (
-                        <Link
+                        <BreadcrumbLink
                           as={RouterLink}
                           to={`/shop/${params.catalogId}/categories/${params.categoryId}`}
                         >
                           {startCase(params.categoryId)}
-                        </Link>
+                        </BreadcrumbLink>
                       ),
                     },
                     children: [

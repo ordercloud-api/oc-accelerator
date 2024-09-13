@@ -1,6 +1,6 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
+import { Breadcrumb, BreadcrumbItem } from "@chakra-ui/react";
 import { useMemo } from "react";
-import { Link, useMatches } from "react-router-dom";
+import { useMatches } from "react-router-dom";
 
 const Breadcrumbs = () => {
   const matches = useMatches();
@@ -43,9 +43,7 @@ const Breadcrumbs = () => {
           key={idx}
           isCurrentPage={idx === parsedBreadcrumbs.length - 1}
         >
-          <BreadcrumbLink as={Link} to={breadcrumb.path}>
             {breadcrumb.element}
-          </BreadcrumbLink>
         </BreadcrumbItem>
       ))}
     </Breadcrumb>
