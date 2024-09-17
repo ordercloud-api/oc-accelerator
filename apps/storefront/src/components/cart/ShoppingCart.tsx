@@ -45,7 +45,8 @@ export const ShoppingCart = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
 
-  const { orderWorksheet, worksheetLoading, deleteCart, submitCart } = useShopper();
+  const { orderWorksheet, worksheetLoading, deleteCart, submitCart } =
+    useShopper();
 
   const navigate = useNavigate();
 
@@ -60,7 +61,6 @@ export const ShoppingCart = (): JSX.Element => {
     } catch (err) {
       console.log(err);
     }
-
   }, [navigate, orderWorksheet?.Order?.ID, submitCart]);
 
   const deleteOrder = useCallback(async () => {
@@ -88,7 +88,9 @@ export const ShoppingCart = (): JSX.Element => {
         <CartSkeleton />
       ) : (
         <>
-          {orderWorksheet?.Order && orderWorksheet?.LineItems ? (
+          {orderWorksheet?.Order &&
+          orderWorksheet?.LineItems &&
+          orderWorksheet?.LineItems?.length ? (
             <>
               {submitting && (
                 <Center
