@@ -11,19 +11,20 @@ interface OcCurrentOrderLineItemListProps {
   tabIndex?: number
 }
 
-const OcCurrentOrderLineItemList: FunctionComponent<OcCurrentOrderLineItemListProps> = ({
+const OcCurrentOrderLineItemList: FunctionComponent<
+  OcCurrentOrderLineItemListProps
+> = ({
   emptyMessage,
   editable,
   productType,
   lineItems,
   onChange,
-  tabIndex
 }) => {
-  let productItems = lineItems
+  let productItems = lineItems;
   if (productType != null) {
     productItems = lineItems?.filter(function (p) {
-      return p.xp?.Type == productType
-    })
+      return p.xp?.Type == productType;
+    });
   }
 
   return (
@@ -32,9 +33,8 @@ const OcCurrentOrderLineItemList: FunctionComponent<OcCurrentOrderLineItemListPr
       editable={editable}
       lineItems={productItems}
       onChange={onChange}
-      tabIndex={tabIndex}
     />
-  )
-}
+  );
+};
 
 export default OcCurrentOrderLineItemList

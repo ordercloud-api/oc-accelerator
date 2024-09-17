@@ -11,7 +11,6 @@ import {
   GridItem,
   Heading,
   HStack,
-  Icon,
   Input,
   Radio,
   RadioGroup,
@@ -25,21 +24,20 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
 import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import { useCallback, useEffect, useState } from "react";
-import { TbCheckbox } from "react-icons/tb";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
 
-  export const TABS = {
-    INFORMATION: 0,
-    SHIPPING: 1,
-    PAYMENT: 2,
-    CONFIRMATION: 3,
-  };
+export const TABS = {
+  INFORMATION: 0,
+  SHIPPING: 1,
+  PAYMENT: 2,
+};
 
 export const ShoppingCart = (): JSX.Element => {
   const [loading, setLoading] = useState(true);
@@ -47,6 +45,8 @@ export const ShoppingCart = (): JSX.Element => {
   const [lineItems, setLineItems] = useState<LineItem[]>();
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
   const [order, setOrder] = useState<RequiredDeep<Order>>();
+  const navigate = useNavigate();
+  const toast = useToast();
 
   const getOrder = useCallback(async () => {
     const result = await Cart.Get();
@@ -65,13 +65,22 @@ export const ShoppingCart = (): JSX.Element => {
     setSubmitting(true);
     if (!order?.ID) return;
     try {
-      await Cart.Submit();
-      setTabIndex(TABS.CONFIRMATION);
+      const submittedOrder = await Cart.Submit();
       setSubmitting(false);
+      navigate(`/order-confirmation?orderID=${submittedOrder.ID}`);
     } catch (err) {
-      console.log(err);
+      console.error("Error submitting order:", err);
+      setSubmitting(false);
+      toast({
+        title: "Error submitting order",
+        description:
+          "There was an issue submitting your order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
-  }, [order?.ID]);
+  }, [navigate, order?.ID, toast]);
 
   const deleteOrder = useCallback(async () => {
     if (!order?.ID) return;
@@ -103,7 +112,6 @@ export const ShoppingCart = (): JSX.Element => {
     setTabIndex(index);
   };
 
-  
   return (
     <>
       {loading ? (
@@ -147,23 +155,18 @@ export const ShoppingCart = (): JSX.Element => {
                     ml="auto"
                     p={{ base: 6, lg: 12 }}
                   >
-                    {tabIndex !== TABS.CONFIRMATION && (
                     <Heading mb={6}>Checkout</Heading>
-                    )}
                     <Tabs
                       size="sm"
                       index={tabIndex}
                       onChange={handleTabChange}
                       variant="soft-rounded"
                     >
-                      {tabIndex !== TABS.CONFIRMATION && (
-                        <TabList>
-                          <Tab>Information</Tab>
-                          <Tab>Shipping</Tab>
-                          <Tab>Payment</Tab>
-                          <Tab display="none">Order Confirmation</Tab>
-                        </TabList>
-                      )}
+                      <TabList>
+                        <Tab>Information</Tab>
+                        <Tab>Shipping</Tab>
+                        <Tab>Payment</Tab>
+                      </TabList>
 
                       <TabPanels>
                         <TabPanel as={VStack} alignItems="stretch">
@@ -406,57 +409,6 @@ export const ShoppingCart = (): JSX.Element => {
                             {submitting ? "Submitting" : "Submit Order"}
                           </Button>
                         </TabPanel>
-                        {/* Order Confirmation */}
-                        <TabPanel>
-                          <VStack alignItems="flex-start" flex="1" minH="500px">
-                            <HStack gap="3" alignItems="center">
-                              <Icon
-                                layerStyle="icon.subtle"
-                                boxSize="icon.2xl"
-                                color="primary"
-                                as={TbCheckbox}
-                              />
-                              <VStack alignItems="flex-start" gap="0">
-                                <Heading size="xl">Order confirmed</Heading>
-                                <Text color="chakra-subtle-text">
-                                  Order #0001
-                                </Text>
-                              </VStack>
-                            </HStack>
-                            <Divider my="3" />
-                            <VStack
-                              justifyContent="flex-start"
-                              alignItems="flex-start"
-                            >
-                              <HStack alignItems="flex-start">
-                                <VStack alignItems="flex-start" gap="0">
-                                  <Text fontWeight="bold">
-                                    [FIRSTNAME] [LASTNAME]
-                                  </Text>
-                                  <Text>[ADDRESS1] [ADDRESS2]</Text>
-                                  <Text>[CITY] [STATE] [ZIP]</Text>
-                                  <Text mt="3">[PHONE] | [EMAIL]</Text>
-                                </VStack>
-                              </HStack>
-                            </VStack>
-                            <Divider my="3" />
-                            <Text>[SHIPPING METHOD]</Text>
-                            <Text>[PAYMENT SUMMARY]</Text>
-                          </VStack>
-                          <Divider my="3" />
-                          <HStack mt="auto">
-                            <Text color="chakra-subtle-text">
-                              Need help with your order?
-                            </Text>
-                            <Text
-                              color="primary"
-                              fontWeight="bold"
-                              textDecoration="underline"
-                            >
-                              Contact us
-                            </Text>
-                          </HStack>
-                        </TabPanel>
                       </TabPanels>
                     </Tabs>
                   </Container>
@@ -488,7 +440,7 @@ export const ShoppingCart = (): JSX.Element => {
             <Center flex="1">
               <VStack mt={-28}>
                 <Heading>Cart is empty</Heading>
-                <Button as={RouterLink} size="sm" to="/products">
+                <Button as={RouterLink} size="sm" to="/shop">
                   Continue shopping
                 </Button>
               </VStack>

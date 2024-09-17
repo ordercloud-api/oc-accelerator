@@ -10,6 +10,7 @@ import { FC, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import LoginModal from "../components/Login/LoginModal";
 import MainMenu from "./MainMenu";
+import Breadcrumbs from "../components/shared/Breadcrumbs";
 
 const Layout: FC = () => {
   const { pathname } = useLocation();
@@ -29,6 +30,7 @@ const Layout: FC = () => {
     <>
       <LoginModal disclosure={loginDisclosure} />
       <MainMenu loginDisclosure={loginDisclosure} />
+      <Breadcrumbs/>
       <VStack
         alignItems="flex-start"
         w="full"

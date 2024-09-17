@@ -21,6 +21,7 @@ interface OcQuantityInputProps {
   disabled?: boolean
   quantity: number
   onChange: (quantity: number) => void
+  size?: string;
 }
 
 const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
@@ -30,6 +31,7 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
   disabled,
   quantity,
   onChange,
+  size
 }) => {
 
   const [ps, setPs] = useState(priceSchedule);
@@ -60,25 +62,19 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
   }
 
   return ps ? (
-    <VStack
-      alignItems="flex-start"
-      gap={0}
-    >
+    <VStack alignItems="flex-start" gap={0}>
       {/* <FormLabel>{label}</FormLabel> */}
       {ps?.RestrictedQuantity ? (
         <Select
           maxW="100"
-          size="sm"
+          size={size || "sm"}
           id={controlId}
           isDisabled={disabled}
           value={quantity}
           onChange={handleSelectChange}
         >
           {ps.PriceBreaks?.map((pb) => (
-            <option
-              key={pb.Quantity}
-              value={pb.Quantity}
-            >
+            <option key={pb.Quantity} value={pb.Quantity}>
               {pb.Quantity}
             </option>
           ))}
@@ -86,8 +82,8 @@ const OcQuantityInput: FunctionComponent<OcQuantityInputProps> = ({
       ) : (
         <NumberInput
           maxW="100"
-          size="sm"
-          value={quantity || ''}
+          size={size || "sm"}
+          value={quantity || ""}
           defaultValue={quantity}
           onChange={handleNumberInputChange}
           isDisabled={disabled}

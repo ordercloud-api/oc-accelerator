@@ -96,7 +96,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
     navigate(`/shop/${selectedCatalog}/categories/${categoryId}`);
     onClose();
   };
-  
+
   const handleViewAllCategoryClick = (categoryId: string | undefined) => {
     if (!categoryId || !selectedCatalog) return;
     navigate(`/shop/${selectedCatalog}/categories`);
