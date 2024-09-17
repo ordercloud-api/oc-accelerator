@@ -141,7 +141,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
           <HStack>
             {isLoggedIn && (
               <Heading size="sm">
-                `Welcome, ${user?.FirstName} ${user?.LastName}`
+                {`Welcome, ${user?.FirstName} ${user?.LastName}`}
               </Heading>
             )}
             <Button

@@ -27,13 +27,12 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
-import { useCallback, useEffect, useState } from "react";
-import { TbCheckbox } from "react-icons/tb";
-import { Link as RouterLink } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
 import { useShopper } from "@rwatt451/ordercloud-react";
+import { TbCheckbox } from "react-icons/tb";
 
 export const TABS = {
   INFORMATION: 0,
@@ -43,51 +42,31 @@ export const TABS = {
 };
 
 export const ShoppingCart = (): JSX.Element => {
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [lineItems, setLineItems] = useState<LineItem[]>();
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
-  const [order, setOrder] = useState<RequiredDeep<Order>>();
-  const { orderWorksheet, deleteCart, submitCart } = useShopper();
 
-  const getOrder = useCallback(async () => {
-    setOrder(orderWorksheet?.Order);
-    setLoading(false);
-  }, [orderWorksheet?.Order]);
+  const { orderWorksheet, worksheetLoading, deleteCart, submitCart } = useShopper();
 
-  const getLineItems = useCallback(async () => {
-    if (!order?.ID) return;
-    setLineItems(orderWorksheet?.LineItems);
-    setLoading(false);
-  }, [order?.ID, orderWorksheet?.LineItems]);
+  const navigate = useNavigate();
 
   const submitOrder = useCallback(async () => {
     setSubmitting(true);
-    if (!order?.ID) return;
+    if (!orderWorksheet?.Order?.ID) return;
     try {
       await submitCart();
       setTabIndex(TABS.CONFIRMATION);
       setSubmitting(false);
+      navigate(`/order-confirmation?orderID=${orderWorksheet.Order.ID}`);
     } catch (err) {
       console.log(err);
     }
-  }, [order?.ID, submitCart]);
+
+  }, [navigate, orderWorksheet?.Order?.ID, submitCart]);
 
   const deleteOrder = useCallback(async () => {
-    if (!order?.ID) return;
+    if (!orderWorksheet?.Order?.ID) return;
     await deleteCart();
-
-    setOrder(undefined);
-    setLineItems(undefined);
-  }, [deleteCart, order?.ID]);
-
-  useEffect(() => {
-    getOrder();
-  }, [getOrder]);
-
-  useEffect(() => {
-    getLineItems();
-  }, [order, getLineItems]);
+  }, [deleteCart, orderWorksheet?.Order?.ID]);
 
   const handleNextTab = () => {
     setTabIndex((prevIndex) =>
@@ -105,11 +84,11 @@ export const ShoppingCart = (): JSX.Element => {
 
   return (
     <>
-      {loading ? (
+      {worksheetLoading ? (
         <CartSkeleton />
       ) : (
         <>
-          {order && lineItems ? (
+          {orderWorksheet?.Order && orderWorksheet?.LineItems ? (
             <>
               {submitting && (
                 <Center
@@ -468,13 +447,13 @@ export const ShoppingCart = (): JSX.Element => {
                     mr="auto"
                     p={{ base: 6, lg: 12 }}
                   >
-                    {loading ? (
+                    {worksheetLoading ? (
                       <Spinner />
                     ) : (
                       <CartSummary
                         deleteOrder={deleteOrder}
-                        order={order}
-                        lineItems={lineItems}
+                        order={orderWorksheet?.Order}
+                        lineItems={orderWorksheet?.LineItems}
                         promotions={orderWorksheet?.OrderPromotions}
                         onSubmitOrder={submitOrder}
                         tabIndex={tabIndex}
