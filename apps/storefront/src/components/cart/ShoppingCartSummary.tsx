@@ -37,7 +37,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   lineItems,
   promotions,
   deleteOrder,
-  tabIndex
+  tabIndex,
 }) => {
   const { addCartPromo, removeCartPromo } = useShopper();
   const [promoCode, setPromoCode] = useState<string>("");
@@ -88,22 +88,20 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
   return (
     <VStack align="stretch" spacing={6}>
-      {tabIndex !== TABS.CONFIRMATION && (
-        <ButtonGroup alignSelf="flex-end" alignItems="center" gap={3} mt={-3}>
-          <Button variant="link" size="xs" onClick={deleteOrder}>
-            Clear cart
-          </Button>
-          <Button
-            size="xs"
-            variant="outline"
-            alignSelf="flex-end"
-            as={RouterLink}
-            to="/products"
-          >
-            Continue shopping
-          </Button>
-        </ButtonGroup>
-      )}
+      <ButtonGroup alignSelf="flex-end" alignItems="center" gap={3} mt={-3}>
+        <Button variant="link" size="xs" onClick={deleteOrder}>
+          Clear cart
+        </Button>
+        <Button
+          size="xs"
+          variant="outline"
+          alignSelf="flex-end"
+          as={RouterLink}
+          to="/products"
+        >
+          Continue shopping
+        </Button>
+      </ButtonGroup>
       <OcCurrentOrderLineItemList
         lineItems={lineItems}
         emptyMessage="Your cart is empty"
@@ -112,8 +110,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         tabIndex={tabIndex}
       />
       <Divider />
-      {tabIndex !== TABS.CONFIRMATION && (
-      <>
       <form id="APPLY_PROMO" onSubmit={handleApplyPromotion}>
         <Flex justify="space-between">
           <FormControl isRequired mb={3}>
@@ -144,8 +140,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         </Flex>
       ))}
       <Divider />
-      </>
-      )}
       <Stack spacing={3}>
         <Flex justify="space-between">
           <Text>Subtotal</Text>
@@ -159,7 +153,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         )}
         <Flex justify="space-between">
           <Text>Shipping</Text>
-          {tabIndex !== TABS.SHIPPING || tabIndex !== TABS.INFORMATION && <Text></Text>}
+          {tabIndex !== TABS.SHIPPING ||
+            (tabIndex !== TABS.INFORMATION && <Text></Text>)}
           <Text>
             {order.ShippingCost === 0
               ? "FREE SHIPPING"
