@@ -107,7 +107,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         emptyMessage="Your cart is empty"
         onChange={handleLineItemChange}
         editable={false}
-        tabIndex={tabIndex}
       />
       <Divider />
       <form id="APPLY_PROMO" onSubmit={handleApplyPromotion}>

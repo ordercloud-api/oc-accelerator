@@ -6,7 +6,6 @@ import { ShoppingCart } from "./components/cart/ShoppingCart";
 import CategoryList from "./components/category/CategoryList";
 import ProductDetailWrapper from "./components/product/ProductDetailWrapper";
 import ProductList from "./components/product/ProductList";
-import OrderSummary from "./components/cart/OrderSummary";
 
 const routes: RouteObject[] = [
   {

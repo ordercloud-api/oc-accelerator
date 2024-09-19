@@ -25,28 +25,26 @@ import React, {
   useState,
 } from "react";
 import { TbPhoto } from "react-icons/tb";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import useDebounce from "../../hooks/useDebounce";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "./OcQuantityInput";
 import { useShopper } from "@rwatt451/ordercloud-react";
-import { TABS } from "./ShoppingCart";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;
   editable?: boolean;
   onChange?: (newLi: LineItem) => void;
-  tabIndex?: number;
 }
 
 const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   lineItem,
   editable,
   onChange,
-  tabIndex,
 }) => {
   const [quantity, setQuantity] = useState(lineItem.Quantity);
-  const { patchCartLineItem, deleteCartLineItem } = useShopper()
+  const { patchCartLineItem, deleteCartLineItem } = useShopper();
+  const { pathname } = useLocation();
 
   const debouncedQuantity: number = useDebounce(quantity, 300);
 
@@ -57,9 +55,12 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   const updateLineItem = useCallback(
     async (quantity: number) => {
       if (lineItem.Quantity === quantity) return;
-      const response = await patchCartLineItem({ID: lineItem.ID!, lineItem: {
-        Quantity: quantity,
-      }});
+      const response = await patchCartLineItem({
+        ID: lineItem.ID!,
+        lineItem: {
+          Quantity: quantity,
+        },
+      });
       if (onChange) {
         onChange(response);
       }
@@ -118,13 +119,13 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
               position="absolute"
             />
           </Center>
-          {tabIndex !== TABS.CONFIRMATION && (
+          {pathname !== "/order-confirmation" && (
             <Button
               size="xs"
               fontSize=".75rem"
               variant="link"
               colorScheme="accent"
-              onClick={()=> deleteCartLineItem(lineItem.ID!)}
+              onClick={() => deleteCartLineItem(lineItem.ID!)}
             >
               Remove
             </Button>

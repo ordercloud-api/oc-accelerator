@@ -32,7 +32,6 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
 import { useShopper } from "@rwatt451/ordercloud-react";
-import { TbCheckbox } from "react-icons/tb";
 
 export const TABS = {
   INFORMATION: 0,
