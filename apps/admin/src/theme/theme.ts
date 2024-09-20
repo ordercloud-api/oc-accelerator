@@ -5,7 +5,7 @@ const acceleratorAdminTheme = extendTheme({
   config: {
     initialColorMode: 'system',
     useSystemColorMode: true,
-    cssVarPrefix: 'schra',
+    cssVarPrefix: 'accelerator',
   },
   styles: {
     global: {

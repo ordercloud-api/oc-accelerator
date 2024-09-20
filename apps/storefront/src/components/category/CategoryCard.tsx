@@ -23,7 +23,7 @@ const CategoryCard: FunctionComponent<CategoryCardProps> = ({
     <>
       {category && (
         <RouterLink
-          to={`/product-list/${catalogId}/${category.ID}`}
+          to={category.ChildCount ? `/shop/${catalogId}/categories/${category.ID}` : `/shop/${catalogId}/categories/${category.ID}/products`}
           style={{ textDecoration: "none" }}
         >
           <Card
