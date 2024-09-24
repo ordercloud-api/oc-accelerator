@@ -89,10 +89,9 @@ const OrderConfirmation = (): JSX.Element => {
 
   return (
     <Grid
-      my={-8}
-      mx={8}
       gridTemplateColumns={{ md: "3fr 2fr" }}
       w="full"
+      h="100vh"
       justifyItems="stretch"
       flex="1"
     >

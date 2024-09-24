@@ -8,9 +8,10 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
-import React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import React, { useCallback } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
+import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 
 interface OrderSummaryProps {
   order: RequiredDeep<Order>;
@@ -18,22 +19,46 @@ interface OrderSummaryProps {
 }
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({ order, lineItems }) => {
+  const navigate = useNavigate();
+  const {isLoggedIn, newAnonSession} = useOrderCloudContext();
+
   const handleLineItemChange = (newLi: LineItem) => {
     // Implement the logic to update the line item
     console.log("Line item updated:", newLi);
   };
+
+  const handleContinueShopping = useCallback(async () => {
+    if (isLoggedIn) {
+      navigate("/products");
+    } else {
+      await newAnonSession();
+      navigate("/products");
+    }
+  }, [isLoggedIn, navigate, newAnonSession])
+
   return (
     <VStack align="stretch" spacing={6}>
       <ButtonGroup alignSelf="flex-end" alignItems="center" gap={3} mt={-3}>
-        <Button
-          size="xs"
-          variant="outline"
-          alignSelf="flex-end"
-          as={RouterLink}
-          to="/products"
-        >
-          Continue shopping
-        </Button>
+        {order.IsSubmitted ? (
+          <Button
+            size="xs"
+            variant="outline"
+            alignSelf="flex-end"
+            onClick={handleContinueShopping}
+          >
+            Continue shopping
+          </Button>
+        ) : (
+          <Button
+            size="xs"
+            variant="outline"
+            alignSelf="flex-end"
+            as={RouterLink}
+            to="/products"
+          >
+            Continue shopping
+          </Button>
+        )}
       </ButtonGroup>
       <OcCurrentOrderLineItemList
         lineItems={lineItems}

@@ -20,10 +20,7 @@ const routes: RouteObject[] = [
         path: "/cart",
         element: <ShoppingCart />,
       },
-      {
-        path: "/order-confirmation",
-        element: <OrderConfirmation />,
-      },
+
       {
         path: "/products",
         element: <ProductList />,
@@ -49,6 +46,10 @@ const routes: RouteObject[] = [
         element: <ProductDetailWrapper />,
       },
     ],
+  },
+  {
+    path: "/order-confirmation",
+    element: <OrderConfirmation />,
   },
 ];
 
