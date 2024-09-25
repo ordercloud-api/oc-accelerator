@@ -11,7 +11,6 @@ import {
   GridItem,
   Heading,
   HStack,
-  Icon,
   Input,
   Radio,
   RadioGroup,
@@ -25,69 +24,56 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useToast,
   VStack,
 } from "@chakra-ui/react";
-import { Cart, LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
-import { useCallback, useEffect, useState } from "react";
-import { TbCheckbox } from "react-icons/tb";
-import { Link as RouterLink } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
+import { useShopper } from "@rwatt451/ordercloud-react";
 
-  export const TABS = {
-    INFORMATION: 0,
-    SHIPPING: 1,
-    PAYMENT: 2,
-    CONFIRMATION: 3,
-  };
+export const TABS = {
+  INFORMATION: 0,
+  SHIPPING: 1,
+  PAYMENT: 2,
+};
 
 export const ShoppingCart = (): JSX.Element => {
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [lineItems, setLineItems] = useState<LineItem[]>();
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
-  const [order, setOrder] = useState<RequiredDeep<Order>>();
 
-  const getOrder = useCallback(async () => {
-    const result = await Cart.Get();
-    setOrder(result);
-    setLoading(false);
-  }, []);
+  const { orderWorksheet, worksheetLoading, deleteCart, submitCart } = useShopper();
 
-  const getLineItems = useCallback(async () => {
-    if (!order?.ID) return;
-    const result = await Cart.ListLineItems();
-    setLineItems(result.Items);
-    setLoading(false);
-  }, [order]);
+  const navigate = useNavigate();
+  const toast = useToast();
 
   const submitOrder = useCallback(async () => {
     setSubmitting(true);
-    if (!order?.ID) return;
+    if (!orderWorksheet?.Order?.ID) return;
     try {
-      await Cart.Submit();
-      setTabIndex(TABS.CONFIRMATION);
+      await submitCart();
       setSubmitting(false);
+      navigate(`/order-confirmation?orderID=${orderWorksheet.Order.ID}`);
     } catch (err) {
-      console.log(err);
+      console.error("Error submitting order:", err);
+      setSubmitting(false);
+      toast({
+        title: "Error submitting order",
+        description:
+          "There was an issue submitting your order. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
-  }, [order?.ID]);
+
+  }, [navigate, orderWorksheet?.Order?.ID, submitCart, toast]);
 
   const deleteOrder = useCallback(async () => {
-    if (!order?.ID) return;
-    await Cart.Delete();
-
-    setOrder(undefined);
-    setLineItems(undefined);
-  }, [order?.ID]);
-
-  useEffect(() => {
-    getOrder();
-  }, [getOrder]);
-
-  useEffect(() => {
-    getLineItems();
-  }, [order, getLineItems]);
+    if (!orderWorksheet?.Order?.ID) return;
+    await deleteCart();
+  }, [deleteCart, orderWorksheet?.Order?.ID]);
 
   const handleNextTab = () => {
     setTabIndex((prevIndex) =>
@@ -103,14 +89,15 @@ export const ShoppingCart = (): JSX.Element => {
     setTabIndex(index);
   };
 
-  
   return (
     <>
-      {loading ? (
+      {worksheetLoading ? (
         <CartSkeleton />
       ) : (
         <>
-          {order && lineItems ? (
+          {orderWorksheet?.Order &&
+          orderWorksheet?.LineItems &&
+          orderWorksheet?.LineItems?.length ? (
             <>
               {submitting && (
                 <Center
@@ -147,23 +134,19 @@ export const ShoppingCart = (): JSX.Element => {
                     ml="auto"
                     p={{ base: 6, lg: 12 }}
                   >
-                    {tabIndex !== TABS.CONFIRMATION && (
                     <Heading mb={6}>Checkout</Heading>
-                    )}
+
                     <Tabs
                       size="sm"
                       index={tabIndex}
                       onChange={handleTabChange}
                       variant="soft-rounded"
                     >
-                      {tabIndex !== TABS.CONFIRMATION && (
-                        <TabList>
-                          <Tab>Information</Tab>
-                          <Tab>Shipping</Tab>
-                          <Tab>Payment</Tab>
-                          <Tab display="none">Order Confirmation</Tab>
-                        </TabList>
-                      )}
+                      <TabList>
+                        <Tab>Information</Tab>
+                        <Tab>Shipping</Tab>
+                        <Tab>Payment</Tab>
+                      </TabList>
 
                       <TabPanels>
                         <TabPanel as={VStack} alignItems="stretch">
@@ -406,57 +389,6 @@ export const ShoppingCart = (): JSX.Element => {
                             {submitting ? "Submitting" : "Submit Order"}
                           </Button>
                         </TabPanel>
-                        {/* Order Confirmation */}
-                        <TabPanel>
-                          <VStack alignItems="flex-start" flex="1" minH="500px">
-                            <HStack gap="3" alignItems="center">
-                              <Icon
-                                layerStyle="icon.subtle"
-                                boxSize="icon.2xl"
-                                color="primary"
-                                as={TbCheckbox}
-                              />
-                              <VStack alignItems="flex-start" gap="0">
-                                <Heading size="xl">Order confirmed</Heading>
-                                <Text color="chakra-subtle-text">
-                                  Order #0001
-                                </Text>
-                              </VStack>
-                            </HStack>
-                            <Divider my="3" />
-                            <VStack
-                              justifyContent="flex-start"
-                              alignItems="flex-start"
-                            >
-                              <HStack alignItems="flex-start">
-                                <VStack alignItems="flex-start" gap="0">
-                                  <Text fontWeight="bold">
-                                    [FIRSTNAME] [LASTNAME]
-                                  </Text>
-                                  <Text>[ADDRESS1] [ADDRESS2]</Text>
-                                  <Text>[CITY] [STATE] [ZIP]</Text>
-                                  <Text mt="3">[PHONE] | [EMAIL]</Text>
-                                </VStack>
-                              </HStack>
-                            </VStack>
-                            <Divider my="3" />
-                            <Text>[SHIPPING METHOD]</Text>
-                            <Text>[PAYMENT SUMMARY]</Text>
-                          </VStack>
-                          <Divider my="3" />
-                          <HStack mt="auto">
-                            <Text color="chakra-subtle-text">
-                              Need help with your order?
-                            </Text>
-                            <Text
-                              color="primary"
-                              fontWeight="bold"
-                              textDecoration="underline"
-                            >
-                              Contact us
-                            </Text>
-                          </HStack>
-                        </TabPanel>
                       </TabPanels>
                     </Tabs>
                   </Container>
@@ -469,13 +401,14 @@ export const ShoppingCart = (): JSX.Element => {
                     mr="auto"
                     p={{ base: 6, lg: 12 }}
                   >
-                    {loading ? (
+                    {worksheetLoading ? (
                       <Spinner />
                     ) : (
                       <CartSummary
                         deleteOrder={deleteOrder}
-                        order={order}
-                        lineItems={lineItems}
+                        order={orderWorksheet?.Order}
+                        lineItems={orderWorksheet?.LineItems}
+                        promotions={orderWorksheet?.OrderPromotions}
                         onSubmitOrder={submitOrder}
                         tabIndex={tabIndex}
                       />

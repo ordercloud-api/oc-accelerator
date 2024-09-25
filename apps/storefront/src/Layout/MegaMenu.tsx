@@ -7,10 +7,11 @@ import {
   Select,
   SlideFade,
   Spinner,
-  useOutsideClick
+  useOutsideClick,
 } from "@chakra-ui/react";
-import { Catalog, Category, ListPage, Me } from "ordercloud-javascript-sdk";
-import { FC, useEffect, useRef, useState } from "react";
+import { useOcResourceList } from "@rwatt451/ordercloud-react";
+import { Catalog, Category } from "ordercloud-javascript-sdk";
+import { FC, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface MegaMenuProps {
@@ -26,9 +27,6 @@ const MegaMenu: FC<MegaMenuProps> = ({
   selectedCatalog,
   setSelectedCatalog,
 }) => {
-  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -55,48 +53,35 @@ const MegaMenu: FC<MegaMenuProps> = ({
     };
   }, [isOpen, onClose]);
 
-  useEffect(() => {
-    const fetchCatalogs = async () => {
-      try {
-        setLoading(true);
-        const catalogResult: ListPage<Catalog> = await Me.ListCatalogs();
-        setCatalogs(catalogResult.Items || []);
-        if (catalogResult.Items && catalogResult.Items.length > 0) {
-          setSelectedCatalog(catalogResult.Items[0].ID || "");
-        }
-      } catch (error) {
-        console.error("Error fetching catalogs:", error);
-      } finally {
-        setLoading(false);
+  const { data: catalogResult, isLoading: loading } =
+    useOcResourceList<Catalog>(
+      "Me.Catalogs",
+      undefined,
+      undefined,
+      {
+        staleTime: 300000,
       }
-    };
-    fetchCatalogs();
-  }, [setSelectedCatalog]);
+    );
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      if (!selectedCatalog) return;
-      try {
-        setLoading(true);
-        const categoryResult: ListPage<Category> = await Me.ListCategories({
-          catalogID: selectedCatalog,
-        });
-        setCategories(categoryResult.Items || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCategories();
-  }, [selectedCatalog]);
+  const { data: categoryResult } = useOcResourceList<Category>(
+    "Me.Categories",
+    { catalogID: selectedCatalog },
+    undefined,
+    {
+      staleTime: 300000,
+      disabled: !selectedCatalog,
+    }
+  );
+
+  const catalogs = useMemo(() => catalogResult?.Items, [catalogResult]);
+  const categories = useMemo(() => categoryResult?.Items, [categoryResult]);
 
   const handleCategoryClick = (categoryId: string | undefined) => {
     if (!categoryId || !selectedCatalog) return;
     navigate(`/shop/${selectedCatalog}/categories/${categoryId}`);
     onClose();
   };
-  
+
   const handleViewAllCategoryClick = (categoryId: string | undefined) => {
     if (!categoryId || !selectedCatalog) return;
     navigate(`/shop/${selectedCatalog}/categories`);
@@ -145,7 +130,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
               !loading ? "repeat( auto-fit, minmax(300px, 1fr))" : "1fr"
             }
           >
-            {categories.map((category) => (
+            {categories?.map((category) => (
               <Button
                 key={category.ID}
                 variant="ghost"
@@ -176,7 +161,7 @@ const MegaMenu: FC<MegaMenuProps> = ({
           >
             View all categories
           </Button>
-          {catalogs.length > 1 && (
+          {catalogs?.length && catalogs.length > 1 && (
             <FormControl w="auto">
               <FormLabel fontSize=".7rem" color="chakra-subtle-text" mb={0}>
                 Switch catalogs
@@ -185,13 +170,13 @@ const MegaMenu: FC<MegaMenuProps> = ({
                 size="sm"
                 h="24px"
                 value={selectedCatalog}
-                onChange={(e) => setSelectedCatalog(e.target.value)} // Update the selected catalog
+                onChange={(e) => setSelectedCatalog(e.target.value)}
                 w="fit-content"
                 variant="outline"
                 bgColor="transparent"
                 fontSize=".7rem"
               >
-                {catalogs.map((catalog) => (
+                {catalogs?.map((catalog) => (
                   <option key={catalog.ID} value={catalog.ID}>
                     {catalog.Name}
                   </option>
