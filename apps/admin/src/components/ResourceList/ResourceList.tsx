@@ -181,7 +181,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
       (value?: string | boolean | number) => {
         const searchParams = new URLSearchParams(location.search)
         const hasPageParam = Boolean(searchParams.get('page'))
-        const isFilterParam = !['search', 'page', 'pageSize'].includes(queryKey)
+        const isFilterParam = !['search', 'page', 'pageSize', 'sortBy'].includes(queryKey)
 
         // filters can have multiple values for one key i.e. SpecCount > 0 AND SpecCount < 2
         const prevValue = isFilterParam ? searchParams.getAll(queryKey) : searchParams.get(queryKey)

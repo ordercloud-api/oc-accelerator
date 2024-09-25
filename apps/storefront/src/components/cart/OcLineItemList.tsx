@@ -8,7 +8,6 @@ interface OcLineItemListProps {
   editable?: boolean;
   lineItems?: LineItem[];
   onChange: (newLineItem: LineItem) => void;
-  tabIndex?: number;
 }
 
 const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
@@ -16,7 +15,6 @@ const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
   editable,
   lineItems,
   onChange,
-  tabIndex
 }) => {
   return lineItems && lineItems.length ? (
     <VStack gap={6} alignItems="flex-start" w="full">
@@ -35,7 +33,6 @@ const OcLineItemList: FunctionComponent<OcLineItemListProps> = ({
               lineItem={li}
               editable={editable}
               onChange={onChange}
-              tabIndex={tabIndex}
             />
           ))}
         </CardBody>

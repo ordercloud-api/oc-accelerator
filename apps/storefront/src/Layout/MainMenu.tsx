@@ -14,16 +14,15 @@ import {
   useDisclosure,
   UseDisclosureProps,
 } from "@chakra-ui/react";
-import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
 import {
-  Cart,
-  Catalog,
-  ListPage,
-  Me
-} from "ordercloud-javascript-sdk";
-import { FC, useCallback, useEffect, useState } from "react";
+  useOcResourceList,
+  useOrderCloudContext,
+  useShopper,
+} from "@rwatt451/ordercloud-react";
+import { Catalog } from "ordercloud-javascript-sdk";
+import { FC, useEffect, useMemo, useState } from "react";
 import { TbShoppingCartFilled } from "react-icons/tb";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { DEFAULT_BRAND } from "../assets/DEFAULT_BRAND";
 import { useCurrentUser } from "../hooks/currentUser";
 import MegaMenu from "./MegaMenu";
@@ -36,43 +35,37 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
   const { data: user } = useCurrentUser();
   const { isLoggedIn, logout } = useOrderCloudContext();
   const megaMenuDisclosure = useDisclosure();
-  const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [selectedCatalog, setSelectedCatalog] = useState<string>("");
-  const [totalQuantity, setTotalQuantity] = useState(0);
 
-  const navigate = useNavigate();
+  const { orderWorksheet } = useShopper();
+
+  const { data } = useOcResourceList<Catalog>(
+    "Me.Catalogs",
+    undefined,
+    undefined,
+    {
+      staleTime: 300000,
+    }
+  );
+
+  const catalogs = useMemo(() => data?.Items, [data]);
 
   useEffect(() => {
-    const fetchCatalogs = async () => {
-      try {
-        const catalogResult: ListPage<Catalog> = await Me.ListCatalogs();
-        setCatalogs(catalogResult.Items || []);
-        if (catalogResult.Items && catalogResult.Items.length > 0) {
-          setSelectedCatalog(catalogResult.Items[0].ID || "");
-        }
-      } catch (error) {
-        console.error("Error fetching catalogs:", error);
-      }
-    };
+    if (!selectedCatalog && catalogs?.length)
+      setSelectedCatalog(catalogs[0].ID);
+  }, [catalogs, selectedCatalog]);
 
-    fetchCatalogs();
-  }, []);
-
-  const getTotalLineItemQuantity = useCallback(async () => {
-    const result = await Cart.ListLineItems();
-    const totalQuantity = result.Items.reduce(
-      (sum, item) => sum + item.Quantity,
-      0
+  const totalQuantity = useMemo(() => {
+    return (
+      orderWorksheet?.LineItems?.reduce(
+        (sum, item) => sum + item.Quantity,
+        0
+      ) || 0
     );
-    setTotalQuantity(totalQuantity);
-  }, []);
-
-  useEffect(() => {
-    getTotalLineItemQuantity();
-  }, [getTotalLineItemQuantity, navigate]);
+  }, [orderWorksheet?.LineItems]);
 
   const renderCatalogMenu = () => {
-    if (catalogs.length > 1) {
+    if (catalogs?.length && catalogs.length > 1) {
       return (
         <Menu>
           <MenuButton
@@ -84,20 +77,22 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
             Shop by catalog
           </MenuButton>
           <MenuList>
-            {catalogs.map((catalog) => (
-              <MenuItem
-                key={catalog.ID}
-                onClick={() => setSelectedCatalog(catalog.ID || "")}
-                as={RouterLink}
-                to={`/shop/${selectedCatalog}/products`}
-              >
-                {catalog.Name}
-              </MenuItem>
-            ))}
+            {catalogs?.map((catalog) => {
+              return (
+                <MenuItem
+                  key={catalog.ID}
+                  onClick={() => setSelectedCatalog(catalog.ID)}
+                  as={RouterLink}
+                  to={`/shop/${catalog.ID}/products`}
+                >
+                  {catalog.Name}
+                </MenuItem>
+              );
+            })}
           </MenuList>
         </Menu>
       );
-    } else if (catalogs.length === 1) {
+    } else if (catalogs?.length === 1) {
       return (
         <Button
           as={RouterLink}
@@ -146,7 +141,7 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
           <HStack>
             {isLoggedIn && (
               <Heading size="sm">
-                `Welcome, ${user?.FirstName} ${user?.LastName}`
+                {`Welcome, ${user?.FirstName} ${user?.LastName}`}
               </Heading>
             )}
             <Button
@@ -154,35 +149,37 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
               to="/cart"
               variant="outline"
               size="sm"
-              leftIcon={totalQuantity !== 0 ?
-                    <Box position="relative" mt="2px" mr="2px" lineHeight="1">
-                      <Box
-                        id="cartCountFrame"
-                        top="5px"
-                        left="6px"
-                        position="absolute"
-                        height="9px"
-                        width="15px"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
+              leftIcon={
+                totalQuantity !== 0 ? (
+                  <Box position="relative" mt="2px" mr="2px" lineHeight="1">
+                    <Box
+                      id="cartCountFrame"
+                      top="5px"
+                      left="6px"
+                      position="absolute"
+                      height="9px"
+                      width="15px"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Text
+                        fontSize=".5rem"
+                        color="white"
+                        fontWeight="bold"
+                        letterSpacing="-.5px"
                       >
-                        <Text
-                          fontSize=".5rem"
-                          color="white"
-                          fontWeight="bold"
-                          letterSpacing="-.5px"
-                        >
-                          {totalQuantity}
-                        </Text>
-                      </Box>
+                        {totalQuantity}
+                      </Text>
+                    </Box>
 
-                      <Icon
-                        fontSize="lg"
-                        as={TbShoppingCartFilled}
-                        color="gray.500"
-                      />
-                    </Box>: undefined
+                    <Icon
+                      fontSize="lg"
+                      as={TbShoppingCartFilled}
+                      color="gray.500"
+                    />
+                  </Box>
+                ) : undefined
               }
               aria-label={`Link to cart`}
             >

@@ -8,7 +8,6 @@ interface OcCurrentOrderLineItemListProps {
   productType?: string;
   lineItems?: LineItem[];
   onChange: (newLineItem: LineItem) => void;
-  tabIndex?: number
 }
 
 const OcCurrentOrderLineItemList: FunctionComponent<OcCurrentOrderLineItemListProps> = ({
@@ -16,8 +15,7 @@ const OcCurrentOrderLineItemList: FunctionComponent<OcCurrentOrderLineItemListPr
   editable,
   productType,
   lineItems,
-  onChange,
-  tabIndex
+  onChange
 }) => {
   let productItems = lineItems
   if (productType != null) {
@@ -32,7 +30,6 @@ const OcCurrentOrderLineItemList: FunctionComponent<OcCurrentOrderLineItemListPr
       editable={editable}
       lineItems={productItems}
       onChange={onChange}
-      tabIndex={tabIndex}
     />
   )
 }
