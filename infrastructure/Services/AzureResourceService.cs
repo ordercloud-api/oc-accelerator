@@ -140,8 +140,8 @@ public class AzureResourceService
         }
 
 
-        var results = resourceGroup.GetGenericResources(filter: filters);
-
+        var results = resourceGroup.GetGenericResources(filter: filters, expand: "createdTime").OrderByDescending(r => r.Data.CreatedOn);
+        
         // Find the storage account
         var genericStorageResource = results.FirstOrDefault(r => r.Data.ResourceType.Type == "storageAccounts");
         if (genericStorageResource == null)
@@ -224,7 +224,7 @@ public class AzureResourceService
             throw;
         }
 
-        results = resourceGroup.GetGenericResources(filter: filters);
+        results = resourceGroup.GetGenericResources(filter: filters, expand: "createdTime").OrderByDescending(r => r.Data.CreatedOn);
         var resourceNames = results.Select(r => $"{r.Data.Name} ({r.Data.ResourceType.Type})");
         await logger.WriteLineAsync($"Created the following Azure Resources: \n{string.Join(Environment.NewLine, resourceNames)}");
 
@@ -300,7 +300,7 @@ public class AzureResourceService
     private async Task ErrorHandlingCleanup(TextWriter logger, ResourceGroupResource resourceGroup, string filters)
     {
         
-        var results = resourceGroup.GetGenericResources(filter: filters);
+        var results = resourceGroup.GetGenericResources(filter: filters, expand: "createdTime").OrderByDescending(r => r.Data.CreatedOn);
         if (results.Any())
         {
             Console.ForegroundColor = ConsoleColor.White;
