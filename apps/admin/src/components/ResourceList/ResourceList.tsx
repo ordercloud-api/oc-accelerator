@@ -80,10 +80,14 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
     return paramsObj
   }, [actionItem, requiredParameters, routeParams])
 
-  const { mutateAsync: deleteAsync, error: deleteError } = useDeleteOcResource(resourceName, {
-    ...routeParams,
-    ...requiredParams,
-  })
+  const { mutateAsync: deleteAsync, error: deleteError } = useDeleteOcResource(
+    resourceName,
+    {
+      ...routeParams,
+      ...requiredParams,
+    },
+    { disabled: !!readOnly }
+  )
 
   useEffect(() => {
     const ocError = deleteError?.response?.data?.Errors[0] as ApiError
@@ -211,7 +215,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
   const resolveHref = useCallback(
     (rowData: any) => {
-      if(!rowData?.ID) return ''
+      if (!rowData?.ID) return ''
       if (hrefResolver) hrefResolver(rowData)
       return `${location.pathname}/${rowData?.ID}`
     },
