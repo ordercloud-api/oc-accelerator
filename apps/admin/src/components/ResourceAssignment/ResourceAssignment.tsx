@@ -324,10 +324,11 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
   }, [params])
 
   const Ids = useMemo(() => {
-    return dataQuery?.data?.Items?.length
+    return dataQuery?.data?.Items?.length &&
+      (!switcherResourceName || (!!switcherResourceName && switcherResourceID))
       ? dataQuery.data.Items.map((i: any) => i[assignmentIdKey]).join('|')
       : undefined
-  }, [assignmentIdKey, dataQuery?.data?.Items])
+  }, [assignmentIdKey, dataQuery?.data?.Items, switcherResourceID, switcherResourceName])
 
   const listOptions = useMemo(() => {
     return {
