@@ -14,9 +14,9 @@ import {
   ModalOverlay,
   Text,
   Textarea,
-  VStack
+  VStack,
 } from "@chakra-ui/react";
-import { Cart, LineItem } from "ordercloud-javascript-sdk";
+import { LineItem } from "ordercloud-javascript-sdk";
 import React, {
   FunctionComponent,
   useCallback,
@@ -25,10 +25,11 @@ import React, {
   useState,
 } from "react";
 import { TbPhoto } from "react-icons/tb";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import useDebounce from "../../hooks/useDebounce";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "./OcQuantityInput";
+import { useShopper } from "@rwatt451/ordercloud-react";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;
@@ -41,7 +42,9 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   editable,
   onChange,
 }) => {
-  const [quantity, _setQuantity] = useState(lineItem.Quantity);
+  const [quantity, setQuantity] = useState(lineItem.Quantity);
+  const { patchCartLineItem, deleteCartLineItem } = useShopper();
+  const { pathname } = useLocation();
 
   const debouncedQuantity: number = useDebounce(quantity, 300);
 
@@ -52,14 +55,17 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
   const updateLineItem = useCallback(
     async (quantity: number) => {
       if (lineItem.Quantity === quantity) return;
-      const response = await Cart.PatchLineItem(lineItem.ID!, {
-        Quantity: quantity,
+      const response = await patchCartLineItem({
+        ID: lineItem.ID!,
+        lineItem: {
+          Quantity: quantity,
+        },
       });
       if (onChange) {
         onChange(response);
       }
     },
-    [lineItem, onChange]
+    [lineItem.ID, lineItem.Quantity, onChange, patchCartLineItem]
   );
 
   useEffect(() => {
@@ -113,14 +119,17 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
               position="absolute"
             />
           </Center>
-          <Button
-            size="xs"
-            fontSize=".75rem"
-            variant="link"
-            colorScheme="accent"
-          >
-            Remove
-          </Button>
+          {pathname !== "/order-confirmation" && (
+            <Button
+              size="xs"
+              fontSize=".75rem"
+              variant="link"
+              colorScheme="accent"
+              onClick={() => deleteCartLineItem(lineItem.ID!)}
+            >
+              Remove
+            </Button>
+          )}
         </VStack>
         <VStack alignItems="flex-start" gap={3} flexGrow="1">
           <Link as={RouterLink} to={`/products/${lineItem?.Product?.ID}`}>
@@ -154,13 +163,13 @@ const OcLineItemCard: FunctionComponent<OcLineItemCardProps> = ({
                 controlId="addToCart"
                 productId={lineItem.ProductID}
                 quantity={Number(quantity)}
-                onChange={_setQuantity}
+                onChange={setQuantity}
               />
             )}
           </VStack>
         ) : (
           <Text ml="auto" color="chakra-subtle-text">
-            Qty: {' '}
+            Qty:{" "}
             <Text as="span" fontWeight="bold" color="chakra-body-text">
               {lineItem.Quantity}
             </Text>

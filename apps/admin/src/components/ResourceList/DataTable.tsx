@@ -1,6 +1,7 @@
 import {
   Box,
   ButtonGroup,
+  Center,
   Flex,
   HStack,
   Icon,
@@ -16,7 +17,9 @@ import {
   Thead,
   Tr,
   useColorMode,
+  VStack,
 } from '@chakra-ui/react'
+import { BiConfused } from 'react-icons/bi'
 import { UseQueryResult } from '@tanstack/react-query'
 import {
   ColumnDef,
@@ -161,7 +164,6 @@ const DataTable = <T extends IDefaultResource>({
           borderInline="1px"
           py="0"
           background="chakra-body-bg"
-          borderLeftWidth="0px !important"
           _last={{ borderRightWidth: '0px !important' }}
           borderTop="0px"
           borderBottomWidth={header.isPlaceholder ? '0px !important' : undefined}
@@ -236,7 +238,6 @@ const DataTable = <T extends IDefaultResource>({
         {itemActions && (
           <Th
             key={headerGroup.id}
-            background="chakra-body-bg"
             borderBottomWidth="0px !important"
           ></Th>
         )}
@@ -263,7 +264,17 @@ const DataTable = <T extends IDefaultResource>({
             },
           }}
         >
-          {itemActions && <Td>{itemActions(row?.original)}</Td>}
+          {itemActions && (
+            <Td
+              shadow="sm"
+              marginBlock="-2px"
+              backgroundColor={`${colorMode === 'dark' ? 'gray.800' : 'white'} !important`}
+              position="sticky"
+              left="0px"
+            >
+              {itemActions(row?.original)}
+            </Td>
+          )}
           {row.getVisibleCells().map((cell: any) => {
             const assignmentLink = listAssignments
               ? getAssignmentCellHref(cell, row?.original)
@@ -317,117 +328,133 @@ const DataTable = <T extends IDefaultResource>({
 
   return !query.data && query.isLoading ? null : (
     <>
-      <TableContainer
-        as={OverlayScrollbarsComponent}
-        overflowY="auto"
-        sx={{
-          '& div[data-overlayscrollbars-contents]': {
-            maxHeight: 'calc(100vh - 224px)',
-          },
-        }}
-      >
-        <Table>
-          <Thead>{table.getHeaderGroups()?.map(tableHeaderRow)}</Thead>
-          <Tbody>
-            {table.getRowModel().rows?.map(tableRow)}{' '}
-            {noResults && (
-              <Tr>
-                <Text p={3}>No results</Text>
-              </Tr>
-            )}
-          </Tbody>
-        </Table>
-      </TableContainer>
-      <HStack
-        id="pagination-nav"
-        fontSize="sm"
-        fontWeight="normal"
-        p={3}
-        justifyContent="center"
-        position="sticky"
-        bottom={0}
-        left={0}
-        h="60px !important"
-        borderTop="1px solid"
-        borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
-        alignItems="center"
-        ml={{ xl: '215px' }}
-      >
-        <ButtonGroup
-          alignItems="center"
-          justifyContent={{ base: 'flex-start', xl: 'center' }}
-          flexGrow="1"
-        >
-          <IconButton
-            size="sm"
-            isDisabled={!table.getCanPreviousPage()}
-            onClick={() => onOptionChange('page')('1')}
-            aria-label="Paginate from the start"
-            icon={<Icon as={TbChevronsLeft} />}
-          />
-          <IconButton
-            size="sm"
-            icon={<Icon as={TbChevronLeft} />}
-            aria-label="Paginate to previous page"
-            isDisabled={!table.getCanPreviousPage()}
-            onClick={() => onOptionChange('page')(table.getState().pagination.pageIndex)}
-          />
-          <Flex
-            width="120px"
-            h="25px"
-            alignItems="center"
+      {noResults ? (
+        <Center minH="75vh">
+          <VStack
+            gap={0}
+            color="chakra-subtle-text"
+          >
+            <Icon
+              as={BiConfused}
+              boxSize="2rem"
+            />
+            <Text
+              as="td"
+              p={3}
+              fontSize="2xl"
+            >
+              No results
+            </Text>
+          </VStack>
+        </Center>
+      ) : (
+        <>
+          <TableContainer
+            as={OverlayScrollbarsComponent}
+            overflowY="auto"
+            sx={{
+              '& div[data-overlayscrollbars-contents]': {
+                maxHeight: 'calc(100vh - 224px)',
+              },
+            }}
+          >
+            <Table>
+              <Thead>{table.getHeaderGroups()?.map(tableHeaderRow)}</Thead>
+              <Tbody>{table.getRowModel().rows?.map(tableRow)}</Tbody>
+            </Table>
+          </TableContainer>
+          <HStack
+            id="pagination-nav"
+            fontSize="sm"
+            fontWeight="normal"
+            p={3}
             justifyContent="center"
+            position="sticky"
+            bottom={0}
+            left={0}
+            h="60px !important"
+            borderTop="1px solid"
+            borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
+            alignItems="center"
+            ml={{ xl: '215px' }}
           >
-            {table.getPageCount() === 0 && !noResults ? (
-              <Skeleton
-                h="21px"
-                w="12ch"
-                opacity=".5"
+            <ButtonGroup
+              alignItems="center"
+              justifyContent={{ base: 'flex-start', xl: 'center' }}
+              flexGrow="1"
+            >
+              <IconButton
+                size="sm"
+                isDisabled={!table.getCanPreviousPage()}
+                onClick={() => onOptionChange('page')('1')}
+                aria-label="Paginate from the start"
+                icon={<Icon as={TbChevronsLeft} />}
               />
-            ) : (
-              <Text whiteSpace="nowrap">
-                {table.getPageCount() === 0
-                  ? 'Page 0 of 0'
-                  : `Page ${table.getState().pagination.pageIndex + 1} of ${table
-                      .getPageCount()
-                      .toLocaleString()}`}
-              </Text>
-            )}
-          </Flex>
-          <IconButton
-            size="sm"
-            icon={<Icon as={TbChevronRight} />}
-            aria-label="Paginate to next page"
-            isDisabled={!table.getCanNextPage()}
-            onClick={() => onOptionChange('page')(table.getState().pagination.pageIndex + 2)}
-          />
-          <IconButton
-            size="sm"
-            icon={<Icon as={TbChevronsRight} />}
-            aria-label="Paginate to last page"
-            isDisabled={!table.getCanNextPage()}
-            onClick={() => onOptionChange('page')(table.getPageCount())}
-          />
-        </ButtonGroup>
-        <HStack>
-          <Text whiteSpace="nowrap">Show: </Text>
-          <Select
-            size="sm"
-            value={table.getState().pagination.pageSize || 20}
-            onChange={(e) => onOptionChange('pageSize')(e.target.value)}
-          >
-            {[5, 10, 20, 30, 50].map((size) => (
-              <option
-                key={size}
-                value={size}
+              <IconButton
+                size="sm"
+                icon={<Icon as={TbChevronLeft} />}
+                aria-label="Paginate to previous page"
+                isDisabled={!table.getCanPreviousPage()}
+                onClick={() => onOptionChange('page')(table.getState().pagination.pageIndex)}
+              />
+              <Flex
+                width="120px"
+                h="25px"
+                alignItems="center"
+                justifyContent="center"
               >
-                {size}
-              </option>
-            ))}
-          </Select>
-          <Box whiteSpace="nowrap"> items per page</Box>
-        </HStack>
-      </HStack>
+                {table.getPageCount() === 0 && !noResults ? (
+                  <Skeleton
+                    h="21px"
+                    w="12ch"
+                    opacity=".5"
+                  />
+                ) : (
+                  <Text whiteSpace="nowrap">
+                    {table.getPageCount() === 0
+                      ? 'Page 0 of 0'
+                      : `Page ${table.getState().pagination.pageIndex + 1} of ${table
+                          .getPageCount()
+                          .toLocaleString()}`}
+                  </Text>
+                )}
+              </Flex>
+              <IconButton
+                size="sm"
+                icon={<Icon as={TbChevronRight} />}
+                aria-label="Paginate to next page"
+                isDisabled={!table.getCanNextPage()}
+                onClick={() => onOptionChange('page')(table.getState().pagination.pageIndex + 2)}
+              />
+              <IconButton
+                size="sm"
+                icon={<Icon as={TbChevronsRight} />}
+                aria-label="Paginate to last page"
+                isDisabled={!table.getCanNextPage()}
+                onClick={() => onOptionChange('page')(table.getPageCount())}
+              />
+            </ButtonGroup>
+            <HStack>
+              <Text whiteSpace="nowrap">Show: </Text>
+              <Select
+                size="sm"
+                value={table.getState().pagination.pageSize || 20}
+                onChange={(e) => onOptionChange('pageSize')(e.target.value)}
+              >
+                {[5, 10, 20, 30, 50].map((size) => (
+                  <option
+                    key={size}
+                    value={size}
+                  >
+                    {size}
+                  </option>
+                ))}
+              </Select>
+              <Box whiteSpace="nowrap"> items per page</Box>
+            </HStack>
+          </HStack>
+        </>
+      )}
     </>
   )
 }

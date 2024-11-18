@@ -25,6 +25,9 @@ const ALLOW_ANONYMOUS: boolean = Boolean(ALLOW_ANONYMOUS_STRING === "true");
 const IS_MULTILOCATION_STRING = import.meta.env
   .VITE_APP_ORDERCLOUD_MULTILOCATION_INVENTORY;
 const IS_MULTI_LOCATION_INVENTORY = Boolean(IS_MULTILOCATION_STRING === "true");
+const IS_AUTO_APPLY_STRING = import.meta.env.VITE_APP_ORDERCLOUD_AUTO_APPLY_PROMOS;
+const IS_AUTO_APPLY = Boolean(IS_AUTO_APPLY_STRING === "true");
+
 
 // Dashboard configs
 const DASHBOARD_HERO_TAGLINE =
@@ -38,20 +41,20 @@ const DASHBOARD_HERO_CTA_TEXT =
 const DASHBOARD_HERO_CTA_LINK = import.meta.env
   .VITE_APP_ORDERCLOUD_DASHBOARD_HERO_CTA_LINK;
 
-const DASHBOARD_SECONDARY_IMAGE = import.meta.env
-  .VITE_APP_ORDERCLOUD_DASHBOARD_HERO_TAGLINE;
+  const DASHBOARD_SECONDARY_IMAGE = import.meta.env
+  .VITE_APP_ORDERCLOUD_DASHBOARD_SECONDARY_IMAGE;
 const DASHBOARD_SECONDARY_HEADING = import.meta.env
-  .VITE_APP_ORDERCLOUD_DASHBOARD_HERO_TAGLINE || "Secondary heading text";
+  .VITE_APP_ORDERCLOUD_DASHBOARD_SECONDARY_HEADING || "Secondary heading text";
 const DASHBOARD_SECONDARY_DESCRIPTION =
   import.meta.env.VITE_APP_ORDERCLOUD_DASHBOARD_SECONDARY_DESCRIPTION ||
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 const DASHBOARD_SECONDARY_CTA_TEXT = import.meta.env
-  .VITE_APP_ORDERCLOUD_DASHBOARD_HERO_TAGLINE || "Call to action";
+  .VITE_APP_ORDERCLOUD_DASHBOARD_SECONDARY_CTA_TEXT || "Call to action";
 const DASHBOARD_SECONDARY_CTA_LINK = import.meta.env
-  .VITE_APP_ORDERCLOUD_DASHBOARD_HERO_TAGLINE;
+  .VITE_APP_ORDERCLOUD_DASHBOARD_SECONDARY_CTA_LINK;
 
   const DASHBOARD_TERTIARY_IMAGE = import.meta.env
-    .VITE_APP_ORDERCLOUD_DASHBOARD_TERTIARY_IMAGE;
+  .VITE_APP_ORDERCLOUD_DASHBOARD_TERTIARY_IMAGE;
 const DASHBOARD_TERTIARY_HEADING =
   import.meta.env.VITE_APP_ORDERCLOUD_DASHBOARD_TERTIARY_HEADING ||
   "Tertiary heading text";
@@ -72,6 +75,7 @@ export {
   CUSTOM_SCOPE,
   ALLOW_ANONYMOUS,
   IS_MULTI_LOCATION_INVENTORY,
+  IS_AUTO_APPLY,
 
   DASHBOARD_HERO_TAGLINE,
   DASHBOARD_HERO_IMAGE,

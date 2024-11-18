@@ -179,7 +179,8 @@ const OperationForm: FC<IOperationForm> = ({
   const { mutateAsync: saveAssignmentAsync, error: saveAssignmentError } = useMutateAssignment(
     resourceId,
     operationInclusion,
-    initialValues?.parameters || parameters
+    initialValues?.parameters || parameters,
+    { disabled: !isAssignment }
   )
 
   useEffect(() => {

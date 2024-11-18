@@ -80,10 +80,14 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
     return paramsObj
   }, [actionItem, requiredParameters, routeParams])
 
-  const { mutateAsync: deleteAsync, error: deleteError } = useDeleteOcResource(resourceName, {
-    ...routeParams,
-    ...requiredParams,
-  })
+  const { mutateAsync: deleteAsync, error: deleteError } = useDeleteOcResource(
+    resourceName,
+    {
+      ...routeParams,
+      ...requiredParams,
+    },
+    { disabled: !!readOnly }
+  )
 
   useEffect(() => {
     const ocError = deleteError?.response?.data?.Errors[0] as ApiError
@@ -181,7 +185,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
       (value?: string | boolean | number) => {
         const searchParams = new URLSearchParams(location.search)
         const hasPageParam = Boolean(searchParams.get('page'))
-        const isFilterParam = !['search', 'page', 'pageSize'].includes(queryKey)
+        const isFilterParam = !['search', 'page', 'pageSize', 'sortBy'].includes(queryKey)
 
         // filters can have multiple values for one key i.e. SpecCount > 0 AND SpecCount < 2
         const prevValue = isFilterParam ? searchParams.getAll(queryKey) : searchParams.get(queryKey)
@@ -211,7 +215,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
 
   const resolveHref = useCallback(
     (rowData: any) => {
-      if(!rowData?.ID) return ''
+      if (!rowData?.ID) return ''
       if (hrefResolver) hrefResolver(rowData)
       return `${location.pathname}/${rowData?.ID}`
     },

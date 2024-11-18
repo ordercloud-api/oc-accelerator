@@ -11,16 +11,12 @@ import {
   Spinner,
   Text,
   useToast,
-  VStack
+  VStack,
 } from "@chakra-ui/react";
 import {
   BuyerProduct,
-  Cart,
   InventoryRecord,
-  ListPage,
-  Me,
   OrderCloudError,
-  RequiredDeep,
 } from "ordercloud-javascript-sdk";
 import pluralize from "pluralize";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -29,6 +25,11 @@ import { IS_MULTI_LOCATION_INVENTORY } from "../../constants";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "../cart/OcQuantityInput";
 import ProductImageGallery from "./product-detail/ProductImageGallery";
+import {
+  useOcResourceGet,
+  useOcResourceList,
+  useShopper,
+} from "@rwatt451/ordercloud-react";
 
 export interface ProductDetailProps {
   productId: string;
@@ -41,11 +42,18 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
 }) => {
   const navigate = useNavigate();
   const toast = useToast();
-  const [product, setProduct] = useState<BuyerProduct>();
   const [activeRecordId, setActiveRecordId] = useState<string>();
-  const [inventoryRecords, setInventoryRecords] =
-    useState<RequiredDeep<ListPage<InventoryRecord>>>();
-  const [loading, setLoading] = useState<boolean>(true);
+  const { data: product, isLoading: loading } = useOcResourceGet<BuyerProduct>(
+    "Me.Products",
+    { productID: productId }
+  );
+  const { data: inventoryRecords } = useOcResourceList<InventoryRecord>(
+    "Me.ProductInventoryRecords",
+    undefined,
+    { productID: productId },
+    { disabled: !IS_MULTI_LOCATION_INVENTORY }
+  );
+
   const [addingToCart, setAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(
     product?.PriceSchedule?.MinQuantity ?? 1
@@ -54,52 +62,22 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
     () => product?.Inventory?.QuantityAvailable === 0,
     [product?.Inventory?.QuantityAvailable]
   );
-
-  const getProduct = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await Me.GetProduct(productId);
-      setProduct(result);
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-      setLoading(false);
-    }
-  }, [productId]);
-
-  const getProductInventory = useCallback(async () => {
-    try {
-      const result = await Me.ListProductInventoryRecords(productId);
-      setInventoryRecords(result);
-
-      const availableRecord = result.Items.find(
-        (item) => item.QuantityAvailable > 0
-      );
-
-      if (availableRecord) {
-        setActiveRecordId(availableRecord.ID);
-      }
-    } catch (error) {
-      console.error("Error fetching product inventory:", error);
-    }
-  }, [productId]);
+  const { addCartLineItem } = useShopper();
 
   useEffect(() => {
-    getProduct();
-    if (IS_MULTI_LOCATION_INVENTORY) getProductInventory();
-  }, [getProduct, getProductInventory]);
+    const availableRecord = inventoryRecords?.Items.find(
+      (item) => item.QuantityAvailable > 0
+    );
+    if (availableRecord) {
+      setActiveRecordId(availableRecord.ID);
+    }
+  }, [inventoryRecords?.Items]);
 
   const handleAddToCart = useCallback(async () => {
     if (!product) {
       console.warn("[ProductDetail.tsx] Product not found for ID:", productId);
       return <div>Product not found for ID: {productId}</div>;
     }
-    toast({
-      title: `${quantity} ${pluralize('item', quantity)} added to cart`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
 
     if (IS_MULTI_LOCATION_INVENTORY && !activeRecordId) {
       toast({
@@ -113,12 +91,18 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
 
     try {
       setAddingToCart(true);
-      await Cart.CreateLineItem({
+      await addCartLineItem({
         ProductID: productId,
         Quantity: quantity,
         InventoryRecordID: activeRecordId,
       });
       setAddingToCart(false);
+      toast({
+        title: `${quantity} ${pluralize("item", quantity)} added to cart`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
       navigate("/cart");
     } catch (error) {
       setAddingToCart(false);
@@ -143,7 +127,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
         });
       }
     }
-  }, [product, productId, quantity, navigate, toast, activeRecordId]);
+  }, [product, activeRecordId, productId, toast, addCartLineItem, quantity, navigate]);
 
   return loading ? (
     <Center h="50vh">

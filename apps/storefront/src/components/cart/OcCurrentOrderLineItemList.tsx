@@ -3,11 +3,11 @@ import { FunctionComponent } from 'react'
 import OcLineItemList from './OcLineItemList'
 
 interface OcCurrentOrderLineItemListProps {
-  emptyMessage?: string
-  editable?: boolean
-  productType?: string
-  lineItems?: LineItem[]
-  onChange: (newLineItem:LineItem) => void
+  emptyMessage?: string;
+  editable?: boolean;
+  productType?: string;
+  lineItems?: LineItem[];
+  onChange: (newLineItem: LineItem) => void;
 }
 
 const OcCurrentOrderLineItemList: FunctionComponent<OcCurrentOrderLineItemListProps> = ({

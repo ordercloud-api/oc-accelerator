@@ -8,6 +8,7 @@ import {
   CLIENT_ID,
   CUSTOM_SCOPE,
   SCOPE,
+  IS_AUTO_APPLY
 } from "./constants";
 import { useToast } from "@chakra-ui/react";
 import { OrderCloudError } from "ordercloud-javascript-sdk";
@@ -37,6 +38,7 @@ const AppProvider: FC = () => {
       scope={SCOPE}
       customScope={CUSTOM_SCOPE}
       allowAnonymous={ALLOW_ANONYMOUS}
+      autoApplyPromotions={IS_AUTO_APPLY}
       defaultErrorHandler={defaultErrorHandler}
     >
       <RouterProvider router={router} />
