@@ -75,7 +75,7 @@ namespace OC_Accelerator.Helpers
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_ALLOW_ANONYMOUS",
-                    value = appType == ApplicationType.Storefront ? _appSettings.ocStorefrontAllowAnon : string.Empty
+                    value = appType == ApplicationType.Storefront && _appSettings.ocStorefrontAllowAnon != null ? _appSettings.ocStorefrontAllowAnon.ToString().ToLower() : string.Empty
                 }
             };
         }
