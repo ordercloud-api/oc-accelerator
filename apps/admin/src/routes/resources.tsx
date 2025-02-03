@@ -20,11 +20,92 @@ export type ResourceRoute = IndexResourceRoute | NonIndexResourceRoute;
 
 export const resources: ResourceRoute[] = [
   {
+    label: "Admin Users",
+    path: "/admin-users",
+    element: <ResourceList resourceName="AdminUsers" />,
+  },
+  {
+    path: "/admin-users/:userID",
+    element: (
+      <ResourceDetailWithParams
+        resourceName="AdminUsers"
+        navigationItemsWithParams={(params) => [
+          {
+            path: `/admin-users/${params.userID}`,
+            label: "Details",
+          },
+          {
+            path: `/admin-users/${params.userID}/admin-user-groups`,
+            label: "User Groups",
+          },
+        ]}
+      />
+    ),
+    children: [
+      {
+        path: `/admin-users/:userID/admin-user-groups`,
+        element: (
+          <ResourceAssignment
+            fromResource="AdminUserGroups"
+            toResource="AdminUsers"
+            operationInclusion="User"
+            reverseDirection={true}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    label: "Admin User Groups",
+    path: "/admin-user-groups",
+    element: (
+      <ResourceList resourceName="AdminUserGroups" />
+    ),
+  },
+  {
+    path: "/admin-user-groups/:userGroupID",
+    element: (
+      <ResourceDetailWithParams
+        resourceName="AdminUserGroups"
+        navigationItemsWithParams={(params) => [
+          {
+            path: `/admin-user-groups/${params.userGroupID}`,
+            label: "Details",
+          },
+          {
+            path: `/admin-user-groups/${params.userGroupID}/admin-users`,
+            label: "Users",
+          },
+        ]}
+      />
+    ),
+    children: [
+      {
+        path: `/admin-user-groups/:userGroupID/admin-users`,
+        element: (
+          <ResourceAssignment
+            fromResource="AdminUsers"
+            toResource="AdminUserGroups"
+            operationInclusion="User"
+            hideEditAction={true}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    label: "Admin Addresses",
+    path: "/admin-addresses",
+    element: (
+      <ResourceList resourceName="AdminAddresses" />
+    ),
+  },
+  {
     label: "Orders",
     defaultParams: { direction: "Incoming" },
     path: "/orders/:direction",
     element: (
-      <ResourceList resourceName="Orders" readOnly={true} />
+      <ResourceList key="OrderList" resourceName="Orders" readOnly={true} />
     ),
   },
   {
@@ -147,7 +228,7 @@ export const resources: ResourceRoute[] = [
   {
     label: "Products",
     path: "/products",
-    element: <ResourceList resourceName="Products" />,
+    element: <ResourceList key="ProductsList" resourceName="Products" />,
   },
   {
     path: "/products/:productID",
@@ -414,80 +495,6 @@ export const resources: ResourceRoute[] = [
             level="Group"
             switcherResourceName="Buyers"
             switcherIdKey="buyerID"
-          />
-        ),
-      },
-    ],
-  },
-  {
-    label: "Admin Users",
-    path: "/admin-users",
-    element: <ResourceList resourceName="AdminUsers" />,
-  },
-  {
-    path: "/admin-users/:userID",
-    element: (
-      <ResourceDetailWithParams
-        resourceName="AdminUsers"
-        navigationItemsWithParams={(params) => [
-          {
-            path: `/admin-users/${params.userID}`,
-            label: "Details",
-          },
-          {
-            path: `/admin-users/${params.userID}/admin-user-groups`,
-            label: "User Groups",
-          },
-        ]}
-      />
-    ),
-    children: [
-      {
-        path: `/admin-users/:userID/admin-user-groups`,
-        element: (
-          <ResourceAssignment
-            fromResource="AdminUserGroups"
-            toResource="AdminUsers"
-            operationInclusion="User"
-            reverseDirection={true}
-          />
-        ),
-      },
-    ],
-  },
-  {
-    label: "Admin User Groups",
-    path: "/admin-user-groups",
-    element: (
-      <ResourceList resourceName="AdminUserGroups" />
-    ),
-  },
-  {
-    path: "/admin-user-groups/:userGroupID",
-    element: (
-      <ResourceDetailWithParams
-        resourceName="AdminUserGroups"
-        navigationItemsWithParams={(params) => [
-          {
-            path: `/admin-user-groups/${params.userGroupID}`,
-            label: "Details",
-          },
-          {
-            path: `/admin-user-groups/${params.userGroupID}/admin-users`,
-            label: "Users",
-          },
-        ]}
-      />
-    ),
-    children: [
-      {
-        path: `/admin-user-groups/:userGroupID/admin-users`,
-        element: (
-          <ResourceAssignment
-            fromResource="AdminUsers"
-            toResource="AdminUserGroups"
-            operationInclusion="User"
-            hideEditAction={true}
           />
         ),
       },

@@ -1,6 +1,6 @@
 import { Button, VStack } from '@chakra-ui/react'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { ForgottenPassword } from 'ordercloud-javascript-sdk'
+import { ForgottenCredentials } from 'ordercloud-javascript-sdk'
 import { FC, useMemo } from 'react'
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup'
@@ -27,7 +27,7 @@ const ForgotUsernameForm: FC<ILoginForm> = ({ onSuccess }) => {
   const methods = useForm<FormInputs>({ resolver: yupResolver(validationSchema) })
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    await ForgottenPassword.SendVerificationCode({
+    await ForgottenCredentials.SendVerificationCode({
       ClientID: CLIENT_ID,
       Email: data.email,
     })
