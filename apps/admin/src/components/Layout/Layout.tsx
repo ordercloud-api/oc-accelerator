@@ -31,6 +31,7 @@ export const NavButton = forwardRef<ButtonProps, NavButtonProps>(({ to, ...props
   const { pathname } = useLocation()
 
   const isActive = useMemo(() => {
+    if(!to) return false
     return matchPath({ path: to, end: false }, pathname) !== null
   }, [pathname, to])
 

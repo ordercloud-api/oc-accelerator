@@ -42,7 +42,7 @@ export const RelatedResourceControl: FC<IRelatedResourceControl> = ({
 
   const dataQuery = useOcResourceList(
     operationInfo?.operationId?.split('.')[0] || '',
-    { search: inputValue },
+    { search: inputValue, ...operationInfo?.filters },
     operationInfo?.parameters,
     {
       staleTime: 300000, // 5 min

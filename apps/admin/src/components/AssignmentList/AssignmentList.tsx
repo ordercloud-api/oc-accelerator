@@ -192,6 +192,7 @@ const AssignmentList: FC<AssignmentListProps> = ({
       onOptionChange={handleRoutingChange}
       columnDef={columns}
       parameters={params}
+      hasAccess={isAdmin}
       listOptions={filterParams}
       tableState={tableState}
       resourceName={resourceName}
