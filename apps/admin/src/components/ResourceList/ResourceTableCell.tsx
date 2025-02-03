@@ -31,6 +31,8 @@ const ResourceTableCell: FC<ResourceTableCellProps> = ({
       switch (type) {
         case "undefined":
           return <></>;
+        case "number":
+          return <Text display="block" width="full" textAlign="right">{value?.toString()}</Text>;
         case "string":
           if (properties?.maxLength && properties?.maxLength > 200) {
             return (
@@ -49,7 +51,6 @@ const ResourceTableCell: FC<ResourceTableCellProps> = ({
           } else {
             return <Text whiteSpace="nowrap">{value?.toString()}</Text>;
           }
-
         case "date-time":
           if (!value) {
             return <></>;

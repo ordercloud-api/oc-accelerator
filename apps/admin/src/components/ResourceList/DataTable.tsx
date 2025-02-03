@@ -248,6 +248,50 @@ const DataTable = <T extends IDefaultResource>({
     [colorMode, itemActions, tableHeaderRowHeader]
   )
 
+  const tableCell = useCallback((row: any, cell: any, hrefValue: any) => {
+    const assignmentLink = listAssignments ? getAssignmentCellHref(cell, row?.original) : undefined
+
+    return (
+      <Td
+        borderInline="1px"
+        _last={{ borderRightWidth: '0px !important' }}
+        borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
+        fontWeight="normal"
+        h="1px"
+        p={0}
+        textAlign={cell.align}
+        w={cell.width}
+        minW={cell.minWidth ? cell.minWidth : 150}
+        verticalAlign="middle"
+        key={cell.id}
+      >
+        <Box
+          display="flex"
+          alignItems="center"
+          boxSize="full"
+          minH="55"
+          as={hrefValue ? Link : undefined}
+          to={hrefValue}
+          py="3"
+          px="6"
+        >
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          {assignmentLink && (
+            <Box ml={2}>
+              <IconButton
+                icon={<Icon as={TbLink} />}
+                variant="unstyled"
+                aria-label={`Link to ${cell.column.columnDef.header}`}
+                as={Link}
+                to={assignmentLink}
+              />
+            </Box>
+          )}
+        </Box>
+      </Td>
+    )
+  }, [])
+
   const tableRow = useCallback(
     (row: Row<unknown>) => {
       const hrefValue = itemHrefResolver ? itemHrefResolver(row?.original) : ''
@@ -275,51 +319,7 @@ const DataTable = <T extends IDefaultResource>({
               {itemActions(row?.original)}
             </Td>
           )}
-          {row.getVisibleCells().map((cell: any) => {
-            const assignmentLink = listAssignments
-              ? getAssignmentCellHref(cell, row?.original)
-              : undefined
-
-            return (
-              <Td
-                borderInline="1px"
-                _last={{ borderRightWidth: '0px !important' }}
-                borderColor={colorMode === 'dark' ? 'gray.700' : 'gray.100'}
-                fontWeight="normal"
-                h="1px"
-                p={0}
-                textAlign={cell.align}
-                w={cell.width}
-                minW={cell.minWidth ? cell.minWidth : 150}
-                verticalAlign="middle"
-                key={cell.id}
-              >
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  boxSize="full"
-                  minH="55"
-                  as={hrefValue ? Link : undefined}
-                  to={hrefValue}
-                  py="3"
-                  px="6"
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  {assignmentLink && (
-                    <Box ml={2}>
-                      <IconButton
-                        icon={<Icon as={TbLink} />}
-                        variant="unstyled"
-                        aria-label={`Link to ${cell.column.columnDef.header}`}
-                        as={Link}
-                        to={assignmentLink}
-                      />
-                    </Box>
-                  )}
-                </Box>
-              </Td>
-            )
-          })}
+          {row.getVisibleCells().map((cell: any) => tableCell(row, cell, hrefValue))}
         </Tr>
       )
     },
