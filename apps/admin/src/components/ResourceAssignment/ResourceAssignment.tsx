@@ -106,6 +106,7 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
   hideEditAction,
   level,
   hrefOverride,
+  filters
 }) => {
   const primaryActionContainerRef = useContext(PrimaryActionRefContext)
   const deleteDisclosure = useDisclosure()
@@ -281,18 +282,29 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
     const options = {
       [toResourceID]: listFilterValue,
       level,
+      ...filters
     }
     if (switcherIdKey && switcherResourceID && !requiredParameters.includes(switcherIdKey)) {
       options[switcherIdKey] = switcherResourceID
     }
     return options as { [key: string]: string }
-  }, [level, listFilterValue, requiredParameters, switcherIdKey, switcherResourceID, toResourceID])
+  }, [filters, level, listFilterValue, requiredParameters, switcherIdKey, switcherResourceID, toResourceID])
+
+  const listParams = useMemo(() => {
+    const paramsObj = {
+      ...params,
+    }
+    if (switcherIdKey && switcherResourceID) {
+      paramsObj[switcherIdKey] = switcherResourceID
+    }
+    return paramsObj
+  }, [params, switcherIdKey, switcherResourceID])
 
   const dataQuery = useListAssignments(
     reverseDirection ? fromResource : toResource,
     operationInclusion,
     assignmentListOptions,
-    operationParams,
+    listParams,
     {
       // staleTime: 300000, // 5 min
       disabled: switcherResourceName ? !switcherResourceID : !allowed,
@@ -335,8 +347,9 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
       page: searchParams.get('page') || '1',
       pageSize: searchParams.get('pageSize') || '20',
       ID: Ids,
+      ...filters
     } as ServiceListOptions
-  }, [Ids, searchParams])
+  }, [Ids, searchParams, filters])
 
   const renderDirectCompanyAssignmentUI = useMemo(() => {
     if (directCompanyLevelAssignment) {
@@ -420,16 +433,6 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
     },
     [assignmentDisclosure.onOpen, deleteDisclosure.onOpen, hideEditAction, resolveHref]
   )
-
-  const listParams = useMemo(() => {
-    const paramsObj = {
-      ...params,
-    }
-    if (switcherIdKey && switcherResourceID) {
-      paramsObj[switcherIdKey] = switcherResourceID
-    }
-    return paramsObj
-  }, [params, switcherIdKey, switcherResourceID])
 
   return (
     <Container
