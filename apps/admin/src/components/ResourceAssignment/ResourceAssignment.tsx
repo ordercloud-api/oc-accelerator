@@ -106,6 +106,7 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
   hideEditAction,
   level,
   hrefOverride,
+  filters
 }) => {
   const primaryActionContainerRef = useContext(PrimaryActionRefContext)
   const deleteDisclosure = useDisclosure()
@@ -281,12 +282,13 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
     const options = {
       [toResourceID]: listFilterValue,
       level,
+      ...filters
     }
     if (switcherIdKey && switcherResourceID && !requiredParameters.includes(switcherIdKey)) {
       options[switcherIdKey] = switcherResourceID
     }
     return options as { [key: string]: string }
-  }, [level, listFilterValue, requiredParameters, switcherIdKey, switcherResourceID, toResourceID])
+  }, [filters, level, listFilterValue, requiredParameters, switcherIdKey, switcherResourceID, toResourceID])
 
   const dataQuery = useListAssignments(
     reverseDirection ? fromResource : toResource,
@@ -335,8 +337,9 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
       page: searchParams.get('page') || '1',
       pageSize: searchParams.get('pageSize') || '20',
       ID: Ids,
+      ...filters
     } as ServiceListOptions
-  }, [Ids, searchParams])
+  }, [Ids, searchParams, filters])
 
   const renderDirectCompanyAssignmentUI = useMemo(() => {
     if (directCompanyLevelAssignment) {

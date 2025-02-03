@@ -14,6 +14,9 @@ export interface IRelatedOpData {
     parameters?: {
       [key: string]: string;
     };
+    filters?: {
+      [key: string]: string;
+    };
   };
   renderItem(result: any): ReactNode;
 }
@@ -52,7 +55,8 @@ const CategoryID: IRelatedOpData = {
     return {
       pauseOperation: !catalogID,
       operationId: "Categories.List",
-      parameters: { catalogID, depth: "all" },
+      parameters: { catalogID },
+      filters: { depth: "all"}
     };
   },
   renderItem: (result: any) => <DefaultTemplate result={result} />,
@@ -269,7 +273,8 @@ export const relatedListOperationsByResource: {
         return {
           pauseOperation: !dependencies![0],
           operationId: "Categories.List",
-          parameters: { catalogID: dependencies![0]!, depth: "all" },
+          parameters: { catalogID: dependencies![0]! },
+          filters: { depth: "all" }
         };
       },
       renderItem: (result: any) => <DefaultTemplate result={result} />,
