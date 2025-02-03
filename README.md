@@ -110,8 +110,8 @@ The Accelerator creates OrderCloud API Clients configured for Storefront, Admin,
 
 ### Publish Your App Code
 1. In VS Code, open the directory for the app code you want to publish (admin, functions, or storefront) and run `npm install`
-2. Right click anywhere in the file explorer and select "Deploy To Web App" or "Deploy To Function App"
-   - Attempting to deploy from the project root will cause unintended results
+    - Ensure you do not have the project open at the root, as attempting to deploy from the root will cause unintended results.
+2. Right click anywhere in the file explorer and select "Deploy To Web App" or "Deploy To Function App".  Please note, this option will not appear if you have opened the project root in VS Code.
 3. If your deployment was successful, you should see a popup in the lower right hand side that will launch the app
    - If your initial attempt at deploy was unsuccessful and you have to retry, occasionally you may observe a 503 in the browser for 2-3 minutes before the site loads correctly
    

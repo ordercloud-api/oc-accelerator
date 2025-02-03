@@ -47,7 +47,7 @@ export const cellCallback = (cellValue: unknown, properties: OpenAPIV3.SchemaObj
   )
 }
 
-const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResolver }) => {
+const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, filters, hrefResolver }) => {
   const location = useLocation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -210,8 +210,8 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, hrefResol
   )
 
   const listOptions = useMemo(() => {
-    return parse(location.search.slice(1)) as ServiceListOptions
-  }, [location.search])
+    return {...parse(location.search.slice(1)) as ServiceListOptions, ...filters}
+  }, [filters, location.search])
 
   const resolveHref = useCallback(
     (rowData: any) => {
