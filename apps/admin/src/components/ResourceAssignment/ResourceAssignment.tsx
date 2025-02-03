@@ -290,11 +290,21 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
     return options as { [key: string]: string }
   }, [filters, level, listFilterValue, requiredParameters, switcherIdKey, switcherResourceID, toResourceID])
 
+  const listParams = useMemo(() => {
+    const paramsObj = {
+      ...params,
+    }
+    if (switcherIdKey && switcherResourceID) {
+      paramsObj[switcherIdKey] = switcherResourceID
+    }
+    return paramsObj
+  }, [params, switcherIdKey, switcherResourceID])
+
   const dataQuery = useListAssignments(
     reverseDirection ? fromResource : toResource,
     operationInclusion,
     assignmentListOptions,
-    operationParams,
+    listParams,
     {
       // staleTime: 300000, // 5 min
       disabled: switcherResourceName ? !switcherResourceID : !allowed,
@@ -423,16 +433,6 @@ const ResourceAssignment: FC<IResourceAssignment> = ({
     },
     [assignmentDisclosure.onOpen, deleteDisclosure.onOpen, hideEditAction, resolveHref]
   )
-
-  const listParams = useMemo(() => {
-    const paramsObj = {
-      ...params,
-    }
-    if (switcherIdKey && switcherResourceID) {
-      paramsObj[switcherIdKey] = switcherResourceID
-    }
-    return paramsObj
-  }, [params, switcherIdKey, switcherResourceID])
 
   return (
     <Container
