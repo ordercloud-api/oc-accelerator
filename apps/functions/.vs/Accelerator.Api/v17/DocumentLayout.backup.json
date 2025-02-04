@@ -1,0 +1,113 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\projects\\oc-accelerator\\apps\\functions\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{3626D8C9-E31E-4927-B8E3-5AA522F43DBB}|Accelerator.Core\\Accelerator.Core.csproj|c:\\projects\\oc-accelerator\\apps\\functions\\accelerator.core\\commands\\greetingcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3626D8C9-E31E-4927-B8E3-5AA522F43DBB}|Accelerator.Core\\Accelerator.Core.csproj|solutionrelative:accelerator.core\\commands\\greetingcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DC8F633F-4AE8-4517-A340-40610DF8D6AF}|Accelerator.Functions\\Accelerator.Functions.csproj|c:\\projects\\oc-accelerator\\apps\\functions\\accelerator.functions\\greeting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DC8F633F-4AE8-4517-A340-40610DF8D6AF}|Accelerator.Functions\\Accelerator.Functions.csproj|solutionrelative:accelerator.functions\\greeting.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DC8F633F-4AE8-4517-A340-40610DF8D6AF}|Accelerator.Functions\\Accelerator.Functions.csproj|c:\\projects\\oc-accelerator\\apps\\functions\\accelerator.functions\\local.settings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{DC8F633F-4AE8-4517-A340-40610DF8D6AF}|Accelerator.Functions\\Accelerator.Functions.csproj|solutionrelative:accelerator.functions\\local.settings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{da1e233c-cfa8-5021-b06c-abc3d02f44e8}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{004be353-6879-467c-9d1e-9ac23cdf6d49}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Greeting.cs",
+              "DocumentMoniker": "C:\\projects\\oc-accelerator\\apps\\functions\\Accelerator.Functions\\Greeting.cs",
+              "RelativeDocumentMoniker": "Accelerator.Functions\\Greeting.cs",
+              "ToolTip": "C:\\projects\\oc-accelerator\\apps\\functions\\Accelerator.Functions\\Greeting.cs",
+              "RelativeToolTip": "Accelerator.Functions\\Greeting.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAABjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-04T20:26:45.179Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GreetingCommand.cs",
+              "DocumentMoniker": "C:\\projects\\oc-accelerator\\apps\\functions\\Accelerator.Core\\Commands\\GreetingCommand.cs",
+              "RelativeDocumentMoniker": "Accelerator.Core\\Commands\\GreetingCommand.cs",
+              "ToolTip": "C:\\projects\\oc-accelerator\\apps\\functions\\Accelerator.Core\\Commands\\GreetingCommand.cs",
+              "RelativeToolTip": "Accelerator.Core\\Commands\\GreetingCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-04T20:26:15.847Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "local.settings.json",
+              "DocumentMoniker": "C:\\projects\\oc-accelerator\\apps\\functions\\Accelerator.Functions\\local.settings.json",
+              "RelativeDocumentMoniker": "Accelerator.Functions\\local.settings.json",
+              "ToolTip": "C:\\projects\\oc-accelerator\\apps\\functions\\Accelerator.Functions\\local.settings.json",
+              "RelativeToolTip": "Accelerator.Functions\\local.settings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-02-04T20:23:06.575Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 389,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{e7dc85bf-0119-4685-b401-85acaebb1ea2}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
