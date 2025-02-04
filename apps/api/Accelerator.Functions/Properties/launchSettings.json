@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Accelerator.Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7276",
+      "launchBrowser": false
+    }
+  }
+}
