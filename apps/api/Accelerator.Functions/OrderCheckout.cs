@@ -49,7 +49,7 @@ namespace Accelerator.Functions
             logger.LogInformation("C# HTTP trigger function processed a request.");
             var response = await paymentCommand.AuthorizeCardPaymentAsync(orderID, paymentID);
 
-            return new OkObjectResult(new {});
+            return new OkObjectResult(response);
         }
     }
 }
