@@ -13,9 +13,7 @@ namespace Accelerator.Commands
         public async Task<ShipEstimateResponse> EstimateShippingRatesAsync(OrderCheckoutIEPayload payload)
         {
             var response = new ShipEstimateResponse();
-            var packageWeight = 0;
-            //var packageWeight = payload.OrderWorksheet.LineItems.Sum(x => x.Product.ShipWeight);
-            // containerization logic - how should lineItem quantities be boxed into a set of shipped packages?
+
             // All line items in one package for example.
             response.ShipEstimates = new List<ShipEstimate>()
             {
@@ -26,8 +24,6 @@ namespace Accelerator.Commands
             };
 
             var packages = response.ShipEstimates.Select(se => new ShippingPackage() { Weight = 10m, ShipFrom = payload.OrderWorksheet.Order.BillingAddress});
-
-            // use the interface
             var rates = new List<List<ShippingRate>>();
             try
             {
@@ -35,7 +31,8 @@ namespace Accelerator.Commands
             }
             catch (Exception ex)
             {
-                rates = new List<List<ShippingRate>>()
+                // SOMETHING WENT WRONG. CHECK YOUR CREDENTIALS. FOR TESTING, RETURN A FREE SHIPPING OPTION
+                rates = new()
                 {
                     new()
                     {
