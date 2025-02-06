@@ -10,7 +10,9 @@
         <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
         <PackageReference Include="ordercloud-dotnet-catalyst" Version="2.8.0" />
+        <PackageReference Include="OrderCloud.Integrations.Payment.Stripe" Version="2.5.0" />
         <PackageReference Include="OrderCloud.Integrations.Shipping.EasyPost" Version="2.4.0" />
+        <PackageReference Include="OrderCloud.Integrations.Tax.Avalara" Version="2.4.0" />
         <PackageReference Include="OrderCloud.SDK" Version="0.17.5" />
     </ItemGroup>
 
