@@ -247,6 +247,7 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, filters, 
     <>
       {!allowed && <NoAccessMessage resourceName={resourceName} />}
       <ListView
+        key={resourceName}
         columnDef={tableOverrides[resourceName] ? sortedOverrideColumns : dynamicColumns}
         itemHrefResolver={resolveHref}
         parameters={routeParams}
