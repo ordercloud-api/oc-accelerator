@@ -38,11 +38,14 @@ interface ResourceListProps {
   readOnly?: boolean
 }
 
-export const cellCallback = (cellValue: unknown, properties: OpenAPIV3.SchemaObject) => {
+export const cellCallback = (info: any, properties: OpenAPIV3.SchemaObject, resourceId: string) => {
   return (
     <ResourceTableCell
-      value={cellValue}
+      value={info.getValue()}
       properties={properties}
+      accessor={info.column.id}
+      row={info.row.original}
+      resource={resourceId}
     />
   )
 }
@@ -210,13 +213,15 @@ const ResourceList: FC<ResourceListProps> = ({ resourceName, readOnly, filters, 
   )
 
   const listOptions = useMemo(() => {
-    return {...parse(location.search.slice(1)) as ServiceListOptions, ...filters}
+    return { ...(parse(location.search.slice(1)) as ServiceListOptions), ...filters }
   }, [filters, location.search])
 
   const resolveHref = useCallback(
     (rowData: any) => {
       if (!rowData?.ID) return ''
-      if (hrefResolver) hrefResolver(rowData)
+      if (hrefResolver) {
+        return hrefResolver(rowData)
+      }
       return `${location.pathname}/${rowData?.ID}`
     },
     [location.pathname, hrefResolver]
