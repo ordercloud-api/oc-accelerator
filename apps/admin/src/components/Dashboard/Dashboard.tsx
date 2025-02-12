@@ -8,7 +8,7 @@ import {
   SimpleGrid,
   Text,
 } from "@chakra-ui/react";
-import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
+import { useOrderCloudContext } from "@ordercloud/react-sdk";
 import { FC } from "react";
 import { useCurrentUser } from "../../hooks/currentUser";
 

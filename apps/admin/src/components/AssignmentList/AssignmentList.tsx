@@ -18,7 +18,7 @@ import {
   useColumns,
   useDeleteAssignment,
   useHasAccess,
-} from "@rwatt451/ordercloud-react";
+} from "@ordercloud/react-sdk";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ActionMenu from "../ResourceList/ActionMenu";
 import ListView from "../ResourceList/ListView";

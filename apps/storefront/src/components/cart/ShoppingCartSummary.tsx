@@ -20,7 +20,7 @@ import {
 import React, { FormEvent, useCallback, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
-import { useShopper } from "@rwatt451/ordercloud-react";
+import { useShopper } from "@ordercloud/react-sdk";
 import { TABS } from "./ShoppingCart";
 
 interface CartSummaryProps {

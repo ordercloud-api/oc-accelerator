@@ -18,7 +18,7 @@ import {
   useHasAccess,
   useListAssignments,
   useMutateAssignment,
-} from '@rwatt451/ordercloud-react'
+} from '@ordercloud/react-sdk'
 import { PaginationState, TableState, VisibilityState } from '@tanstack/react-table'
 import Case from 'case'
 import { cloneDeep, kebabCase, mapKeys } from 'lodash'

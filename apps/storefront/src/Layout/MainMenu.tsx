@@ -18,7 +18,7 @@ import {
   useOcResourceList,
   useOrderCloudContext,
   useShopper,
-} from "@rwatt451/ordercloud-react";
+} from "@ordercloud/react-sdk";
 import { Catalog } from "ordercloud-javascript-sdk";
 import { FC, useEffect, useMemo, useState } from "react";
 import { TbShoppingCartFilled } from "react-icons/tb";

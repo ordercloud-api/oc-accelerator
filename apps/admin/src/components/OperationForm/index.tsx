@@ -15,7 +15,7 @@ import {
   useOcForm,
   useMutateAssignment,
   useHasAccess,
-} from '@rwatt451/ordercloud-react'
+} from '@ordercloud/react-sdk'
 import { FC, useCallback, useEffect, useMemo } from 'react'
 import { FormProvider } from 'react-hook-form'
 import { TbTrash } from 'react-icons/tb'

@@ -32,7 +32,7 @@ import FilterSearchMenu, {
 } from "../shared/search/SearchMenu";
 import FacetList from "./facets/FacetList";
 import ProductCard from "./ProductCard";
-import { useOcResourceListWithFacets } from "@rwatt451/ordercloud-react";
+import { useOcResourceListWithFacets } from "@ordercloud/react-sdk";
 
 export interface ProductListProps {
   renderItem?: (product: BuyerProduct) => JSX.Element;

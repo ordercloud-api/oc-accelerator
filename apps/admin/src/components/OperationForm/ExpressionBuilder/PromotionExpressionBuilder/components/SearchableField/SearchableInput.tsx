@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { useMemo, useState } from 'react'
 import { Select } from 'chakra-react-select'
-import { useHasAccess, useOcResourceList } from '@rwatt451/ordercloud-react'
+import { useHasAccess, useOcResourceList } from '@ordercloud/react-sdk'
 import pluralize from 'pluralize'
 
 interface SearchableInputProps {

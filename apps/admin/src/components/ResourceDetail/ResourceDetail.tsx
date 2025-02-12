@@ -1,5 +1,5 @@
 import { Box, Heading, Hide, HStack, Text, VStack, useToast } from '@chakra-ui/react'
-import { useHasAccess, useOcResourceGet } from '@rwatt451/ordercloud-react'
+import { useHasAccess, useOcResourceGet } from '@ordercloud/react-sdk'
 import { createContext, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { matchPath, Outlet, useNavigate } from 'react-router'
 import { NavButton } from '../Layout/Layout'
