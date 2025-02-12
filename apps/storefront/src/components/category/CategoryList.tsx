@@ -3,7 +3,7 @@ import { Category } from "ordercloud-javascript-sdk";
 import React, { FunctionComponent, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import CategoryCard from "./CategoryCard";
-import { useOcResourceList } from "@rwatt451/ordercloud-react";
+import { useOcResourceList } from "@ordercloud/react-sdk";
 
 export interface CategoryListProps {
   renderItem?: (category: Category) => JSX.Element;

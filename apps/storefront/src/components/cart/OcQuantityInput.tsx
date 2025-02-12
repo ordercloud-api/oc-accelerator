@@ -12,7 +12,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { PriceSchedule, BuyerProduct } from "ordercloud-javascript-sdk";
-import { useOcResourceGet } from "@rwatt451/ordercloud-react";
+import { useOcResourceGet } from "@ordercloud/react-sdk";
 
 interface OcQuantityInputProps {
   controlId: string;

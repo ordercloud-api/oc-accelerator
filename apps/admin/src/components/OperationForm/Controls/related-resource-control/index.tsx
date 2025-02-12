@@ -4,7 +4,7 @@ import { BaseProps } from '../form-control'
 import { SelectControl } from '../select-control'
 import { Text } from '@chakra-ui/react'
 import { IRelatedOpData } from '../../../../config/related-resources'
-import { useOcResourceList, useHasAccess } from '@rwatt451/ordercloud-react'
+import { useOcResourceList, useHasAccess } from '@ordercloud/react-sdk'
 import InputControl from '../input-control'
 
 interface IRelatedResourceControl extends BaseProps {

@@ -1,7 +1,7 @@
 import { Badge, Box, SimpleGrid, Tag, Text, Tooltip } from '@chakra-ui/react'
 import { FC, useCallback, useMemo } from 'react'
 import { getType } from '../../utils/spec.utils'
-import { currencyFormats } from '@rwatt451/ordercloud-react'
+import { currencyFormats } from '@ordercloud/react-sdk'
 import { useParams } from 'react-router'
 
 interface ResourceTableCellProps {

@@ -31,7 +31,7 @@ import { useCallback, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
-import { useShopper } from "@rwatt451/ordercloud-react";
+import { useShopper } from "@ordercloud/react-sdk";
 
 export const TABS = {
   INFORMATION: 0,

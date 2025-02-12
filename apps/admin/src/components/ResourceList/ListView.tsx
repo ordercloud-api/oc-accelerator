@@ -1,5 +1,5 @@
 import { Flex, useToast } from '@chakra-ui/react'
-import { useListAssignments, useOcResourceList } from '@rwatt451/ordercloud-react'
+import { useListAssignments, useOcResourceList } from '@ordercloud/react-sdk'
 import { ColumnDef, TableState } from '@tanstack/react-table'
 import { RequiredDeep } from 'ordercloud-javascript-sdk'
 import { ReactElement, useEffect, useMemo } from 'react'

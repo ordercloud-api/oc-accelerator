@@ -11,7 +11,7 @@ import { LineItem, Order, RequiredDeep } from "ordercloud-javascript-sdk";
 import React, { useCallback } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
-import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
+import { useOrderCloudContext } from "@ordercloud/react-sdk";
 
 interface OrderSummaryProps {
   order: RequiredDeep<Order>;

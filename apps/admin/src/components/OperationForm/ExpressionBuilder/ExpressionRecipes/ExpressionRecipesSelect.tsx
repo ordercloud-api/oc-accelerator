@@ -20,7 +20,7 @@ import { ValueEditorProps } from 'react-querybuilder'
 import { CustomValueEditor } from '../PromotionExpressionBuilder/components/CustomValueEditor'
 import approvalRuleRecipes from './approval-rule-recipes.json'
 import promoRecipes from './promo-recipes.json'
-import { usePromoExpressions } from '@rwatt451/ordercloud-react'
+import { usePromoExpressions } from '@ordercloud/react-sdk'
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { transformFunctions } from './transformFunctions'
 

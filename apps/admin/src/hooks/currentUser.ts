@@ -1,5 +1,5 @@
 import { Me, MeUser } from "ordercloud-javascript-sdk";
-import { queryClient, useAuthMutation, useAuthQuery } from "@rwatt451/ordercloud-react";
+import { queryClient, useAuthMutation, useAuthQuery } from "@ordercloud/react-sdk";
 
 export function useCurrentUser() {
   return useAuthQuery({

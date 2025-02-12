@@ -9,7 +9,7 @@ import {
   Spinner,
   useOutsideClick,
 } from "@chakra-ui/react";
-import { useOcResourceList } from "@rwatt451/ordercloud-react";
+import { useOcResourceList } from "@ordercloud/react-sdk";
 import { Catalog, Category } from "ordercloud-javascript-sdk";
 import { FC, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";

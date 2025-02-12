@@ -1,5 +1,5 @@
 import { Box, Button, Flex, HStack, useDisclosure, useToast } from '@chakra-ui/react'
-import { useColumns, useDeleteOcResource, useHasAccess } from '@rwatt451/ordercloud-react'
+import { useColumns, useDeleteOcResource, useHasAccess } from '@ordercloud/react-sdk'
 import {
   ColumnFiltersState,
   PaginationState,
