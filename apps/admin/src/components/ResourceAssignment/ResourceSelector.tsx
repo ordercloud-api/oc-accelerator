@@ -10,20 +10,24 @@ interface ResourceSelectorProps {
   leftAddon?: string
   onChange?: (selectedId: string) => void
   dependencies?: Array<string | null>
+  isSecurityProfile?: boolean
+  disabled?: boolean
 }
 
 const ResourceSelector: FC<ResourceSelectorProps> = ({
   resourceName,
   value,
   leftAddon,
+  isSecurityProfile,
+  disabled,
   onChange,
   dependencies = [],
 }) => {
   const relatedListResourceInfo = useMemo(() => {
-    return relatedListOperationsByResource?.['Assignments']?.[
-      `${pluralize.singular(resourceName)}ID`
-    ]
-  }, [resourceName])
+    return relatedListOperationsByResource?.[
+      isSecurityProfile ? 'SecurityProfiles' : 'Assignments'
+    ]?.[`${pluralize.singular(resourceName)}ID`]
+  }, [isSecurityProfile, resourceName])
 
   const operationInfo = useMemo(() => {
     return relatedListResourceInfo.operationInfo(dependencies)
@@ -56,6 +60,7 @@ const ResourceSelector: FC<ResourceSelectorProps> = ({
         name="selectedId"
         renderFn={relatedListResourceInfo.renderItem}
         operationInfo={operationInfo}
+        isDisabled={disabled}
       />
     </FormProvider>
   )

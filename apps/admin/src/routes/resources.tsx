@@ -1437,4 +1437,33 @@ export const resources: ResourceRoute[] = [
     path: '/buyers/:buyerID/approval-rules/:approvalRuleID',
     element: <ResourceDetailWithParams resourceName="ApprovalRules" />,
   },
+  {
+    path: '/security-profiles',
+    label: 'Security Profiles',
+    element: <ResourceList resourceName="SecurityProfiles" />,
+  },
+  {
+    path: '/security-profiles/:securityProfileID',
+    element: (
+      <ResourceDetailWithParams
+        resourceName="SecurityProfiles"
+        navigationItemsWithParams={(params) => [
+          {
+            path: `/security-profiles/${params.securityProfileID}`,
+            label: 'Details',
+          },
+          {
+            path: `/security-profiles/${params.securityProfileID}/assignments`,
+            label: 'Assignments',
+          },
+        ]}
+      />
+    ),
+    children: [
+      {
+        path: '/security-profiles/:securityProfileID/assignments',
+        element: <AssignmentList resourceName="SecurityProfiles" />,
+      },
+    ],
+  },
 ]
