@@ -15,7 +15,7 @@ import { ChangeEvent, MouseEvent, useMemo } from 'react'
 import { ActionWithRulesAndAddersProps, RuleGroupType, update } from 'react-querybuilder'
 import { groupOperators } from '../groupOperators'
 import { getValidationMessage } from '../validator'
-import { usePromoExpressions } from '@rwatt451/ordercloud-react'
+import { usePromoExpressions } from '@ordercloud/react-sdk'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 
 export function CustomAddRuleAction({

@@ -91,7 +91,7 @@ Milestone 2 will expand OrderCloud API coverage and add assignment functionality
 
 ## References
 - [OrderCloud Javascript SDK](https://www.npmjs.com/package/ordercloud-javascript-sdk)
-- [OrderCloud React](https://www.npmjs.com/package/@rwatt451/ordercloud-react)
+- [OrderCloud React SDK](https://www.npmjs.com/package/@ordercloud/react-sdk)
 - [OrderCloud API Reference](https://ordercloud.io/api-reference)
 - [React Hook Form](https://react-hook-form.com/)
 - [Tanstack React Table](https://tanstack.com/table)

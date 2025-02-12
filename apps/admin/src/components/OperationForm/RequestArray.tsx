@@ -17,7 +17,7 @@ import { SelectControl } from "./Controls/select-control";
 import { TbPlus } from "react-icons/tb";
 import { RelatedResourceControl } from "./Controls/related-resource-control";
 import { relatedListOperationsByResource } from "../../config/related-resources";
-import { useHasAccess } from "@rwatt451/ordercloud-react";
+import { useHasAccess } from "@ordercloud/react-sdk";
 
 interface IRequestArray {
   path?: string;

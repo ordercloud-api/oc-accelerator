@@ -13,7 +13,7 @@ import { CustomValueEditor } from './components/CustomValueEditor'
 import { operators } from './operators'
 import { validator } from './validator'
 import { InfoOutlineIcon } from "@chakra-ui/icons";
-import { usePromoExpressions } from '@rwatt451/ordercloud-react'
+import { usePromoExpressions } from '@ordercloud/react-sdk'
 import { InputControl } from '../../Controls'
 
 interface RuleExpressionBuilderProps {

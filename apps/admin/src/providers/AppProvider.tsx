@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import { IOrderCloudErrorContext, OrderCloudProvider } from '@rwatt451/ordercloud-react'
+import { IOrderCloudErrorContext, OrderCloudProvider } from '@ordercloud/react-sdk'
 import {
   ALLOW_ANONYMOUS,
   BASE_API_URL,

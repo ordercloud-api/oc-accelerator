@@ -13,7 +13,7 @@ import {
   UseDisclosureReturn,
   VStack,
 } from '@chakra-ui/react'
-import { useOrderCloudContext } from '@rwatt451/ordercloud-react'
+import { useOrderCloudContext } from '@ordercloud/react-sdk'
 import { FC, useRef, useState } from 'react'
 import ForgotPasswordForm from './ForgotPasswordForm'
 import LoginForm from './LoginForm'

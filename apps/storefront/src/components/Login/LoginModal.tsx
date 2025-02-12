@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { FC, useRef } from "react";
 import LoginForm from "./LoginForm";
-import { useOrderCloudContext } from "@rwatt451/ordercloud-react";
+import { useOrderCloudContext } from "@ordercloud/react-sdk";
 
 interface ILoginModal {
   disclosure: UseDisclosureReturn;

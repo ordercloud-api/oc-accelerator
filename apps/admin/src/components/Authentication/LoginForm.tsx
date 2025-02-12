@@ -11,7 +11,7 @@ import {
   InputLeftElement,
   VStack,
 } from '@chakra-ui/react'
-import { parseToken, useOrderCloudContext } from '@rwatt451/ordercloud-react'
+import { parseToken, useOrderCloudContext } from '@ordercloud/react-sdk'
 import { AccessToken, OrderCloudError } from 'ordercloud-javascript-sdk'
 import { FC, FormEvent, useCallback, useState } from 'react'
 

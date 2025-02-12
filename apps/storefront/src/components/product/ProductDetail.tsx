@@ -29,7 +29,7 @@ import {
   useOcResourceGet,
   useOcResourceList,
   useShopper,
-} from "@rwatt451/ordercloud-react";
+} from "@ordercloud/react-sdk";
 
 export interface ProductDetailProps {
   productId: string;

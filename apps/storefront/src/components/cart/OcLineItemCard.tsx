@@ -29,7 +29,7 @@ import { Link as RouterLink, useLocation } from "react-router-dom";
 import useDebounce from "../../hooks/useDebounce";
 import formatPrice from "../../utils/formatPrice";
 import OcQuantityInput from "./OcQuantityInput";
-import { useShopper } from "@rwatt451/ordercloud-react";
+import { useShopper } from "@ordercloud/react-sdk";
 
 interface OcLineItemCardProps {
   lineItem: LineItem;
