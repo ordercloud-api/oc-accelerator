@@ -70,7 +70,7 @@ namespace OC_Accelerator.Helpers
                 new()
                 {
                     name = "VITE_APP_ORDERCLOUD_CUSTOM_SCOPE",
-                    value = appType == ApplicationType.Storefront ? _appSettings.ocStorefrontCustomScope : _appSettings.ocAdminCustomScope
+                    value = appType == ApplicationType.Storefront ? _appSettings.ocStorefrontCustomScope : string.Empty
                 },
                 new()
                 {
@@ -91,7 +91,7 @@ namespace OC_Accelerator.Helpers
                 
                 return _appSettings.ocStorefrontScope;
             }
-            return _appSettings.ocAdminScope;
+            return string.Empty;
         }
     }
 }
