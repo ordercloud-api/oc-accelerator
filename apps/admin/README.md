@@ -67,14 +67,12 @@ Resource list and detail views will display all native properties on a resource 
 ```bash
 VITE_APP_ORDERCLOUD_BASE_API_URL="https://sandboxapi.ordercloud.io"
 VITE_APP_ORDERCLOUD_CLIENT_ID="********-****-****-****-************"
-VITE_APP_ORDERCLOUD_SCOPE="OrderAdmin ProductAdmin CatalogAdmin AdminUserAdmin AdminUserGroupAdmin SupplierAdmin BuyerAdmin"
 VITE_APP_NAME="OrderCloud Admin Application"
 ```
 | Variable                            | Description                                                                                                       |
 | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `VITE_APP_ORDERCLOUD_BASE_API_URL`  | Base OrderCloud API URL                                          |
 | `VITE_APP_ORDERCLOUD_CLIENT_ID`     | Admin Client ID                                                                                                   |
-| `VITE_APP_ORDERCLOUD_SCOPE`         | The ID for your OrderCloud Marketplace                                                                            |
 | `VITE_APP_NAME`                     | Name of the application title                                                                                     |
 
 2. Run Vite in development mode
