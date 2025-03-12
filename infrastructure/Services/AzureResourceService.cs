@@ -57,6 +57,7 @@ public class AzureResourceService
         string storageSku;
         string storageType;
         string accessTier = null;
+        string runtimeStack;
 
         bool confirmTierSelections = false;
         do
@@ -73,6 +74,9 @@ public class AzureResourceService
                     "Select the desired access tier for your Blob Storage Account. Please see https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview",
                     new[] { "Cool", "Hot", "Premium"});
             }
+
+            runtimeStack = Prompt.Select("Select the desired runtime stack for your Azure Function",
+                new[] { "dotnet", "node" });
             confirmTierSelections = Prompt.Confirm("Everything look good?", defaultValue: true);
         } while (!confirmTierSelections);
 
@@ -177,7 +181,7 @@ public class AzureResourceService
                 new()
                 {
                     name = "FUNCTIONS_WORKER_RUNTIME",
-                    value = "node"
+                    value = runtimeStack
                 },
                 new()
                 {
