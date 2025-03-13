@@ -1,23 +1,11 @@
 import {
   Button,
-  Card,
-  CardBody,
   Center,
   Container,
-  Divider,
-  FormControl,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
-  HStack,
-  Input,
-  Radio,
-  RadioGroup,
-  Select,
-  Skeleton,
   Spinner,
-  Stack,
   Tab,
   TabList,
   TabPanel,
@@ -27,10 +15,6 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import CartSkeleton from "./ShoppingCartSkeleton";
-import CartSummary from "./ShoppingCartSummary";
 import { useShopper } from "@ordercloud/react-sdk";
 import {
   Address,
@@ -39,9 +23,13 @@ import {
   Orders,
   RequiredDeep,
 } from "ordercloud-javascript-sdk";
+import { useCallback, useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { CartInformationPanel } from "./CartPanels/CartInformationPanel";
-import { CartShippingPanel } from "./CartPanels/CartShippingPanel";
 import { CartPaymentPanel } from "./CartPanels/CartPaymentPanel";
+import CartSkeleton from "./ShoppingCartSkeleton";
+import CartSummary from "./ShoppingCartSummary";
+import CartShippingPanel from "./CartPanels/CartShippingPanel";
 
 export const TABS = {
   INFORMATION: 0,
@@ -57,7 +45,7 @@ export const ShoppingCart = (): JSX.Element => {
     useShopper();
 
   const [order, setOrder] = useState<RequiredDeep<Order>>();
-  
+
   const [shippingAddress, setShippingAddress] = useState<Address>({
     FirstName: "",
     LastName: "",
@@ -70,8 +58,6 @@ export const ShoppingCart = (): JSX.Element => {
     Country: "US",
     Phone: "",
   });
-
-
 
   const navigate = useNavigate();
   const toast = useToast();
@@ -97,20 +83,6 @@ export const ShoppingCart = (): JSX.Element => {
     }
   }, [navigate, orderWorksheet?.Order?.ID, submitCart, toast]);
 
-  // useEffect(() => {
-  //   const testGreeting = async () => {
-  //     try {
-  //       const res = await fetch("http://localhost:7071/api/greeting");
-  //       const data = await res.text();
-  //       console.log("Greeting response:", data);
-  //     } catch (err) {
-  //       console.error("Error calling greeting:", err);
-  //     }
-  //   };
-
-  //   testGreeting();
-  // }, []);
-
   const deleteOrder = useCallback(async () => {
     if (!orderWorksheet?.Order?.ID) return;
     await deleteCart();
@@ -134,23 +106,21 @@ export const ShoppingCart = (): JSX.Element => {
     const orderID = orderWorksheet?.Order?.ID;
     if (!orderID) return;
 
+    handleNextTab();
+
     try {
       await Orders.SetShippingAddress("Outgoing", orderID, shippingAddress);
-      const worksheet = await IntegrationEvents.GetWorksheet("Outgoing", orderID);
-      console.log("🚀 ~ handleSaveShippingAddress ~ worksheet:", worksheet.ShipEstimateResponse.ShipEstimates.at(0)?.ShipMethods.at(0))
-      console.log("🚀 ~ handleSaveShippingAddress ~ worksheet:", worksheet.ShipEstimateResponse.ShipEstimates.at(0)?.ShipMethods.at(0)?.Name)
-      console.log("🚀 ~ handleSaveShippingAddress ~ worksheet:", worksheet.ShipEstimateResponse.ShipEstimates.at(0)?.ShipMethods.at(0)?.Cost)
-      console.log("🚀 ~ handleSaveShippingAddress ~ worksheet:", worksheet.ShipEstimateResponse.ShipEstimates.at(0)?.ShipMethods.at(0)?.EstimatedTransitDays)
-      console.log("🚀 ~ handleSaveShippingAddress ~ orderID:", orderID)
-      const res = await IntegrationEvents.EstimateShipping("Outgoing", orderID);
-      console.log("Shipping Estimate:", res);
-      handleNextTab();
+      await IntegrationEvents.EstimateShipping("Outgoing", orderID);
+
+      const updatedWorksheet = await IntegrationEvents.GetWorksheet(
+        "Outgoing",
+        orderID
+      );
+      console.log("Updated Worksheet:", updatedWorksheet);
     } catch (err) {
       console.error("Failed to save shipping address:", err);
     }
   };
-
-
 
   return (
     <>

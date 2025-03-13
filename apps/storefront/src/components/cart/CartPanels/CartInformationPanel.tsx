@@ -1,4 +1,3 @@
-// ShippingInfoPanel.tsx
 import {
   Button,
   FormControl,

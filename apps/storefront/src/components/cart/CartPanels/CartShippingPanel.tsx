@@ -2,142 +2,138 @@ import {
   Button,
   Card,
   CardBody,
-  Divider,
-  HStack,
-  Heading,
   Radio,
   RadioGroup,
-  Stack,
+  Spinner,
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { OrderWorksheet, Address } from "ordercloud-javascript-sdk";
+import {
+  Address,
+  IntegrationEvents,
+  OrderWorksheet,
+  ShipMethod,
+} from "ordercloud-javascript-sdk";
+import React, { useEffect, useState } from "react";
 
-type CartShippingPanelProps = {
+interface CartShippingPanelProps {
   orderWorksheet: OrderWorksheet;
   shippingAddress: Address;
   handleNextTab: () => void;
   handlePrevTab: () => void;
-};
+}
 
-export const CartShippingPanel = ({
+const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
   orderWorksheet,
   shippingAddress,
   handleNextTab,
-  handlePrevTab,
-}: CartShippingPanelProps) => {
-  return (
-    <VStack alignItems="stretch">
-      <Card variant="flat" shadow="none" bgColor="whiteAlpha.800">
-        <CardBody display="flex" flexDirection="column" gap={6}>
-          <HStack>
-            <Text color="chakra-subtle-text" fontWeight="bold">
-              Contact
-            </Text>
-            <Text>
-              {orderWorksheet?.Order?.FromUser?.Email}
-              {orderWorksheet?.Order?.FromUser?.Phone
-                ? `, ${orderWorksheet.Order.FromUser.Phone}`
-                : ""}
-            </Text>
-            <Button
-              onClick={handlePrevTab}
-              size="xs"
-              variant="outline"
-              ml="auto"
-            >
-              Edit
-            </Button>
-          </HStack>
-          <Divider />
-          <HStack>
-            <Text color="chakra-subtle-text" fontWeight="bold">
-              Ships to
-            </Text>
-            <Text whiteSpace="pre-line">
-              {`${shippingAddress.FirstName} ${shippingAddress.LastName}${
-                shippingAddress?.CompanyName
-                  ? ` (${shippingAddress.CompanyName})`
-                  : ""
-              }
-${shippingAddress.Street1}${
-                shippingAddress.Street2 ? `, ${shippingAddress.Street2}` : ""
-              }
-${shippingAddress.City}, ${shippingAddress.State} ${shippingAddress.Zip}`}
-            </Text>
-            <Button
-              onClick={handlePrevTab}
-              size="xs"
-              variant="outline"
-              ml="auto"
-            >
-              Edit
-            </Button>
-          </HStack>
+}) => {
+  const [shippingMethods, setShippingMethods] = useState<ShipMethod[]>([]);
+  const [selectedMethodIndex, setSelectedMethodIndex] = useState<string>("0");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchShippingEstimates = async () => {
+      const orderID = orderWorksheet?.Order?.ID;
+      if (!orderID || !shippingAddress) return;
+
+      setLoading(true);
+      try {
+        const worksheet = await IntegrationEvents.GetWorksheet(
+          "Outgoing",
+          orderID
+        );
+        const methods =
+          worksheet?.ShipEstimateResponse?.ShipEstimates?.[0]?.ShipMethods ||
+          [];
+        setShippingMethods(methods);
+
+        if (methods.length > 0) {
+          setSelectedMethodIndex("0");
+        }
+      } catch (err) {
+        console.error("Failed to fetch shipping estimates:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchShippingEstimates();
+  }, [orderWorksheet, shippingAddress]);
+
+  const handleChange = (value: string) => {
+    setSelectedMethodIndex(value);
+    const selected = shippingMethods[parseInt(value)];
+    console.log("Selected shipping method:", selected);
+    handleNextTab();
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardBody display="flex" alignItems="center">
+          <Spinner mr="3" />
+          <Text display="inline">Loading shipping options...</Text>
         </CardBody>
       </Card>
+    );
+  }
 
-      <Heading as="h3" size="sm" my={6}>
-        Shipping method
-      </Heading>
+  if (!shippingMethods.length) {
+    return (
+      <Card>
+        <CardBody>No shipping options available</CardBody>
+      </Card>
+    );
+  }
 
-      <Card variant="flat" shadow="none" bgColor="whiteAlpha.800">
+  return (
+    <VStack alignItems="flex-start">
+      <Card variant="flat" shadow="none" bgColor="whiteAlpha.800" w="full">
         <CardBody display="flex" flexDirection="column" gap="3">
           <RadioGroup
-            defaultValue="2"
             sx={{
-              "& .chakra-radio__label": { width: "full" },
+              ".chakra-radio__label": {
+                display: "flex",
+                alignItems: "center",
+                width: "full",
+                gap: "3",
+              },
             }}
+            value={selectedMethodIndex}
+            onChange={handleChange}
+            as={VStack}
           >
-            <Stack
-              w="full"
-              gap={0}
-              sx={{
-                "& .chakra-radio": {
-                  borderBottom: "1px solid",
-                  borderColor: "chakra-border-color",
-                  py: 6,
-                },
-                "& .chakra-radio:last-child": {
-                  borderBottom: "none",
-                },
-              }}
-            >
-              <Radio value="1" display="flex" w="full">
-                <HStack w="full">
-                  <VStack alignItems="flex-start">
-                    <Text>Pick up in store</Text>
-                    <Text fontSize="xs">{/* Add pickup location here */}</Text>
-                  </VStack>
-                  <Text ml="auto" fontWeight="bold" color="chakra-subtle-text">
-                    [SHIPPING_COST]
+            {shippingMethods.map((method, index) => (
+              <Radio key={index} value={index.toString()} w="full" gap="3">
+                <VStack align="flex-start" gap="0" flexGrow="1">
+                  <Text fontSize="lg" fontWeight="semibold">
+                    {method.Name}
                   </Text>
-                </HStack>
-              </Radio>
-              <Radio value="2">
-                <HStack>
-                  <Text>Standard shipping</Text>
-                  <Text ml="auto" fontWeight="bold" color="chakra-subtle-text">
-                    [SHIPPING_COST]
+                  <Text fontSize="sm" color="chakra-subtle-text">
+                    {method.EstimatedTransitDays === 1
+                      ? "1-day delivery"
+                      : `${method.EstimatedTransitDays}-day delivery`}
                   </Text>
-                </HStack>
+                </VStack>
+                <Text
+                  ml="auto"
+                  fontWeight="bold"
+                  color="gray.600"
+                  fontSize="lg"
+                >
+                  ${method?.Cost?.toFixed(2)}
+                </Text>
               </Radio>
-              <Radio value="3">
-                <HStack>
-                  <Text>Express shipping</Text>
-                  <Text ml="auto" fontWeight="bold" color="chakra-subtle-text">
-                    [SHIPPING_COST]
-                  </Text>
-                </HStack>
-              </Radio>
-            </Stack>
+            ))}
           </RadioGroup>
         </CardBody>
       </Card>
-
-      <Button alignSelf="flex-end" onClick={handleNextTab} mt={6}>
+      <Button alignSelf="flex-end" mt={6}>
         Continue to payment
       </Button>
     </VStack>
   );
 };
+
+export default CartShippingPanel;
