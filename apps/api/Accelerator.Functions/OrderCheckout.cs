@@ -51,5 +51,14 @@ namespace Accelerator.Functions
 
             return new OkObjectResult(response);
         }
+
+        [Function("getiframecredentials")]
+        [OrderCloudWebhookAuth]
+        public async Task<IActionResult> GetIFrameCredentialsAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+        {
+            logger.LogInformation("C# HTTP trigger function processed a request.");
+            var response = await paymentCommand.GetIFrameCredentialsAsync() ?? "sk_test_BQokikJOvBiI2HlWgH4olfQ2";
+            return new OkObjectResult(response);
+        }
     }
 }

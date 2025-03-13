@@ -1,23 +1,11 @@
 import {
   Button,
-  Card,
-  CardBody,
   Center,
   Container,
-  Divider,
-  FormControl,
-  FormLabel,
   Grid,
   GridItem,
   Heading,
-  HStack,
-  Input,
-  Radio,
-  RadioGroup,
-  Select,
-  Skeleton,
   Spinner,
-  Stack,
   Tab,
   TabList,
   TabPanel,
@@ -27,11 +15,21 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
+import { useShopper } from "@ordercloud/react-sdk";
+import {
+  Address,
+  IntegrationEvents,
+  Order,
+  Orders,
+  RequiredDeep,
+} from "ordercloud-javascript-sdk";
 import { useCallback, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { CartInformationPanel } from "./cart-panels/CartInformationPanel";
+import { CartPaymentPanel } from "./cart-panels/CartPaymentPanel";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
-import { useShopper } from "@ordercloud/react-sdk";
+import CartShippingPanel from "./cart-panels/CartShippingPanel";
 
 export const TABS = {
   INFORMATION: 0,
@@ -43,7 +41,23 @@ export const ShoppingCart = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
 
-  const { orderWorksheet, worksheetLoading, deleteCart, submitCart } = useShopper();
+  const { orderWorksheet, worksheetLoading, deleteCart, submitCart } =
+    useShopper();
+
+  const [order, setOrder] = useState<RequiredDeep<Order>>();
+
+  const [shippingAddress, setShippingAddress] = useState<Address>({
+    FirstName: "",
+    LastName: "",
+    CompanyName: "",
+    Street1: "",
+    Street2: "",
+    City: "",
+    State: "",
+    Zip: "",
+    Country: "US",
+    Phone: "",
+  });
 
   const navigate = useNavigate();
   const toast = useToast();
@@ -67,7 +81,6 @@ export const ShoppingCart = (): JSX.Element => {
         isClosable: true,
       });
     }
-
   }, [navigate, orderWorksheet?.Order?.ID, submitCart, toast]);
 
   const deleteOrder = useCallback(async () => {
@@ -87,6 +100,26 @@ export const ShoppingCart = (): JSX.Element => {
 
   const handleTabChange = (index: number) => {
     setTabIndex(index);
+  };
+
+  const handleSaveShippingAddress = async () => {
+    const orderID = orderWorksheet?.Order?.ID;
+    if (!orderID) return;
+
+    handleNextTab();
+
+    try {
+      await Orders.SetShippingAddress("Outgoing", orderID, shippingAddress);
+      await IntegrationEvents.EstimateShipping("Outgoing", orderID);
+
+      const updatedWorksheet = await IntegrationEvents.GetWorksheet(
+        "Outgoing",
+        orderID
+      );
+      console.log("Updated Worksheet:", updatedWorksheet);
+    } catch (err) {
+      console.error("Failed to save shipping address:", err);
+    }
   };
 
   return (
@@ -149,245 +182,29 @@ export const ShoppingCart = (): JSX.Element => {
                       </TabList>
 
                       <TabPanels>
-                        <TabPanel as={VStack} alignItems="stretch">
-                          <Stack direction={["column", "row"]} spacing={6}>
-                            <FormControl>
-                              <FormLabel>Email</FormLabel>
-                              <Input placeholder="Email" />
-                            </FormControl>
-                            <FormControl flexBasis="75%">
-                              <FormLabel>Phone</FormLabel>
-                              <Input placeholder="Phone" />
-                            </FormControl>
-                          </Stack>
-                          <Heading size="md" my={6}>
-                            Shipping address
-                          </Heading>
-                          <Stack direction={["column", "row"]} spacing={6}>
-                            <FormControl>
-                              <FormLabel>First Name</FormLabel>
-                              <Input placeholder="Enter first name" />
-                            </FormControl>
-                            <FormControl>
-                              <FormLabel>Last Name</FormLabel>
-                              <Input placeholder="Enter last name" />
-                            </FormControl>
-                          </Stack>
-                          <FormControl>
-                            <FormLabel>Company (optional)</FormLabel>
-                            <Input placeholder="Enter company name" />
-                          </FormControl>
-                          <FormControl>
-                            <FormLabel>Address</FormLabel>
-                            <Input placeholder="Enter address" />
-                          </FormControl>
-                          <FormControl>
-                            <FormLabel>Suburb</FormLabel>
-                            <Input placeholder="Enter suburb" />
-                          </FormControl>
-                          <Stack direction={["column", "row"]} spacing={6}>
-                            <FormControl>
-                              <FormLabel>State/Territory</FormLabel>
-                              <Select placeholder="Select state/territory">
-                                <option value="mn">Minnesota</option>
-                              </Select>
-                            </FormControl>
-                            <FormControl>
-                              <FormLabel>Postcode</FormLabel>
-                              <Input placeholder="Enter postcode" />
-                            </FormControl>
-                          </Stack>
-                          <Button
-                            alignSelf="flex-end"
-                            onClick={handleNextTab}
-                            mt={6}
-                          >
-                            Continue to shipping
-                          </Button>
+                        <TabPanel>
+                          <CartInformationPanel
+                            shippingAddress={shippingAddress}
+                            setShippingAddress={setShippingAddress}
+                            handleSaveShippingAddress={
+                              handleSaveShippingAddress
+                            }
+                          />
                         </TabPanel>
-
-                        <TabPanel as={VStack} alignItems="stretch">
-                          <Card
-                            variant="flat"
-                            shadow="none"
-                            bgColor="whiteAlpha.800"
-                          >
-                            <CardBody
-                              display="flex"
-                              flexDirection="column"
-                              gap={6}
-                            >
-                              <HStack>
-                                <Text
-                                  color="chakra-subtle-text"
-                                  fontWeight="bold"
-                                >
-                                  Contact
-                                </Text>
-                                <Text>[EMAIL]</Text>
-                                <Button
-                                  onClick={handlePrevTab}
-                                  size="xs"
-                                  variant="outline"
-                                  ml="auto"
-                                >
-                                  Edit
-                                </Button>
-                              </HStack>
-                              <Divider />
-                              <HStack>
-                                <Text
-                                  color="chakra-subtle-text"
-                                  fontWeight="bold"
-                                >
-                                  Ships to
-                                </Text>
-                                <Text>[SHIPPING_ADDRESS]</Text>
-                                <Button
-                                  onClick={handlePrevTab}
-                                  size="xs"
-                                  variant="outline"
-                                  ml="auto"
-                                >
-                                  Edit
-                                </Button>
-                              </HStack>
-                            </CardBody>
-                          </Card>
-                          <Heading as="h3" size="sm" my={6}>
-                            Shipping method
-                          </Heading>
-                          <Card
-                            variant="flat"
-                            shadow="none"
-                            bgColor="whiteAlpha.800"
-                          >
-                            <CardBody
-                              display="flex"
-                              flexDirection="column"
-                              gap="3"
-                            >
-                              <RadioGroup
-                                defaultValue="2"
-                                sx={{
-                                  "& .chakra-radio__label": {
-                                    width: "full",
-                                  },
-                                }}
-                              >
-                                <Stack
-                                  w="full"
-                                  gap={0}
-                                  sx={{
-                                    "& .chakra-radio": {
-                                      borderBottom: "1px solid",
-                                      borderColor: "chakra-border-color",
-                                      py: 6,
-                                    },
-                                    "& .chakra-radio:last-child": {
-                                      borderBottom: "none",
-                                    },
-                                  }}
-                                >
-                                  <Radio value="1" display="flex" w="full">
-                                    <HStack w="full">
-                                      <Text>Pick up in store</Text>
-                                      <Text
-                                        ml="auto"
-                                        fontWeight="bold"
-                                        color="chakra-subtle-text"
-                                      >
-                                        [SHIPPING_COST]
-                                      </Text>
-                                    </HStack>
-                                  </Radio>
-                                  <Radio value="2">
-                                    <HStack>
-                                      <Text>Standard shipping</Text>
-                                      <Text
-                                        ml="auto"
-                                        fontWeight="bold"
-                                        color="chakra-subtle-text"
-                                      >
-                                        [SHIPPING_COST]
-                                      </Text>
-                                    </HStack>
-                                  </Radio>
-                                  <Radio value="3">
-                                    <HStack>
-                                      <Text>Express shipping</Text>
-                                      <Text
-                                        ml="auto"
-                                        fontWeight="bold"
-                                        color="chakra-subtle-text"
-                                      >
-                                        [SHIPPING_COST]
-                                      </Text>
-                                    </HStack>
-                                  </Radio>
-                                </Stack>
-                              </RadioGroup>
-                            </CardBody>
-                          </Card>
-                          <Button
-                            alignSelf="flex-end"
-                            onClick={handleNextTab}
-                            mt={6}
-                          >
-                            Continue to payment
-                          </Button>
+                        <TabPanel>
+                          <CartShippingPanel
+                            orderWorksheet={orderWorksheet}
+                            shippingAddress={shippingAddress}
+                            handleNextTab={handleNextTab}
+                            handlePrevTab={handlePrevTab}
+                          />
                         </TabPanel>
 
                         <TabPanel display="flex" flexDirection="column">
-                          <VStack
-                            alignItems="stretch"
-                            mt={3}
-                            gap={5}
-                            position="relative"
-                          >
-                            <Text
-                              zIndex={2}
-                              position="absolute"
-                              top="50%"
-                              left="50%"
-                              transform="translate(-50%, -50%)"
-                              fontSize="5xl"
-                              color="blackAlpha.300"
-                              backgroundColor="whiteAlpha.400"
-                              backdropFilter="auto"
-                              backdropBlur="2px"
-                              px="6"
-                              whiteSpace="nowrap"
-                            >
-                              Embed your payment service iframe
-                            </Text>
-                            <HStack justifyContent="space-between" gap={5}>
-                              <Skeleton
-                                rounded="0"
-                                w="200px"
-                                h="30px"
-                                mr="auto"
-                              />
-                              <Skeleton rounded="0" w="100px" h="30px" />
-                              <Skeleton rounded="0" w="100px" h="30px" />
-                              <Skeleton rounded="0" w="100px" h="30px" />
-                              <Skeleton rounded="0" w="100px" h="30px" />
-                            </HStack>
-                            <Skeleton rounded="0" w="full" h="40px" />
-                            <Skeleton rounded="0" w="full" h="40px" />
-                            <HStack justifyContent="space-between" gap={5}>
-                              <Skeleton rounded="0" w="full" h="40px" />
-                              <Skeleton rounded="0" w="full" h="40px" />
-                            </HStack>
-                          </VStack>
-                          <Button
-                            alignSelf="flex-end"
-                            onClick={submitOrder}
-                            mt={6}
-                            isDisabled={submitting}
-                          >
-                            {submitting ? "Submitting" : "Submit Order"}
-                          </Button>
+                          <CartPaymentPanel
+                            submitOrder={submitOrder}
+                            submitting={submitting}
+                          />
                         </TabPanel>
                       </TabPanels>
                     </Tabs>

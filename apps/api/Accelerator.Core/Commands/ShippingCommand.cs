@@ -19,6 +19,7 @@ namespace Accelerator.Commands
             {
                 new ()
                 {
+                    ID = Guid.NewGuid().ToString(),
                     ShipEstimateItems = payload.OrderWorksheet.LineItems.Select(li => new ShipEstimateItem() {LineItemID = li.ID, Quantity = li.Quantity}).ToList()
                 }
             };
@@ -53,6 +54,7 @@ namespace Accelerator.Commands
                 {
                     new()
                     {
+                        ID = rates[i][0].ID,
                         Name = rates[i][0].Name,
                         Cost = rates[i][0].Cost,
                         EstimatedTransitDays = rates[i][0].EstimatedTransitDays

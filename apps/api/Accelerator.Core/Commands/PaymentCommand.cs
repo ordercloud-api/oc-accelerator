@@ -55,5 +55,10 @@ namespace Accelerator.Commands
             });
             return updatedPayment;
         }
+
+        public async Task<string> GetIFrameCredentialsAsync()
+        {
+            return await creditCardProcessor.GetIFrameCredentialAsync();
+        }
     }
 }
