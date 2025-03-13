@@ -1,17 +1,42 @@
-import { Button, HStack, Skeleton, Text, VStack } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
+import { useMemo } from "react";
+import { PAYMENT_PROVIDER } from "../../../constants";
+import { BlueSnap } from "../Payment/BlueSnap";
+import { CardConnect } from "../Payment/CardConnect";
+import { PayPal } from "../Payment/PayPal";
+import { Stripe } from "../Payment/Stripe";
 
 type CartPaymentPanelProps = {
   submitOrder: () => void;
   submitting: boolean;
 };
 
+const PaymentMapper = (provider: string) => {
+  switch (provider) {
+    case "Stripe":
+      return <Stripe />;
+    case "CardConnect":
+      return <CardConnect />;
+    case "BlueSnap":
+      return <BlueSnap />;
+    case "PayPal":
+      return <PayPal />;
+    default:
+      null;
+  }
+};
+
 export const CartPaymentPanel = ({
   submitOrder,
   submitting,
 }: CartPaymentPanelProps) => {
+  const PaymentElement = useMemo(() => {
+    return PaymentMapper(PAYMENT_PROVIDER);
+  }, [PaymentMapper, PAYMENT_PROVIDER]);
+
   return (
     <>
-      <VStack alignItems="stretch" mt={3} gap={5} position="relative">
+      {/* <VStack alignItems="stretch" mt={3} gap={5} position="relative">
         <Text
           zIndex={2}
           position="absolute"
@@ -44,7 +69,8 @@ export const CartPaymentPanel = ({
           <Skeleton rounded="0" w="full" h="40px" />
           <Skeleton rounded="0" w="full" h="40px" />
         </HStack>
-      </VStack>
+      </VStack> */}
+      {PaymentElement}
 
       <Button
         alignSelf="flex-end"
