@@ -118,7 +118,10 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
   if (!shippingMethods.length) {
     return (
       <Card>
-        <CardBody>No shipping options available</CardBody>
+        <CardBody>
+          Shipping service unavailable, please contact your site admin and try
+          again later
+        </CardBody>
       </Card>
     );
   }

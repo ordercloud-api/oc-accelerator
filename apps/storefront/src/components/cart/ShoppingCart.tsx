@@ -25,11 +25,11 @@ import {
 } from "ordercloud-javascript-sdk";
 import { useCallback, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { CartInformationPanel } from "./CartPanels/CartInformationPanel";
-import { CartPaymentPanel } from "./CartPanels/CartPaymentPanel";
+import { CartInformationPanel } from "./cart-panels/CartInformationPanel";
+import { CartPaymentPanel } from "./cart-panels/CartPaymentPanel";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
-import CartShippingPanel from "./CartPanels/CartShippingPanel";
+import CartShippingPanel from "./cart-panels/CartShippingPanel";
 
 export const TABS = {
   INFORMATION: 0,

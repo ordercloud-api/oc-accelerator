@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@chakra-ui/cli": "^2.5.7",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@fontsource-variable/dm-sans": "^5.0.7",

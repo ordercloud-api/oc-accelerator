@@ -17,7 +17,7 @@ import {
   OrderPromotion,
   RequiredDeep,
 } from "ordercloud-javascript-sdk";
-import React, { FormEvent, useCallback, useState } from "react";
+import React, { FormEvent, useCallback, useEffect, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
 import { useShopper } from "@ordercloud/react-sdk";
@@ -46,6 +46,36 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     console.log("Line item updated:", newLi);
   };
   const toast = useToast();
+
+  const [taxCost, setTaxCost] = useState(null);
+  console.log("🚀 ~ taxCost:", taxCost)
+
+  // useEffect(() => {
+  //   const fetchTaxCost = async () => {
+  //     const orderID = order?.ID;
+  //     if (!orderID) return;
+
+  //     try {
+  //       const response = await fetch(`/api/ordercalculate?orderID=${orderID}`);
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch tax cost");
+  //       }
+
+  //       const data = await response.json();
+  //       const taxCost = data?.TaxCost;
+
+  //       if (taxCost !== undefined) {
+  //         setTaxCost(taxCost);
+  //       } else {
+  //         console.warn("No tax cost found in response.");
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to fetch tax cost:", err);
+  //     }
+  //   };
+
+  //   fetchTaxCost();
+  // }, [order]);
 
   const handleApplyPromotion = useCallback(
     (e: FormEvent) => {
@@ -159,6 +189,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               ? "FREE SHIPPING"
               : "$" + order.ShippingCost}
           </Text>
+        </Flex>
+        <Flex justify="space-between">
+          <Text>Tax</Text>
+          {tabIndex !== TABS.SHIPPING ||
+            (tabIndex !== TABS.INFORMATION && <Text></Text>)}
+          <Text>{taxCost}</Text>
         </Flex>
         <Flex justify="space-between" fontWeight="bold" fontSize="lg">
           <Text>Total</Text>
