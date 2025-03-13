@@ -61,6 +61,42 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
     fetchShippingEstimates();
   }, [orderWorksheet, shippingAddress]);
 
+  const handleShippingMethod = async () => {
+    const orderID = orderWorksheet?.Order?.ID;
+    const shipEstimateID =
+      orderWorksheet?.ShipEstimateResponse?.ShipEstimates?.at(0)?.ID;
+    const selectedMethod = shippingMethods[parseInt(selectedMethodIndex)];
+
+    if (!orderID || !selectedMethod || !shipEstimateID) {
+      console.error("Missing required data for ship method selection.");
+      return;
+    }
+
+    try {
+      await IntegrationEvents.SelectShipmethods("Outgoing", orderID, {
+        ShipMethodSelections: [
+          {
+            ShipEstimateID: shipEstimateID,
+            ShipMethodID: selectedMethod.ID,
+          },
+        ],
+      });
+
+      const updatedWorksheet = await IntegrationEvents.GetWorksheet(
+        "Outgoing",
+        orderID
+      );
+      console.log(
+        "Updated Worksheet after ShipMethodSelection:",
+        updatedWorksheet
+      );
+
+      handleNextTab();
+    } catch (err) {
+      console.error("Failed to save shipping method:", err);
+    }
+  };
+
   const handleChange = (value: string) => {
     setSelectedMethodIndex(value);
     const selected = shippingMethods[parseInt(value)];
@@ -129,7 +165,7 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
           </RadioGroup>
         </CardBody>
       </Card>
-      <Button alignSelf="flex-end" mt={6}>
+      <Button alignSelf="flex-end" mt={6} onClick={handleShippingMethod}>
         Continue to payment
       </Button>
     </VStack>
