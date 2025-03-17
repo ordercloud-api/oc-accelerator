@@ -8,7 +8,7 @@ import {
 import { useOrderCloudContext } from "@ordercloud/react-sdk";
 import { FC, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import LoginModal from "../components/Login/LoginModal";
+import LoginModal from "../components/login/LoginModal";
 import MainMenu from "./MainMenu";
 
 const Layout: FC = () => {

@@ -11,6 +11,7 @@ import {
   VStack,
   useToast,
 } from "@chakra-ui/react";
+import { useShopper } from "@ordercloud/react-sdk";
 import {
   LineItem,
   Order,
@@ -20,7 +21,6 @@ import {
 import React, { FormEvent, useCallback, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
-import { useShopper } from "@ordercloud/react-sdk";
 import { TABS } from "./ShoppingCart";
 
 interface CartSummaryProps {
@@ -46,6 +46,35 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     console.log("Line item updated:", newLi);
   };
   const toast = useToast();
+  // TODO: tax blocked by work on .NET functions
+  // const [taxCost, setTaxCost] = useState(null);
+
+  // useEffect(() => {
+  //   const fetchTaxCost = async () => {
+  //     const orderID = order?.ID;
+  //     if (!orderID) return;
+
+  //     try {
+  //       const response = await fetch(`/api/ordercalculate?orderID=${orderID}`);
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch tax cost");
+  //       }
+
+  //       const data = await response.json();
+  //       const taxCost = data?.TaxCost;
+
+  //       if (taxCost !== undefined) {
+  //         setTaxCost(taxCost);
+  //       } else {
+  //         console.warn("No tax cost found in response.");
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to fetch tax cost:", err);
+  //     }
+  //   };
+
+  //   fetchTaxCost();
+  // }, [order]);
 
   const handleApplyPromotion = useCallback(
     (e: FormEvent) => {
@@ -160,6 +189,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               : "$" + order.ShippingCost}
           </Text>
         </Flex>
+        {/* <Flex justify="space-between">
+          <Text>Tax</Text>
+          {tabIndex !== TABS.SHIPPING ||
+            (tabIndex !== TABS.INFORMATION && <Text></Text>)}
+          <Text>{taxCost}</Text>
+        </Flex> */}
         <Flex justify="space-between" fontWeight="bold" fontSize="lg">
           <Text>Total</Text>
           <Text>${order.Total?.toFixed(2)}</Text>
