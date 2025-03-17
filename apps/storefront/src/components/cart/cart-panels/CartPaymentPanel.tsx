@@ -1,6 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import { useMemo } from "react";
-import { PAYMENT_PROVIDER } from "../../../constants";
+import { PAYMENT_PROVIDER, PAYMENT_PROVIDERS } from "../../../constants";
 import { BlueSnap } from "../payment/BlueSnap";
 import { CardConnect } from "../payment/CardConnect";
 import { PayPal } from "../payment/PayPal";
@@ -13,13 +13,13 @@ type CartPaymentPanelProps = {
 
 const PaymentMapper = (provider: string) => {
   switch (provider) {
-    case "Stripe":
+    case PAYMENT_PROVIDERS.STRIPE:
       return <Stripe />;
-    case "CardConnect":
+    case PAYMENT_PROVIDERS.CARD_CONNECT:
       return <CardConnect />;
-    case "BlueSnap":
+    case PAYMENT_PROVIDERS.BLUESNAP:
       return <BlueSnap />;
-    case "PayPal":
+    case PAYMENT_PROVIDERS.PAYPAL:
       return <PayPal />;
     default:
       null;
