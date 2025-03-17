@@ -8,13 +8,9 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import {
-  Address,
-  IntegrationEvents,
-  OrderWorksheet,
-  ShipMethod,
-} from "ordercloud-javascript-sdk";
-import React, { useEffect, useState } from "react";
+import { Address, OrderWorksheet } from "ordercloud-javascript-sdk";
+import React from "react";
+import { useShippingMethods } from "../../../hooks/useShippingMethods";
 
 interface CartShippingPanelProps {
   orderWorksheet: OrderWorksheet;
@@ -28,78 +24,35 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
   shippingAddress,
   handleNextTab,
 }) => {
-  const [shippingMethods, setShippingMethods] = useState<ShipMethod[]>([]);
-  const [selectedMethodIndex, setSelectedMethodIndex] = useState<string>("0");
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchShippingEstimates = async () => {
-      const orderID = orderWorksheet?.Order?.ID;
-      if (!orderID || !shippingAddress) return;
-
-      setLoading(true);
-      try {
-        const worksheet = await IntegrationEvents.GetWorksheet(
-          "Outgoing",
-          orderID
-        );
-        const methods =
-          worksheet?.ShipEstimateResponse?.ShipEstimates?.[0]?.ShipMethods ||
-          [];
-        setShippingMethods(methods);
-
-        if (methods.length > 0) {
-          setSelectedMethodIndex("0");
-        }
-      } catch (err) {
-        console.error("Failed to fetch shipping estimates:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchShippingEstimates();
-  }, [orderWorksheet, shippingAddress]);
+  const {
+    availableMethods,
+    selectedMethodIndex,
+    selectShipMethod,
+    error,
+    loading,
+  } = useShippingMethods({ orderWorksheet, shippingAddress });
 
   const handleShippingMethod = async () => {
     const orderID = orderWorksheet?.Order?.ID;
     const shipEstimateID =
       orderWorksheet?.ShipEstimateResponse?.ShipEstimates?.at(0)?.ID;
-    const selectedMethod = shippingMethods[parseInt(selectedMethodIndex)];
 
-    if (!orderID || !selectedMethod || !shipEstimateID) {
+    if (!orderID || !selectedMethodIndex || !shipEstimateID) {
       console.error("Missing required data for ship method selection.");
       return;
     }
 
-    try {
-      await IntegrationEvents.SelectShipmethods("Outgoing", orderID, {
-        ShipMethodSelections: [
-          {
-            ShipEstimateID: shipEstimateID,
-            ShipMethodID: selectedMethod.ID,
-          },
-        ],
-      });
+    const selectedMethod = availableMethods[parseInt(selectedMethodIndex)];
 
-      const updatedWorksheet = await IntegrationEvents.GetWorksheet(
-        "Outgoing",
-        orderID
-      );
-      console.log(
-        "Updated Worksheet after ShipMethodSelection:",
-        updatedWorksheet
-      );
-
-      handleNextTab();
-    } catch (err) {
-      console.error("Failed to save shipping method:", err);
+    if (!selectedMethod) {
+      console.error("Selected method not found.");
+      return;
     }
   };
 
   const handleChange = (value: string) => {
-    setSelectedMethodIndex(value);
-    const selected = shippingMethods[parseInt(value)];
+    selectShipMethod(value);
+    const selected = availableMethods[parseInt(value)];
     console.log("Selected shipping method:", selected);
     handleNextTab();
   };
@@ -115,7 +68,7 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
     );
   }
 
-  if (!shippingMethods.length) {
+  if (error) {
     return (
       <Card>
         <CardBody>
@@ -139,12 +92,12 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
                 gap: "3",
               },
             }}
-            value={selectedMethodIndex}
+            value={selectedMethodIndex || undefined}
             onChange={handleChange}
             as={VStack}
           >
-            {shippingMethods.map((method, index) => (
-              <Radio key={index} value={index.toString()} w="full" gap="3">
+            {availableMethods.map((method, index) => (
+              <Radio key={method.ID} value={index.toString()} w="full" gap="3">
                 <VStack align="flex-start" gap="0" flexGrow="1">
                   <Text fontSize="lg" fontWeight="semibold">
                     {method.Name}
