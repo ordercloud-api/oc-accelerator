@@ -11,7 +11,7 @@ type CartPaymentPanelProps = {
   submitting: boolean;
 };
 
-const PaymentMapper = (provider: string) => {
+const PaymentMapper = (provider: PAYMENT_PROVIDERS) => {
   switch (provider) {
     case PAYMENT_PROVIDERS.STRIPE:
       return <Stripe />;

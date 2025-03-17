@@ -11,16 +11,16 @@ import {
   VStack,
   useToast,
 } from "@chakra-ui/react";
+import { useShopper } from "@ordercloud/react-sdk";
 import {
   LineItem,
   Order,
   OrderPromotion,
   RequiredDeep,
 } from "ordercloud-javascript-sdk";
-import React, { FormEvent, useCallback, useEffect, useState } from "react";
+import React, { FormEvent, useCallback, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
-import { useShopper } from "@ordercloud/react-sdk";
 import { TABS } from "./ShoppingCart";
 
 interface CartSummaryProps {
@@ -46,9 +46,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     console.log("Line item updated:", newLi);
   };
   const toast = useToast();
-
-  const [taxCost, setTaxCost] = useState(null);
-  console.log("🚀 ~ taxCost:", taxCost)
+  // TODO: tax blocked by work on .NET functions
+  // const [taxCost, setTaxCost] = useState(null);
 
   // useEffect(() => {
   //   const fetchTaxCost = async () => {
@@ -190,12 +189,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
               : "$" + order.ShippingCost}
           </Text>
         </Flex>
-        <Flex justify="space-between">
+        {/* <Flex justify="space-between">
           <Text>Tax</Text>
           {tabIndex !== TABS.SHIPPING ||
             (tabIndex !== TABS.INFORMATION && <Text></Text>)}
           <Text>{taxCost}</Text>
-        </Flex>
+        </Flex> */}
         <Flex justify="space-between" fontWeight="bold" fontSize="lg">
           <Text>Total</Text>
           <Text>${order.Total?.toFixed(2)}</Text>
