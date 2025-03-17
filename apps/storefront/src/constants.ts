@@ -67,26 +67,12 @@ const DASHBOARD_TERTIARY_CTA_TEXT =
 const DASHBOARD_TERTIARY_CTA_LINK = import.meta.env
   .VITE_APP_ORDERCLOUD_DASHBOARD_TERTIARY_CTA_LINK;
 
-const CARD_CONNECT = "CardConnect";
-type CARD_CONNECT = typeof CARD_CONNECT;
-
-const PAYPAL = "PayPal";
-type PAYPAL = typeof PAYPAL;
-
-const STRIPE = "Stripe";
-type STRIPE = typeof STRIPE;
-
-const BLUESNAP = "BlueSnap";
-type BLUESNAP = typeof BLUESNAP;
-
-enum PAYMENT_PROVIDERS {
-  CARD_CONNECT = "CardConnect",
-  PAYPAL = "PayPal",
-  STRIPE = "Stripe",
-  BLUESNAP = "BlueSnap",
+  enum PAYMENT_PROVIDERS {
+  CARD_CONNECT,
+  PAYPAL,
+  STRIPE,
+  BLUESNAP,
 }
-
-type PAYMENT_PROVIDER = CARD_CONNECT | PAYPAL | STRIPE | BLUESNAP;
 
 const PAYMENT_PROVIDER = import.meta.env.VITE_APP_PAYMENT_PROVIDER as PAYMENT_PROVIDERS;
 
