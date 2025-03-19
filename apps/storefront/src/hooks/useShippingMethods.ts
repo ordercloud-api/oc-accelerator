@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Address,
   IntegrationEvents,
@@ -9,8 +9,24 @@ import {
 
 interface useShippingMethodProps {
   orderWorksheet: OrderWorksheet;
-  shippingAddress: Address;
+  shippingAddress: Address | null;
 }
+
+const hasRequiredFields = (
+  address: Address | null,
+  formElements: HTMLFormElement | null
+): boolean => {
+  if (!address || !formElements) return false;
+
+  const requiredFields = Array.from(formElements.elements).filter(
+    (el) => el instanceof HTMLInputElement && el.required
+  );
+
+  return requiredFields.every((field) => {
+    const key = (field as HTMLInputElement).name;
+    return address[key as keyof Address];
+  });
+};
 
 export const useShippingMethods = ({
   orderWorksheet,
@@ -25,9 +41,14 @@ export const useShippingMethods = ({
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const formRef = useRef<HTMLFormElement>(null);
+
   const fetchShippingMethods = useCallback(async () => {
     const orderID = orderWorksheet?.Order?.ID;
-    if (!orderID || !shippingAddress) return;
+
+    if (!orderID || !shippingAddress || !hasRequiredFields(shippingAddress, formRef.current)) {
+      return;
+    }
 
     setLoading(true);
     try {
@@ -66,5 +87,6 @@ export const useShippingMethods = ({
     selectShipMethod,
     error,
     loading,
+    formRef,
   };
 };
