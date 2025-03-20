@@ -1,87 +1,52 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useShopper } from "@ordercloud/react-sdk";
 import {
-  Address,
   IntegrationEvents,
-  OrderWorksheet,
-  RequiredDeep,
-  ShipMethod,
+  OrderShipMethodSelection,
+  ShipMethodSelection,
 } from "ordercloud-javascript-sdk";
+import { useMemo, useState } from "react";
 
-interface useShippingMethodProps {
-  orderWorksheet: OrderWorksheet;
-  shippingAddress: Address | null;
-}
-
-export const useShippingMethods = ({
-  orderWorksheet,
-  shippingAddress,
-}: useShippingMethodProps) => {
-  const [availableMethods, setAvailableMethods] = useState<
-    RequiredDeep<ShipMethod<unknown>>[]
-  >([]);
-  const [selectedMethodIndex, setSelectedMethodIndex] = useState<string | null>(
-    null
-  );
+export const useShippingMethods = () => {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
-  const orderIdRef = useRef(orderWorksheet?.Order?.ID);
-  const addressRef = useRef(shippingAddress);
 
-  useEffect(() => {
-    orderIdRef.current = orderWorksheet?.Order?.ID;
-    addressRef.current = shippingAddress;
-  }, [orderWorksheet?.Order?.ID, shippingAddress]);
+  const { orderWorksheet } = useShopper();
 
-  const fetchShippingMethods = useCallback(async () => {
-    const orderID = orderIdRef.current;
-    const address = addressRef.current;
-
-    console.log("Order ID:", orderID);
-    console.log("Shipping Address:", address);
-
-    if (!orderID || !address) {
-      console.log("Missing required data for shipping methods.");
-      return;
-    }
-
+  const selectShipMethods = async (shipMethodID: string) => {
     setLoading(true);
+    const ShipMethodSelection: ShipMethodSelection = {
+      ShipEstimateID:
+        orderWorksheet?.ShipEstimateResponse.ShipEstimates.at(0)?.ID,
+      ShipMethodID: shipMethodID,
+    };
+    const shipMethodSelection: OrderShipMethodSelection = {
+      ShipMethodSelections: [ShipMethodSelection],
+    };
+    if (!orderWorksheet) return;
     try {
-      const worksheet = await IntegrationEvents.GetWorksheet(
+      await IntegrationEvents.SelectShipmethods(
         "Outgoing",
-        orderID
+        orderWorksheet?.Order.ID,
+        shipMethodSelection
       );
-      const methods =
-        worksheet?.ShipEstimateResponse?.ShipEstimates?.[0]?.ShipMethods || [];
-      setAvailableMethods(methods);
-      if (methods.length > 0) {
-        setSelectedMethodIndex("0");
-      }
-    } catch (err) {
-      const error = err as Error;
-      console.error("Failed to fetch shipping estimates:", error);
-      setError(error);
-    } finally {
       setLoading(false);
+    } catch (err) {
+      console.error("Failed to save shipping address:", err);
+      setLoading(false);
+      setError(err as Error);
     }
-  }, []);
-
-  useEffect(() => {
-    if (shippingAddress && Object.keys(shippingAddress).length > 0) {
-      fetchShippingMethods();
-    }
-  }, []);
-
-  const selectShipMethod = (index: string) => {
-    setSelectedMethodIndex(index);
   };
+
+  const availableShipMethods = useMemo(
+    () =>
+      orderWorksheet?.ShipEstimateResponse?.ShipEstimates?.at(0)?.ShipMethods,
+    [orderWorksheet]
+  );
+
   return {
-    availableMethods,
-    selectedMethodIndex,
-    selectShipMethod,
     error,
+    selectShipMethods,
+    availableShipMethods,
     loading,
-    formRef,
-    validateAndFetchShippingMethods: fetchShippingMethods,
   };
 };

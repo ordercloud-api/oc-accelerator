@@ -1,8 +1,8 @@
 import {
   Button,
   FormControl,
-  FormLabel,
   FormErrorMessage,
+  FormLabel,
   Heading,
   HStack,
   Input,
@@ -10,10 +10,9 @@ import {
   Stack,
   VStack,
 } from "@chakra-ui/react";
-import { DebouncedInput } from "../../shared/DebouncedInput";
 import { Address, OrderWorksheet } from "ordercloud-javascript-sdk";
 import { Dispatch, SetStateAction, useState } from "react";
-import { useShippingMethods } from "../../../hooks/useShippingMethods";
+import { DebouncedInput } from "../../shared/DebouncedInput";
 
 type CartInformationPanelProps = {
   shippingAddress: Address;
@@ -26,13 +25,8 @@ export const CartInformationPanel = ({
   shippingAddress,
   setShippingAddress,
   handleSaveShippingAddress,
-  orderWorksheet,
 }: CartInformationPanelProps) => {
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
-  const { formRef, validateAndFetchShippingMethods } = useShippingMethods({
-    orderWorksheet,
-    shippingAddress,
-  });
+  const [formErrors, setFormErrors] = useState<Record<string, boolean>>({});
 
   const formatPhoneNumber = (value: string) => {
     const cleaned = value.replace(/\D/g, ""); // Remove all non-digit characters
@@ -56,7 +50,7 @@ export const CartInformationPanel = ({
       ...shippingAddress,
       Phone: rawValue,
     });
-    setErrors((prev) => ({
+    setFormErrors((prev) => ({
       ...prev,
       Phone: rawValue.length !== 10,
     }));
@@ -72,19 +66,18 @@ export const CartInformationPanel = ({
       }
     });
 
-    setErrors(newErrors);
+    setFormErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleFormSubmit = () => {
     if (validateFields()) {
       handleSaveShippingAddress();
-      validateAndFetchShippingMethods();
     }
   };
 
   return (
-    <VStack alignItems="stretch" as="form" ref={formRef}>
+    <VStack alignItems="stretch" as="form">
       <Stack direction={["column", "row"]} spacing={6}>
         <DebouncedInput
           name="Phone"
@@ -99,7 +92,7 @@ export const CartInformationPanel = ({
       </Heading>
 
       <Stack direction={["column", "row"]} spacing={6}>
-        <FormControl isInvalid={errors.FirstName}>
+        <FormControl isInvalid={formErrors.FirstName}>
           <FormLabel>First Name</FormLabel>
           <Input
             name="FirstName"
@@ -112,12 +105,12 @@ export const CartInformationPanel = ({
               })
             }
           />
-          {errors.FirstName && (
+          {formErrors.FirstName && (
             <FormErrorMessage>First Name is required.</FormErrorMessage>
           )}
         </FormControl>
 
-        <FormControl isInvalid={errors.LastName}>
+        <FormControl isInvalid={formErrors.LastName}>
           <FormLabel>Last Name</FormLabel>
           <Input
             name="LastName"
@@ -130,7 +123,7 @@ export const CartInformationPanel = ({
               })
             }
           />
-          {errors.LastName && (
+          {formErrors.LastName && (
             <FormErrorMessage>Last Name is required.</FormErrorMessage>
           )}
         </FormControl>
@@ -152,7 +145,7 @@ export const CartInformationPanel = ({
       </FormControl>
 
       <HStack gap="6">
-        <FormControl isRequired isInvalid={errors.Street1}>
+        <FormControl isRequired isInvalid={formErrors.Street1}>
           <FormLabel>Street 1</FormLabel>
           <Input
             name="Street1"
@@ -165,7 +158,7 @@ export const CartInformationPanel = ({
               })
             }
           />
-          {errors.Street1 && (
+          {formErrors.Street1 && (
             <FormErrorMessage>Street 1 is required.</FormErrorMessage>
           )}
         </FormControl>
@@ -187,7 +180,7 @@ export const CartInformationPanel = ({
       </HStack>
 
       <Stack direction={["column", "row"]} spacing={6}>
-        <FormControl isRequired isInvalid={errors.City}>
+        <FormControl isRequired isInvalid={formErrors.City}>
           <FormLabel>City</FormLabel>
           <Input
             name="City"
@@ -200,12 +193,12 @@ export const CartInformationPanel = ({
               })
             }
           />
-          {errors.City && (
+          {formErrors.City && (
             <FormErrorMessage>City is required.</FormErrorMessage>
           )}
         </FormControl>
 
-        <FormControl isRequired isInvalid={errors.State}>
+        <FormControl isRequired isInvalid={formErrors.State}>
           <FormLabel>State</FormLabel>
           <Select
             name="State"
@@ -269,12 +262,12 @@ export const CartInformationPanel = ({
             <option value="Wisconsin">Wisconsin</option>
             <option value="Wyoming">Wyoming</option>
           </Select>
-          {errors.State && (
+          {formErrors.State && (
             <FormErrorMessage>State is required.</FormErrorMessage>
           )}
         </FormControl>
 
-        <FormControl flexBasis="50%" isRequired isInvalid={errors.Zip}>
+        <FormControl flexBasis="50%" isRequired isInvalid={formErrors.Zip}>
           <FormLabel>Zip</FormLabel>
           <Input
             placeholder="Enter zip"
@@ -286,7 +279,7 @@ export const CartInformationPanel = ({
               })
             }
           />
-          {errors.Zip && <FormErrorMessage>Zip is required.</FormErrorMessage>}
+          {formErrors.Zip && <FormErrorMessage>Zip is required.</FormErrorMessage>}
         </FormControl>
       </Stack>
 
