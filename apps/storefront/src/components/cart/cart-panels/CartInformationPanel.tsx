@@ -10,21 +10,57 @@ import {
   Stack,
   VStack,
 } from "@chakra-ui/react";
-import { Address } from "ordercloud-javascript-sdk";
+import { DebouncedInput } from "../../shared/DebouncedInput";
+import { Address, OrderWorksheet } from "ordercloud-javascript-sdk";
 import { Dispatch, SetStateAction, useState } from "react";
+import { useShippingMethods } from "../../../hooks/useShippingMethods";
 
 type CartInformationPanelProps = {
   shippingAddress: Address;
   setShippingAddress: Dispatch<SetStateAction<Address>>;
   handleSaveShippingAddress: () => void;
+  orderWorksheet: OrderWorksheet;
 };
 
 export const CartInformationPanel = ({
   shippingAddress,
   setShippingAddress,
   handleSaveShippingAddress,
+  orderWorksheet,
 }: CartInformationPanelProps) => {
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const { formRef, validateAndFetchShippingMethods } = useShippingMethods({
+    orderWorksheet,
+    shippingAddress,
+  });
+
+  const formatPhoneNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, ""); // Remove all non-digit characters
+    const trimmed = cleaned.slice(0, 10); // Limit to 10 digits
+    const match = trimmed.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/); // Format for display
+
+    if (!match) return trimmed;
+
+    const [, area, prefix, line] = match;
+
+    if (!area) return "";
+    if (!prefix) return `(${area}`;
+    if (!line) return `(${area}) ${prefix}`;
+
+    return `(${area}) ${prefix}-${line}`;
+  };
+
+  const handlePhoneChange = (value: string | number) => {
+    const rawValue = value.toString().replace(/\D/g, "").slice(0, 10);
+    setShippingAddress({
+      ...shippingAddress,
+      Phone: rawValue,
+    });
+    setErrors((prev) => ({
+      ...prev,
+      Phone: rawValue.length !== 10,
+    }));
+  };
 
   const validateFields = () => {
     const newErrors: Record<string, boolean> = {};
@@ -51,28 +87,19 @@ export const CartInformationPanel = ({
   const handleFormSubmit = () => {
     if (validateFields()) {
       handleSaveShippingAddress();
+      validateAndFetchShippingMethods();
     }
   };
 
   return (
-    <VStack alignItems="stretch" as="form">
+    <VStack alignItems="stretch" as="form" ref={formRef}>
       <Stack direction={["column", "row"]} spacing={6}>
-        <FormControl flexBasis="75%" isInvalid={errors.Phone} isRequired>
-          <FormLabel>Phone</FormLabel>
-          <Input
-            placeholder="Phone"
-            value={shippingAddress?.Phone || ""}
-            onChange={(e) =>
-              setShippingAddress({
-                ...shippingAddress,
-                Phone: e.target.value,
-              })
-            }
-          />
-          {errors.Phone && (
-            <FormErrorMessage>Phone is required.</FormErrorMessage>
-          )}
-        </FormControl>
+        <DebouncedInput
+          name="Phone"
+          placeholder="(555) 555-5555"
+          value={formatPhoneNumber(shippingAddress?.Phone || "")}
+          onChange={handlePhoneChange}
+        />
       </Stack>
 
       <Heading size="md" my={6}>
@@ -83,6 +110,7 @@ export const CartInformationPanel = ({
         <FormControl isRequired isInvalid={errors.FirstName}>
           <FormLabel>First Name</FormLabel>
           <Input
+            name="FirstName"
             placeholder="Enter first name"
             value={shippingAddress?.FirstName || ""}
             onChange={(e) =>
@@ -100,6 +128,7 @@ export const CartInformationPanel = ({
         <FormControl isRequired isInvalid={errors.LastName}>
           <FormLabel>Last Name</FormLabel>
           <Input
+            name="LastName"
             placeholder="Enter last name"
             value={shippingAddress?.LastName || ""}
             onChange={(e) =>
@@ -118,6 +147,7 @@ export const CartInformationPanel = ({
       <FormControl>
         <FormLabel>Company (optional)</FormLabel>
         <Input
+          name="CompanyName"
           placeholder="Enter company name"
           value={shippingAddress?.CompanyName || ""}
           onChange={(e) =>
@@ -133,6 +163,7 @@ export const CartInformationPanel = ({
         <FormControl isRequired isInvalid={errors.Street1}>
           <FormLabel>Street 1</FormLabel>
           <Input
+            name="Street1"
             placeholder="Enter street"
             value={shippingAddress?.Street1 || ""}
             onChange={(e) =>
@@ -150,6 +181,7 @@ export const CartInformationPanel = ({
         <FormControl flexBasis="75%">
           <FormLabel>Street 2</FormLabel>
           <Input
+            name="Street2"
             placeholder="Enter address"
             value={shippingAddress?.Street2 || ""}
             onChange={(e) =>
@@ -166,6 +198,7 @@ export const CartInformationPanel = ({
         <FormControl isRequired isInvalid={errors.City}>
           <FormLabel>City</FormLabel>
           <Input
+            name="City"
             placeholder="Enter city"
             value={shippingAddress?.City || ""}
             onChange={(e) =>
@@ -183,7 +216,8 @@ export const CartInformationPanel = ({
         <FormControl isRequired isInvalid={errors.State}>
           <FormLabel>State</FormLabel>
           <Select
-            placeholder="Select state/territory"
+            name="State"
+            placeholder="Select state"
             value={shippingAddress?.State || ""}
             onChange={(e) =>
               setShippingAddress({
@@ -192,7 +226,56 @@ export const CartInformationPanel = ({
               })
             }
           >
-            <option value="MN">Minnesota</option>
+            <option value="Alabama">Alabama</option>
+            <option value="Alaska">Alaska</option>
+            <option value="Arizona">Arizona</option>
+            <option value="Arkansas">Arkansas</option>
+            <option value="California">California</option>
+            <option value="Colorado">Colorado</option>
+            <option value="Connecticut">Connecticut</option>
+            <option value="Delaware">Delaware</option>
+            <option value="Florida">Florida</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Hawaii">Hawaii</option>
+            <option value="Idaho">Idaho</option>
+            <option value="Illinois">Illinois</option>
+            <option value="Indiana">Indiana</option>
+            <option value="Iowa">Iowa</option>
+            <option value="Kansas">Kansas</option>
+            <option value="Kentucky">Kentucky</option>
+            <option value="Louisiana">Louisiana</option>
+            <option value="Maine">Maine</option>
+            <option value="Maryland">Maryland</option>
+            <option value="Massachusetts">Massachusetts</option>
+            <option value="Michigan">Michigan</option>
+            <option value="Minnesota">Minnesota</option>
+            <option value="Mississippi">Mississippi</option>
+            <option value="Missouri">Missouri</option>
+            <option value="Montana">Montana</option>
+            <option value="Nebraska">Nebraska</option>
+            <option value="Nevada">Nevada</option>
+            <option value="New Hampshire">New Hampshire</option>
+            <option value="New Jersey">New Jersey</option>
+            <option value="New Mexico">New Mexico</option>
+            <option value="New York">New York</option>
+            <option value="North Carolina">North Carolina</option>
+            <option value="North Dakota">North Dakota</option>
+            <option value="Ohio">Ohio</option>
+            <option value="Oklahoma">Oklahoma</option>
+            <option value="Oregon">Oregon</option>
+            <option value="Pennsylvania">Pennsylvania</option>
+            <option value="Rhode Island">Rhode Island</option>
+            <option value="South Carolina">South Carolina</option>
+            <option value="South Dakota">South Dakota</option>
+            <option value="Tennessee">Tennessee</option>
+            <option value="Texas">Texas</option>
+            <option value="Utah">Utah</option>
+            <option value="Vermont">Vermont</option>
+            <option value="Virginia">Virginia</option>
+            <option value="Washington">Washington</option>
+            <option value="West Virginia">West Virginia</option>
+            <option value="Wisconsin">Wisconsin</option>
+            <option value="Wyoming">Wyoming</option>
           </Select>
           {errors.State && (
             <FormErrorMessage>State is required.</FormErrorMessage>
