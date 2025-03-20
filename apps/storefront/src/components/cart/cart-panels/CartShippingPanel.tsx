@@ -8,27 +8,26 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useShopper } from "@ordercloud/react-sdk";
 import {
   Address,
-  OrderWorksheet,
-  ShipMethod
+  IntegrationEvents,
+  ShipMethod,
 } from "ordercloud-javascript-sdk";
 import React from "react";
 import { useShippingMethods } from "../../../hooks/useShippingMethods";
 
 interface CartShippingPanelProps {
-  orderWorksheet: OrderWorksheet;
   shippingAddress: Address;
   handleNextTab: () => void;
   handlePrevTab: () => void;
 }
 
 const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
-  orderWorksheet,
   handleNextTab,
 }) => {
-  const { selectShipMethods, availableShipMethods, error, loading } =
-    useShippingMethods();
+  const { selectShipMethods, error, loading } = useShippingMethods();
+  const { orderWorksheet, refreshWorksheet } = useShopper();
 
   const [shipMethodID, setShipMethodID] = React.useState<string>();
 
@@ -48,7 +47,8 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
     }
 
     await selectShipMethods(shipMethodID);
-
+    await IntegrationEvents.Calculate("Outgoing", orderID);
+    await refreshWorksheet();
     handleNextTab();
   };
 
@@ -95,7 +95,9 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
             onChange={handleChange}
             as={VStack}
           >
-            {availableShipMethods?.map((method: ShipMethod) => (
+            {orderWorksheet?.ShipEstimateResponse?.ShipEstimates?.at(
+              0
+            )?.ShipMethods?.map((method: ShipMethod) => (
               <Radio key={method.ID} value={method?.ID} w="full" gap="3">
                 <VStack align="flex-start" gap="0" flexGrow="1">
                   <Text fontSize="lg" fontWeight="semibold">

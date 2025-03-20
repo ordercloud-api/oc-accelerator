@@ -4,7 +4,7 @@ import {
   OrderShipMethodSelection,
   ShipMethodSelection,
 } from "ordercloud-javascript-sdk";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 export const useShippingMethods = () => {
   const [error, setError] = useState<Error | null>(null);
@@ -37,16 +37,9 @@ export const useShippingMethods = () => {
     }
   };
 
-  const availableShipMethods = useMemo(
-    () =>
-      orderWorksheet?.ShipEstimateResponse?.ShipEstimates?.at(0)?.ShipMethods,
-    [orderWorksheet]
-  );
-
   return {
     error,
     selectShipMethods,
-    availableShipMethods,
     loading,
   };
 };

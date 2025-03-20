@@ -10,7 +10,7 @@ import {
   Stack,
   VStack,
 } from "@chakra-ui/react";
-import { Address, OrderWorksheet } from "ordercloud-javascript-sdk";
+import { Address } from "ordercloud-javascript-sdk";
 import { Dispatch, SetStateAction, useState } from "react";
 import { DebouncedInput } from "../../shared/DebouncedInput";
 
@@ -18,7 +18,6 @@ type CartInformationPanelProps = {
   shippingAddress: Address;
   setShippingAddress: Dispatch<SetStateAction<Address>>;
   handleSaveShippingAddress: () => void;
-  orderWorksheet: OrderWorksheet;
 };
 
 export const CartInformationPanel = ({
@@ -279,7 +278,9 @@ export const CartInformationPanel = ({
               })
             }
           />
-          {formErrors.Zip && <FormErrorMessage>Zip is required.</FormErrorMessage>}
+          {formErrors.Zip && (
+            <FormErrorMessage>Zip is required.</FormErrorMessage>
+          )}
         </FormControl>
       </Stack>
 

@@ -39,8 +39,13 @@ export const ShoppingCart = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
 
-  const { orderWorksheet, worksheetLoading, deleteCart, submitCart } =
-    useShopper();
+  const {
+    orderWorksheet,
+    worksheetLoading,
+    deleteCart,
+    submitCart,
+    refreshWorksheet,
+  } = useShopper();
 
 
   const [shippingAddress, setShippingAddress] = useState<Address>({
@@ -103,14 +108,14 @@ export const ShoppingCart = (): JSX.Element => {
     const orderID = orderWorksheet?.Order?.ID;
     if (!orderID) return;
 
-    handleNextTab();
-
     try {
       await Orders.SetShippingAddress("Outgoing", orderID, shippingAddress);
       await IntegrationEvents.EstimateShipping("Outgoing", orderID);
     } catch (err) {
       console.error("Failed to save shipping address:", err);
     }
+    await refreshWorksheet();
+    handleNextTab();
   };
 
   return (
@@ -180,12 +185,10 @@ export const ShoppingCart = (): JSX.Element => {
                             handleSaveShippingAddress={
                               handleSaveShippingAddress
                             }
-                            orderWorksheet={orderWorksheet}
                           />
                         </TabPanel>
                         <TabPanel>
                           <CartShippingPanel
-                            orderWorksheet={orderWorksheet}
                             shippingAddress={shippingAddress}
                             handleNextTab={handleNextTab}
                             handlePrevTab={handlePrevTab}
@@ -215,9 +218,6 @@ export const ShoppingCart = (): JSX.Element => {
                     ) : (
                       <CartSummary
                         deleteOrder={deleteOrder}
-                        order={orderWorksheet?.Order}
-                        lineItems={orderWorksheet?.LineItems}
-                        promotions={orderWorksheet?.OrderPromotions}
                         onSubmitOrder={submitOrder}
                         tabIndex={tabIndex}
                       />
