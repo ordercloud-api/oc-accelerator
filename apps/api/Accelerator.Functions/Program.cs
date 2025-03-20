@@ -6,10 +6,9 @@ using Microsoft.Extensions.Hosting;
 using OrderCloud.Catalyst;
 using OrderCloud.SDK;
 using System.Reflection;
-using OrderCloud.Integrations.Payment.Stripe;
-using OrderCloud.Integrations.Shipping.EasyPost;
-using OrderCloud.Integrations.Tax.Avalara;
-
+using Accelerator.MockServices;
+using Flurl.Util;
+//using OrderCloud.Integrations.Shipping.EasyPost;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -22,36 +21,26 @@ builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
 //     .ConfigureFunctionsApplicationInsights();
 
 var config = builder.Configuration;
-var easyPostService = new EasyPostService(new EasyPostConfig()
-{
-    BaseUrl = config.GetValue<string>("EasyPostSettings:BaseUrl"),
-    ApiKey = config.GetValue<string>("EasyPostSettings:ApiKey"),
-    CarrierAccountIDs = config.GetValue<List<string>>("EasyPostSettings:CarrierAccountIDs")
-});
-
-var avalaraService = new AvalaraService(new AvalaraConfig()
-{
-    BaseUrl = config.GetValue<string>("AvalaraSettings:BaseUrl"),
-    LicenseKey = config.GetValue<string>("AvalaraSettings:LicenseKey"),
-    AccountID = config.GetValue<string>("AvalaraSettings:AccountID"),
-    CompanyCode = config.GetValue<string>("AvalaraSettings:CompanyCode")
-});
-
-var stripeService = new StripeService(new StripeConfig()
-{
-    SecretKey = config.GetValue<string>("StripeSettings:SecretKey"),
-});
-
-
 // Add Services
 builder.Services.AddSingleton<GreetingCommand>();
 builder.Services.AddSingleton<ShippingCommand>();
 builder.Services.AddSingleton<TaxCommand>();
 builder.Services.AddSingleton<PaymentCommand>();
-builder.Services.AddSingleton<IShippingRatesCalculator>(easyPostService);
-builder.Services.AddSingleton<ITaxCalculator>(avalaraService);
-builder.Services.AddSingleton<ICreditCardProcessor>(stripeService);
-builder.Services.AddSingleton<ICreditCardSaver>(stripeService);
+
+//var carriers = config.GetSection("ShippingSettings:EasyPostSettings:CarrierAccountIDs").GetChildren().Select(x => x.Value).ToList();
+//var easyPostService = new EasyPostService(new EasyPostConfig()
+//{
+//    ApiKey = config.GetValue<string>("ShippingSettings:EasyPostSettings:ApiKey"),
+//    BaseUrl = config.GetValue<string>("ShippingSettings:EasyPostSettings:BaseUrl"),
+//    CarrierAccountIDs = carriers
+//});
+
+//builder.Services.AddSingleton<IShippingRatesCalculator>(easyPostService);
+builder.Services.AddSingleton<IShippingRatesCalculator>(new ShippingServiceMock());
+builder.Services.AddSingleton<ITaxCalculator>(new TaxServiceMock());
+builder.Services.AddSingleton<ICreditCardProcessor>(new CreditCardProcessorMock());
+builder.Services.AddSingleton<ICreditCardSaver>(new CreditCardSaverMock());
+
 builder.Services.AddSingleton<IOrderCloudClient>(new OrderCloudClient(new OrderCloudClientConfig()
 {
     ApiUrl = config.GetValue<string>("OrderCloudSettings:ApiUrl"),
@@ -59,5 +48,6 @@ builder.Services.AddSingleton<IOrderCloudClient>(new OrderCloudClient(new OrderC
     ClientId = config.GetValue<string>("OrderCloudSettings:MiddlewareClientID"),
     ClientSecret = config.GetValue<string>("OrderCloudSettings:MiddlewareClientSecret"),
 }));
+
 
 builder.Build().Run();
