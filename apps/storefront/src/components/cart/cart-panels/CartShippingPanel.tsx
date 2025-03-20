@@ -38,7 +38,7 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
       orderWorksheet?.ShipEstimateResponse?.ShipEstimates?.at(0)?.ID;
 
     if (!orderID || !selectedMethodIndex || !shipEstimateID) {
-      console.error("Missing required data for ship method selection.");
+      console.error("Missing required data for ship method selection?");
       return;
     }
 

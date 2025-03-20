@@ -64,15 +64,7 @@ export const CartInformationPanel = ({
 
   const validateFields = () => {
     const newErrors: Record<string, boolean> = {};
-    const requiredFields = [
-      "FirstName",
-      "LastName",
-      "Street1",
-      "City",
-      "State",
-      "Zip",
-      "Phone",
-    ] as const;
+    const requiredFields = ["Street1", "City", "State", "Zip"] as const;
 
     requiredFields.forEach((field) => {
       if (!shippingAddress?.[field]) {
@@ -107,7 +99,7 @@ export const CartInformationPanel = ({
       </Heading>
 
       <Stack direction={["column", "row"]} spacing={6}>
-        <FormControl isRequired isInvalid={errors.FirstName}>
+        <FormControl isInvalid={errors.FirstName}>
           <FormLabel>First Name</FormLabel>
           <Input
             name="FirstName"
@@ -125,7 +117,7 @@ export const CartInformationPanel = ({
           )}
         </FormControl>
 
-        <FormControl isRequired isInvalid={errors.LastName}>
+        <FormControl isInvalid={errors.LastName}>
           <FormLabel>Last Name</FormLabel>
           <Input
             name="LastName"

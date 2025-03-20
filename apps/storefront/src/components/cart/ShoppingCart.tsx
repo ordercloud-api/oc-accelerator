@@ -108,12 +108,6 @@ export const ShoppingCart = (): JSX.Element => {
     try {
       await Orders.SetShippingAddress("Outgoing", orderID, shippingAddress);
       await IntegrationEvents.EstimateShipping("Outgoing", orderID);
-
-      const updatedWorksheet = await IntegrationEvents.GetWorksheet(
-        "Outgoing",
-        orderID
-      );
-      console.log("Updated Worksheet:", updatedWorksheet);
     } catch (err) {
       console.error("Failed to save shipping address:", err);
     }
@@ -186,6 +180,7 @@ export const ShoppingCart = (): JSX.Element => {
                             handleSaveShippingAddress={
                               handleSaveShippingAddress
                             }
+                            orderWorksheet={orderWorksheet}
                           />
                         </TabPanel>
                         <TabPanel>

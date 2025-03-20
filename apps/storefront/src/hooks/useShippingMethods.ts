@@ -12,22 +12,6 @@ interface useShippingMethodProps {
   shippingAddress: Address | null;
 }
 
-const hasRequiredFields = (
-  address: Address | null,
-  formElements: HTMLFormElement | null
-): boolean => {
-  if (!address || !formElements) return false;
-
-  const requiredFields = Array.from(formElements.elements).filter(
-    (el) => el instanceof HTMLInputElement && el.required
-  );
-
-  return requiredFields.every((field) => {
-    const key = (field as HTMLInputElement).name;
-    return address[key as keyof Address];
-  });
-};
-
 export const useShippingMethods = ({
   orderWorksheet,
   shippingAddress,
@@ -40,13 +24,24 @@ export const useShippingMethods = ({
   );
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
-
   const formRef = useRef<HTMLFormElement>(null);
+  const orderIdRef = useRef(orderWorksheet?.Order?.ID);
+  const addressRef = useRef(shippingAddress);
+
+  useEffect(() => {
+    orderIdRef.current = orderWorksheet?.Order?.ID;
+    addressRef.current = shippingAddress;
+  }, [orderWorksheet?.Order?.ID, shippingAddress]);
 
   const fetchShippingMethods = useCallback(async () => {
-    const orderID = orderWorksheet?.Order?.ID;
+    const orderID = orderIdRef.current;
+    const address = addressRef.current;
 
-    if (!orderID || !shippingAddress || !hasRequiredFields(shippingAddress, formRef.current)) {
+    console.log("Order ID:", orderID);
+    console.log("Shipping Address:", address);
+
+    if (!orderID || !address) {
+      console.log("Missing required data for shipping methods.");
       return;
     }
 
@@ -58,9 +53,7 @@ export const useShippingMethods = ({
       );
       const methods =
         worksheet?.ShipEstimateResponse?.ShipEstimates?.[0]?.ShipMethods || [];
-
       setAvailableMethods(methods);
-
       if (methods.length > 0) {
         setSelectedMethodIndex("0");
       }
@@ -71,16 +64,17 @@ export const useShippingMethods = ({
     } finally {
       setLoading(false);
     }
-  }, [orderWorksheet, shippingAddress]);
+  }, []);
 
   useEffect(() => {
-    fetchShippingMethods();
-  }, [fetchShippingMethods]);
+    if (shippingAddress && Object.keys(shippingAddress).length > 0) {
+      fetchShippingMethods();
+    }
+  }, []);
 
   const selectShipMethod = (index: string) => {
     setSelectedMethodIndex(index);
   };
-
   return {
     availableMethods,
     selectedMethodIndex,
@@ -88,5 +82,6 @@ export const useShippingMethods = ({
     error,
     loading,
     formRef,
+    validateAndFetchShippingMethods: fetchShippingMethods,
   };
 };
