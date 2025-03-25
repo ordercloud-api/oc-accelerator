@@ -9,11 +9,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useShopper } from "@ordercloud/react-sdk";
-import {
-  Address,
-  IntegrationEvents,
-  ShipMethod,
-} from "ordercloud-javascript-sdk";
+import { Address, ShipMethod } from "ordercloud-javascript-sdk";
 import React from "react";
 import { useShippingMethods } from "../../../hooks/useShippingMethods";
 
@@ -27,7 +23,7 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
   handleNextTab,
 }) => {
   const { selectShipMethods, error, loading } = useShippingMethods();
-  const { orderWorksheet, refreshWorksheet } = useShopper();
+  const { orderWorksheet, refreshWorksheet, calculateOrder } = useShopper();
 
   const [shipMethodID, setShipMethodID] = React.useState<string>();
 
@@ -47,7 +43,7 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
     }
 
     await selectShipMethods(shipMethodID);
-    await IntegrationEvents.Calculate("Outgoing", orderID);
+    await calculateOrder();
     await refreshWorksheet();
     handleNextTab();
   };
