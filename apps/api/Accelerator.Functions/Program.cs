@@ -8,17 +8,11 @@ using OrderCloud.SDK;
 using System.Reflection;
 using Accelerator.MockServices;
 using Flurl.Util;
-//using OrderCloud.Integrations.Shipping.EasyPost;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
-
-// Application Insights isn't enabled by default. See https://aka.ms/AAt8mw4.
-// builder.Services
-//     .AddApplicationInsightsTelemetryWorkerService()
-//     .ConfigureFunctionsApplicationInsights();
 
 var config = builder.Configuration;
 // Add Services
@@ -27,15 +21,6 @@ builder.Services.AddSingleton<ShippingCommand>();
 builder.Services.AddSingleton<TaxCommand>();
 builder.Services.AddSingleton<PaymentCommand>();
 
-//var carriers = config.GetSection("ShippingSettings:EasyPostSettings:CarrierAccountIDs").GetChildren().Select(x => x.Value).ToList();
-//var easyPostService = new EasyPostService(new EasyPostConfig()
-//{
-//    ApiKey = config.GetValue<string>("ShippingSettings:EasyPostSettings:ApiKey"),
-//    BaseUrl = config.GetValue<string>("ShippingSettings:EasyPostSettings:BaseUrl"),
-//    CarrierAccountIDs = carriers
-//});
-
-//builder.Services.AddSingleton<IShippingRatesCalculator>(easyPostService);
 builder.Services.AddSingleton<IShippingRatesCalculator>(new ShippingServiceMock());
 builder.Services.AddSingleton<ITaxCalculator>(new TaxServiceMock());
 builder.Services.AddSingleton<ICreditCardProcessor>(new CreditCardProcessorMock());
