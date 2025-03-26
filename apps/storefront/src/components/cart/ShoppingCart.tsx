@@ -45,6 +45,7 @@ export const ShoppingCart = (): JSX.Element => {
     deleteCart,
     submitCart,
     refreshWorksheet,
+    estimateShipping,
   } = useShopper();
 
 
@@ -105,18 +106,19 @@ export const ShoppingCart = (): JSX.Element => {
   };
 
   const handleSaveShippingAddress = async () => {
-    const orderID = orderWorksheet?.Order?.ID;
-    if (!orderID) return;
+    if (!orderWorksheet?.Order?.ID) return;
 
     try {
-      await Orders.SetShippingAddress("Outgoing", orderID, shippingAddress);
-      await IntegrationEvents.EstimateShipping("Outgoing", orderID);
+      await setShippingAddress(shippingAddress);
+      await estimateShipping();
     } catch (err) {
       console.error("Failed to save shipping address:", err);
     }
+
     await refreshWorksheet();
     handleNextTab();
   };
+
 
   return (
     <>
