@@ -8,19 +8,29 @@ namespace OC_Accelerator.Helpers
 {
     public class AzurePlanOptions
     {
-        public List<string> GetAzureStorageSkuValues()
+        public List<string> GetAzureStorageSkuValues(string planSku)
         {
-            return new List<string>
+            switch (planSku)
             {
-                "Premium_LRS",
-                "Premium_ZRS",
-                "Standard_GRS",
-                "Standard_GZRS",
-                "Standard_LRS",
-                "Standard_RAGRS",
-                "Standard_RAGZRS",
-                "Standard_ZRS",
-            };
+                case "B1":
+                case "B2":
+                case "B3":
+                    return new List<string>
+                    {
+                        "Standard_GRS",
+                        "Standard_GZRS",
+                        "Standard_LRS",
+                        "Standard_RAGRS",
+                        "Standard_RAGZRS",
+                        "Standard_ZRS",
+                    };
+                default:
+                    return new List<string>
+                    {
+                        "Premium_LRS",
+                        "Premium_ZRS",
+                    };
+            }
         }
 
         public List<string> GetAzureStorageKindValues(string storageSku)
@@ -35,7 +45,7 @@ namespace OC_Accelerator.Helpers
             return list;
         }
 
-        public List<string> GetAzureAppPlanSkuValues() // TODO: validate these
+        public List<string> GetAzureAppPlanSkuValues() 
         {
             return new List<string>
             {
@@ -44,7 +54,7 @@ namespace OC_Accelerator.Helpers
                 "B3",
                 "P0v3",
                 "P1v3",
-                "P1v2", // is this one valid?
+                "P1v2", 
                 "P1mv3",
                 "P2v3",
                 "P2mv3",
