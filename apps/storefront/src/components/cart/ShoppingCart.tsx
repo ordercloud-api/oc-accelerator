@@ -44,7 +44,6 @@ export const ShoppingCart = (): JSX.Element => {
     worksheetLoading,
     deleteCart,
     submitCart,
-    refreshWorksheet,
     estimateShipping,
   } = useShopper();
 
@@ -114,8 +113,6 @@ export const ShoppingCart = (): JSX.Element => {
     } catch (err) {
       console.error("Failed to save shipping address:", err);
     }
-
-    await refreshWorksheet();
     handleNextTab();
   };
 

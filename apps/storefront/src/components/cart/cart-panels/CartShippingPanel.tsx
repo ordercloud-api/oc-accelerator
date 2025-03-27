@@ -11,9 +11,8 @@ import {
 import { useShopper } from "@ordercloud/react-sdk";
 import {
   Address,
-  IntegrationEvents,
   OrderShipMethodSelection,
-  ShipMethod,
+  ShipMethod
 } from "ordercloud-javascript-sdk";
 import React, { useState } from "react";
 
@@ -26,7 +25,7 @@ interface CartShippingPanelProps {
 const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
   handleNextTab,
 }) => {
-  const { orderWorksheet, refreshWorksheet, calculateOrder } = useShopper();
+  const { orderWorksheet, calculateOrder, selectShipMethods } = useShopper();
   const [shipMethodID, setShipMethodID] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -54,13 +53,8 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
 
     try {
       setLoading(true);
-      await IntegrationEvents.SelectShipmethods(
-        "Outgoing",
-        orderID,
-        shipMethodSelection
-      );
+      await selectShipMethods(shipMethodSelection);
       await calculateOrder();
-      await refreshWorksheet();
       handleNextTab();
     } catch (err) {
       console.error("Failed to select shipping method:", err);

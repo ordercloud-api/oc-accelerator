@@ -128,32 +128,32 @@ const CartSummary: React.FC<CartSummaryProps> = ({ deleteOrder, tabIndex }) => {
       <Stack spacing={3}>
         <Flex justify="space-between">
           <Text>Subtotal</Text>
-          <Text>${orderWorksheet?.Order.Subtotal?.toFixed(2)}</Text>
+          <Text>${orderWorksheet?.Order?.Subtotal?.toFixed(2)}</Text>
         </Flex>
         {orderWorksheet?.Order.PromotionDiscount &&
           orderWorksheet?.Order.PromotionDiscount > 0 && (
             <Flex justify="space-between">
               <Text>Promotion Discount</Text>
               <Text>
-                - ${orderWorksheet?.Order.PromotionDiscount?.toFixed(2)}
+                - ${orderWorksheet?.Order?.PromotionDiscount?.toFixed(2)}
               </Text>
             </Flex>
           )}
         <Flex justify="space-between">
           <Text>Shipping</Text>
-          {tabIndex !== TABS.SHIPPING ||
-            (tabIndex !== TABS.INFORMATION && <Text></Text>)}
-          <Text>${orderWorksheet?.Order.ShippingCost.toFixed(2)}</Text>
+          {tabIndex !== TABS.SHIPPING && tabIndex !== TABS.INFORMATION && (
+            <Text>${orderWorksheet?.Order?.ShippingCost?.toFixed(2)}</Text>
+          )}
         </Flex>
         <Flex justify="space-between">
           <Text>Tax</Text>
-          {tabIndex !== TABS.SHIPPING ||
-            (tabIndex !== TABS.INFORMATION && <Text></Text>)}
-          <Text>${orderWorksheet?.Order.TaxCost.toFixed(2)}</Text>
+          {tabIndex !== TABS.SHIPPING && tabIndex !== TABS.INFORMATION && (
+            <Text>${orderWorksheet?.Order?.TaxCost?.toFixed(2)}</Text>
+          )}
         </Flex>
         <Flex justify="space-between" fontWeight="bold" fontSize="lg">
           <Text>Total</Text>
-          <Text>${orderWorksheet?.Order.Total?.toFixed(2)}</Text>
+          <Text>${orderWorksheet?.Order?.Total?.toFixed(2)}</Text>
         </Flex>
       </Stack>
     </VStack>
