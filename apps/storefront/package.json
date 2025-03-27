@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@chakra-ui/icons": "^2.1.1",
-    "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/icons": "^2.2.4",
+    "@chakra-ui/react": "^2.10.7",
     "@fontsource-variable/dm-sans": "^5.0.7",
     "@fontsource/dm-mono": "^5.0.21",
     "@ordercloud/react-sdk": "^0.2.0",
@@ -31,6 +31,7 @@
     "universal-cookie": "^7.2.0"
   },
   "devDependencies": {
+    "@chakra-ui/cli": "^2.5.8",
     "@types/pluralize": "^0.0.33",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
