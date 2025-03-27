@@ -81,7 +81,7 @@ export const CartInformationPanel = ({
       <Stack direction={["column", "row"]} spacing={6}>
         <DebouncedInput
           name="Phone"
-          placeholder="(555) 555-5555"
+          placeholder="Enter phone number"
           value={formatPhoneNumber(shippingAddress?.Phone || "")}
           onChange={handlePhoneChange}
         />

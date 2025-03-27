@@ -75,7 +75,7 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
       <Card>
         <CardBody display="flex" alignItems="center">
           <Spinner mr="3" />
-          <Text display="inline">Loading shipping options...</Text>
+          <Text display="inline">Loading...</Text>
         </CardBody>
       </Card>
     );
