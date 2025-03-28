@@ -12,69 +12,26 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useShopper } from "@ordercloud/react-sdk";
-import {
-  LineItem,
-  Order,
-  OrderPromotion,
-  RequiredDeep,
-} from "ordercloud-javascript-sdk";
+import { LineItem } from "ordercloud-javascript-sdk";
 import React, { FormEvent, useCallback, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import OcCurrentOrderLineItemList from "./OcCurrentOrderLineItemList";
 import { TABS } from "./ShoppingCart";
 
 interface CartSummaryProps {
-  order: RequiredDeep<Order>;
-  lineItems: LineItem[];
-  promotions?: OrderPromotion[];
   onSubmitOrder: () => void;
   deleteOrder: () => void;
   tabIndex: number;
 }
 
-const CartSummary: React.FC<CartSummaryProps> = ({
-  order,
-  lineItems,
-  promotions,
-  deleteOrder,
-  tabIndex,
-}) => {
-  const { addCartPromo, removeCartPromo } = useShopper();
+const CartSummary: React.FC<CartSummaryProps> = ({ deleteOrder, tabIndex }) => {
+  const { addCartPromo, removeCartPromo, orderWorksheet } = useShopper();
   const [promoCode, setPromoCode] = useState<string>("");
   const handleLineItemChange = (newLi: LineItem) => {
     // Implement the logic to update the line item
     console.log("Line item updated:", newLi);
   };
   const toast = useToast();
-  // TODO: tax blocked by work on .NET functions
-  // const [taxCost, setTaxCost] = useState(null);
-
-  // useEffect(() => {
-  //   const fetchTaxCost = async () => {
-  //     const orderID = order?.ID;
-  //     if (!orderID) return;
-
-  //     try {
-  //       const response = await fetch(`/api/ordercalculate?orderID=${orderID}`);
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch tax cost");
-  //       }
-
-  //       const data = await response.json();
-  //       const taxCost = data?.TaxCost;
-
-  //       if (taxCost !== undefined) {
-  //         setTaxCost(taxCost);
-  //       } else {
-  //         console.warn("No tax cost found in response.");
-  //       }
-  //     } catch (err) {
-  //       console.error("Failed to fetch tax cost:", err);
-  //     }
-  //   };
-
-  //   fetchTaxCost();
-  // }, [order]);
 
   const handleApplyPromotion = useCallback(
     (e: FormEvent) => {
@@ -132,7 +89,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         </Button>
       </ButtonGroup>
       <OcCurrentOrderLineItemList
-        lineItems={lineItems}
+        lineItems={orderWorksheet?.LineItems}
         emptyMessage="Your cart is empty"
         onChange={handleLineItemChange}
         editable={false}
@@ -156,7 +113,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           </Button>
         </Flex>
       </form>
-      {promotions?.map((p) => (
+      {orderWorksheet?.OrderPromotions?.map((p) => (
         <Flex justify="space-between">
           <Text alignContent="center">{p.Code?.toLocaleUpperCase()}</Text>
           <Button
@@ -171,33 +128,32 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       <Stack spacing={3}>
         <Flex justify="space-between">
           <Text>Subtotal</Text>
-          <Text>${order.Subtotal?.toFixed(2)}</Text>
+          <Text>${orderWorksheet?.Order?.Subtotal?.toFixed(2)}</Text>
         </Flex>
-        {order.PromotionDiscount && order.PromotionDiscount > 0 && (
-          <Flex justify="space-between">
-            <Text>Promotion Discount</Text>
-            <Text>- ${order.PromotionDiscount?.toFixed(2)}</Text>
-          </Flex>
-        )}
+        {orderWorksheet?.Order.PromotionDiscount &&
+          orderWorksheet?.Order.PromotionDiscount > 0 && (
+            <Flex justify="space-between">
+              <Text>Promotion Discount</Text>
+              <Text>
+                - ${orderWorksheet?.Order?.PromotionDiscount?.toFixed(2)}
+              </Text>
+            </Flex>
+          )}
         <Flex justify="space-between">
           <Text>Shipping</Text>
-          {tabIndex !== TABS.SHIPPING ||
-            (tabIndex !== TABS.INFORMATION && <Text></Text>)}
-          <Text>
-            {order.ShippingCost === 0
-              ? "FREE SHIPPING"
-              : "$" + order.ShippingCost}
-          </Text>
+          {tabIndex !== TABS.SHIPPING && tabIndex !== TABS.INFORMATION && (
+            <Text>${orderWorksheet?.Order?.ShippingCost?.toFixed(2)}</Text>
+          )}
         </Flex>
-        {/* <Flex justify="space-between">
+        <Flex justify="space-between">
           <Text>Tax</Text>
-          {tabIndex !== TABS.SHIPPING ||
-            (tabIndex !== TABS.INFORMATION && <Text></Text>)}
-          <Text>{taxCost}</Text>
-        </Flex> */}
+          {tabIndex !== TABS.SHIPPING && tabIndex !== TABS.INFORMATION && (
+            <Text>${orderWorksheet?.Order?.TaxCost?.toFixed(2)}</Text>
+          )}
+        </Flex>
         <Flex justify="space-between" fontWeight="bold" fontSize="lg">
           <Text>Total</Text>
-          <Text>${order.Total?.toFixed(2)}</Text>
+          <Text>${orderWorksheet?.Order?.Total?.toFixed(2)}</Text>
         </Flex>
       </Stack>
     </VStack>

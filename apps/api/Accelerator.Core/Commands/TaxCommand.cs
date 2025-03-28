@@ -26,15 +26,7 @@ namespace Accelerator.Commands
                 PromotionDiscount = payload.OrderWorksheet.Order.PromotionDiscount
             };
 
-            try
-            {
-                calculation = await taxCalculator.CalculateEstimateAsync(summary);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Something went wrong, using the default 10.00 tax.");
-                calculation = new() { TotalTax = 10m };
-            }
+            calculation = await taxCalculator.CalculateEstimateAsync(summary);
             response.TaxTotal = calculation.TotalTax; // Populate Total Tax field on the Order
 
             return response;
