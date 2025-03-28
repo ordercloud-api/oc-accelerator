@@ -16,11 +16,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useShopper } from "@ordercloud/react-sdk";
-import {
-  Address,
-  IntegrationEvents,
-  Orders
-} from "ordercloud-javascript-sdk";
+import { Address } from "ordercloud-javascript-sdk";
 import { useCallback, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { CartInformationPanel } from "./cart-panels/CartInformationPanel";
@@ -46,7 +42,6 @@ export const ShoppingCart = (): JSX.Element => {
     submitCart,
     estimateShipping,
   } = useShopper();
-
 
   const [shippingAddress, setShippingAddress] = useState<Address>({
     FirstName: "",
@@ -115,7 +110,6 @@ export const ShoppingCart = (): JSX.Element => {
     }
     handleNextTab();
   };
-
 
   return (
     <>
