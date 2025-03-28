@@ -19,17 +19,15 @@ import { useShopper } from "@ordercloud/react-sdk";
 import {
   Address,
   IntegrationEvents,
-  Order,
-  Orders,
-  RequiredDeep,
+  Orders
 } from "ordercloud-javascript-sdk";
 import { useCallback, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { CartInformationPanel } from "./cart-panels/CartInformationPanel";
 import { CartPaymentPanel } from "./cart-panels/CartPaymentPanel";
+import CartShippingPanel from "./cart-panels/CartShippingPanel";
 import CartSkeleton from "./ShoppingCartSkeleton";
 import CartSummary from "./ShoppingCartSummary";
-import CartShippingPanel from "./cart-panels/CartShippingPanel";
 
 export const TABS = {
   INFORMATION: 0,
@@ -44,7 +42,6 @@ export const ShoppingCart = (): JSX.Element => {
   const { orderWorksheet, worksheetLoading, deleteCart, submitCart } =
     useShopper();
 
-  const [order, setOrder] = useState<RequiredDeep<Order>>();
 
   const [shippingAddress, setShippingAddress] = useState<Address>({
     FirstName: "",

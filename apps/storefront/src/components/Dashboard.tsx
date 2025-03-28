@@ -12,6 +12,7 @@ import { Link as RouterLink } from "react-router-dom";
 import defaultHeroImage from "../assets/default_images/default_hero_image.jpg";
 import {
   DASHBOARD_HERO_CTA_LINK,
+  DASHBOARD_HERO_CTA_TEXT,
   DASHBOARD_HERO_IMAGE,
   DASHBOARD_HERO_TAGLINE,
   DASHBOARD_SECONDARY_CTA_LINK,
@@ -68,7 +69,7 @@ const Dashboard: FC = () => {
           </Heading>
           {DASHBOARD_HERO_CTA_LINK && (
             <Button size="sm" mt={8} onClick={DASHBOARD_HERO_CTA_LINK}>
-              Call to action
+              {DASHBOARD_HERO_CTA_TEXT}
             </Button>
           )}
         </Stack>

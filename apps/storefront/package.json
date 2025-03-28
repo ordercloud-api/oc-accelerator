@@ -27,12 +27,14 @@
     "react-icons": "^5.1.0",
     "react-querybuilder": "^6.5.5",
     "react-router-dom": "^6.22.2",
+    "tinycolor2": "^1.6.0",
     "universal-cookie": "^7.2.0"
   },
   "devDependencies": {
     "@types/pluralize": "^0.0.33",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
+    "@types/tinycolor2": "^1.4.6",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
     "@vitejs/plugin-react": "^4.2.1",
