@@ -63,7 +63,7 @@ public class AzureResourceService
         do
         {
             appPlanSku = Prompt.Select("Select the desired SKU for your Azure App Service Plan. Please see https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans for more information", _azPlanOptions.GetAzureAppPlanSkuValues());
-            storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function). Please see https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy for more information", _azPlanOptions.GetAzureStorageSkuValues());
+            storageSku = Prompt.Select("Select the desired SKU for your Azure Storage Account (required to create an Azure Function). Please see https://learn.microsoft.com/en-us/azure/storage/common/storage-redundancy for more information", _azPlanOptions.GetAzureStorageSkuValues(appPlanSku));
             storageType =
                 Prompt.Select(
                     "Select the desired storage type for your Azure Storage Account (required to create an Azure Function). Please see https://learn.microsoft.com/en-us/azure/storage/common/storage-account-overview#types-of-storage-accounts for more information",
