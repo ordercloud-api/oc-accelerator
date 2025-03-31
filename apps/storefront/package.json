@@ -14,7 +14,7 @@
     "@chakra-ui/react": "^2.10.7",
     "@fontsource-variable/dm-sans": "^5.0.7",
     "@fontsource/dm-mono": "^5.0.21",
-    "@ordercloud/react-sdk": "^0.2.0",
+    "@ordercloud/react-sdk": "^0.2.3",
     "@sitecore/blok-theme": "^1.1.13",
     "@tanstack/react-query": "^5.62.2",
     "@tanstack/react-table": "^8.20.5",
