@@ -6,6 +6,7 @@ import {
   Heading,
   HStack,
   Icon,
+  Image,
   Menu,
   MenuButton,
   MenuItem,
@@ -19,13 +20,14 @@ import {
   useOrderCloudContext,
   useShopper,
 } from "@ordercloud/react-sdk";
-import { Catalog } from "ordercloud-javascript-sdk";
+import { Catalog, Category } from "ordercloud-javascript-sdk";
 import { FC, useEffect, useMemo, useState } from "react";
 import { TbShoppingCartFilled } from "react-icons/tb";
 import { Link as RouterLink } from "react-router-dom";
 import { DEFAULT_BRAND } from "../assets/DEFAULT_BRAND";
+import { BRAND_LOGO_DARK, BRAND_LOGO_LIGHT } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
-import MegaMenu from "./MegaMenu";
+import MegaMenu from "../Layout/MegaMenu";
 
 interface MainMenuProps {
   loginDisclosure: UseDisclosureProps;
@@ -39,16 +41,25 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
 
   const { orderWorksheet } = useShopper();
 
-  const { data } = useOcResourceList<Catalog>(
+  const { data: catalogData } = useOcResourceList<Catalog>(
     "Me.Catalogs",
     undefined,
     undefined,
-    {
-      staleTime: 300000,
-    }
+    { staleTime: 300000 }
   );
 
-  const catalogs = useMemo(() => data?.Items, [data]);
+  const catalogs = useMemo(() => catalogData?.Items ?? [], [catalogData]);
+
+  const activeCatalogId = catalogs.length > 0 ? catalogs[0]?.ID : undefined;
+
+  const { data: categoryData } = useOcResourceList<Category>(
+    "Me.Categories",
+    activeCatalogId ? { catalogId: activeCatalogId } : undefined,
+    undefined,
+    { staleTime: 300000 }
+  );
+
+  const categories = useMemo(() => categoryData?.Items ?? [], [categoryData]);
 
   useEffect(() => {
     if (!selectedCatalog && catalogs?.length)
@@ -125,17 +136,25 @@ const MainMenu: FC<MainMenuProps> = ({ loginDisclosure }) => {
       <Container h="100%" maxW="full">
         <HStack h="100%" justify="flex-start" alignItems="center">
           <RouterLink to="/">
-            <DEFAULT_BRAND h="10" />
+            {BRAND_LOGO_LIGHT ? (
+              <Image src={BRAND_LOGO_LIGHT} alt="WildSite Logo" h="10" />
+            ) : BRAND_LOGO_DARK ? (
+              <Image src={BRAND_LOGO_DARK} alt="WildSite Logo (Dark)" h="10" />
+            ) : (
+              <DEFAULT_BRAND h="10" />
+            )}
           </RouterLink>
           <HStack as="nav" flexGrow="1" ml={3}>
-            <Button
-              isActive={megaMenuDisclosure.isOpen}
-              size="sm"
-              variant="ghost"
-              onClick={megaMenuDisclosure.onToggle}
-            >
-              Categories
-            </Button>
+            {categories.length > 0 && (
+              <Button
+                isActive={megaMenuDisclosure.isOpen}
+                size="sm"
+                variant="ghost"
+                onClick={megaMenuDisclosure.onToggle}
+              >
+                Categories
+              </Button>
+            )}
             {renderCatalogMenu()}
           </HStack>
           <HStack>

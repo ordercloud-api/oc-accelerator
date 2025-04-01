@@ -16,11 +16,16 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.0" />
-    <PackageReference Include="ordercloud-dotnet-catalyst" Version="2.8.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="ordercloud-dotnet-catalyst" Version="2.8.1" />
+    <PackageReference Include="OrderCloud.Integrations.Payment.Stripe" Version="2.5.0" />
+    <PackageReference Include="OrderCloud.Integrations.Shipping.EasyPost" Version="2.4.0" />
+    <PackageReference Include="OrderCloud.Integrations.Tax.Avalara" Version="2.4.0" />
     <PackageReference Include="OrderCloud.SDK" Version="0.17.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Accelerator.Core\Accelerator.Core.csproj" />
+    <ProjectReference Include="..\Accelerator.Mocks\Accelerator.Mocks.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

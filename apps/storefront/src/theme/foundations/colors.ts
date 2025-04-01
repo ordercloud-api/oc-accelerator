@@ -1,3 +1,10 @@
+import {
+  BRAND_COLOR_ACCENT,
+  BRAND_COLOR_PRIMARY,
+  BRAND_COLOR_SECONDARY,
+} from "../../constants";
+import tinycolor from "tinycolor2";
+
 const basePalette = {
   colors: {
     teal: {
@@ -148,14 +155,40 @@ const basePalette = {
   },
 };
 
-export const DEFAULT_THEME_PRIMARY = basePalette.colors.green;
-export const DEFAULT_THEME_SECONDARY = basePalette.colors.gray;
-export const DEFAULT_THEME_ACCENT = basePalette.colors.gray;
+const generateColorScale = (baseColor: string) => {
+  const color = tinycolor(baseColor);
+
+  return {
+    50: color.clone().lighten(40).toHexString(),
+    100: color.clone().lighten(30).toHexString(),
+    200: color.clone().lighten(20).toHexString(),
+    300: color.clone().lighten(10).toHexString(),
+    400: color.clone().lighten(5).toHexString(),
+    500: color.toHexString(),
+    600: color.clone().darken(5).toHexString(),
+    700: color.clone().darken(10).toHexString(),
+    800: color.clone().darken(20).toHexString(),
+    900: color.clone().darken(30).toHexString(),
+  };
+};
+
+const isValidHex = (color: string): boolean =>
+  /^#([0-9A-F]{3}){1,2}$/i.test(color);
+
+const getColorOrDefault = (brandColor: string, defaultColor: object) =>
+  isValidHex(brandColor) ? generateColorScale(brandColor) : defaultColor;
+
+// THESE ARE SETTING DEFAULT COLORS IN THE UI, UNCOMMENT IF/WHEN WE WANT TO ADD THIS FUNCTIONALITY
+// REFERENCE SCHRA FOR HOW THIS IS DONE
+
+// export const DEFAULT_THEME_PRIMARY = basePalette.colors.green;
+// export const DEFAULT_THEME_SECONDARY = basePalette.colors.gray;
+// export const DEFAULT_THEME_ACCENT = basePalette.colors.gray;
 
 const colors = {
-  primary: DEFAULT_THEME_PRIMARY,
-  secondary: DEFAULT_THEME_SECONDARY,
-  accent: DEFAULT_THEME_ACCENT,
+  primary: getColorOrDefault(BRAND_COLOR_PRIMARY, basePalette.colors.green),
+  secondary: getColorOrDefault(BRAND_COLOR_SECONDARY, basePalette.colors.gray),
+  accent: getColorOrDefault(BRAND_COLOR_ACCENT, basePalette.colors.gray),
 
   info: basePalette.colors.cyan,
   warning: basePalette.colors.yellow,
