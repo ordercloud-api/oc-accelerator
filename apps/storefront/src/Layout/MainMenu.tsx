@@ -27,7 +27,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { DEFAULT_BRAND } from "../assets/DEFAULT_BRAND";
 import { BRAND_LOGO_DARK, BRAND_LOGO_LIGHT } from "../constants";
 import { useCurrentUser } from "../hooks/currentUser";
-import MegaMenu from "../layout/MegaMenu";
+import MegaMenu from "../Layout/MegaMenu";
 
 interface MainMenuProps {
   loginDisclosure: UseDisclosureProps;
