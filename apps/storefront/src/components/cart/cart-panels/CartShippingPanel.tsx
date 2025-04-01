@@ -8,53 +8,60 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { Address, OrderWorksheet } from "ordercloud-javascript-sdk";
-import React from "react";
-import { useShippingMethods } from "../../../hooks/useShippingMethods";
+import { useShopper } from "@ordercloud/react-sdk";
+import {
+  Address,
+  OrderShipMethodSelection,
+  ShipMethod
+} from "ordercloud-javascript-sdk";
+import React, { useState } from "react";
 
 interface CartShippingPanelProps {
-  orderWorksheet: OrderWorksheet;
   shippingAddress: Address;
   handleNextTab: () => void;
   handlePrevTab: () => void;
 }
 
 const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
-  orderWorksheet,
-  shippingAddress,
   handleNextTab,
 }) => {
-  const {
-    availableMethods,
-    selectedMethodIndex,
-    selectShipMethod,
-    error,
-    loading,
-  } = useShippingMethods({ orderWorksheet, shippingAddress });
+  const { orderWorksheet, calculateOrder, selectShipMethods } = useShopper();
+  const [shipMethodID, setShipMethodID] = useState<string>();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const handleShippingMethod = async () => {
+  const handleSelectShipMethod = async () => {
     const orderID = orderWorksheet?.Order?.ID;
     const shipEstimateID =
       orderWorksheet?.ShipEstimateResponse?.ShipEstimates?.at(0)?.ID;
 
-    if (!orderID || !selectedMethodIndex || !shipEstimateID) {
+    if (!orderID || !shipEstimateID) {
       console.error("Missing required data for ship method selection.");
       return;
     }
 
-    const selectedMethod = availableMethods[parseInt(selectedMethodIndex)];
-
-    if (!selectedMethod) {
+    if (!shipMethodID) {
       console.error("Selected method not found.");
       return;
     }
-  };
 
-  const handleChange = (value: string) => {
-    selectShipMethod(value);
-    const selected = availableMethods[parseInt(value)];
-    console.log("Selected shipping method:", selected);
-    handleNextTab();
+    const shipMethodSelection: OrderShipMethodSelection = {
+      ShipMethodSelections: [
+        { ShipEstimateID: shipEstimateID, ShipMethodID: shipMethodID },
+      ],
+    };
+
+    try {
+      setLoading(true);
+      await selectShipMethods(shipMethodSelection);
+      await calculateOrder();
+      handleNextTab();
+    } catch (err) {
+      console.error("Failed to select shipping method:", err);
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -62,7 +69,7 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
       <Card>
         <CardBody display="flex" alignItems="center">
           <Spinner mr="3" />
-          <Text display="inline">Loading shipping options...</Text>
+          <Text display="inline">Loading...</Text>
         </CardBody>
       </Card>
     );
@@ -92,12 +99,14 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
                 gap: "3",
               },
             }}
-            value={selectedMethodIndex || undefined}
-            onChange={handleChange}
+            value={shipMethodID}
+            onChange={setShipMethodID}
             as={VStack}
           >
-            {availableMethods.map((method, index) => (
-              <Radio key={method.ID} value={index.toString()} w="full" gap="3">
+            {orderWorksheet?.ShipEstimateResponse?.ShipEstimates?.at(
+              0
+            )?.ShipMethods?.map((method: ShipMethod) => (
+              <Radio key={method.ID} value={method.ID} w="full" gap="3">
                 <VStack align="flex-start" gap="0" flexGrow="1">
                   <Text fontSize="lg" fontWeight="semibold">
                     {method.Name}
@@ -121,8 +130,13 @@ const CartShippingPanel: React.FC<CartShippingPanelProps> = ({
           </RadioGroup>
         </CardBody>
       </Card>
-      <Button alignSelf="flex-end" mt={6} onClick={handleShippingMethod}>
-        Continue to payment
+      <Button
+        alignSelf="flex-end"
+        mt={6}
+        onClick={handleSelectShipMethod}
+        isDisabled={!shipMethodID || loading}
+      >
+        {loading ? <Spinner size="sm" /> : "Continue to payment"}
       </Button>
     </VStack>
   );

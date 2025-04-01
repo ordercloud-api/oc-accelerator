@@ -9,9 +9,9 @@ import {
   ModalOverlay,
   UseDisclosureReturn,
 } from "@chakra-ui/react";
-import { FC, useRef } from "react";
-import LoginForm from "./LoginForm";
 import { useOrderCloudContext } from "@ordercloud/react-sdk";
+import { FC, useRef } from "react";
+import LoginForm from "../Login/LoginForm";
 
 interface ILoginModal {
   disclosure: UseDisclosureReturn;

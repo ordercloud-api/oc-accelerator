@@ -1,5 +1,5 @@
 import { RouteObject } from "react-router-dom";
-import Layout from "./layout/Layout";
+import Layout from "./Layout/Layout";
 import Dashboard from './components/Dashboard';
 import OrderConfirmation from "./components/cart/OrderConfirmation";
 import { ShoppingCart } from "./components/cart/ShoppingCart";

@@ -16,11 +16,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useShopper } from "@ordercloud/react-sdk";
-import {
-  Address,
-  IntegrationEvents,
-  Orders
-} from "ordercloud-javascript-sdk";
+import { Address } from "ordercloud-javascript-sdk";
 import { useCallback, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { CartInformationPanel } from "./cart-panels/CartInformationPanel";
@@ -39,9 +35,13 @@ export const ShoppingCart = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [tabIndex, setTabIndex] = useState(TABS.INFORMATION);
 
-  const { orderWorksheet, worksheetLoading, deleteCart, submitCart } =
-    useShopper();
-
+  const {
+    orderWorksheet,
+    worksheetLoading,
+    deleteCart,
+    submitCart,
+    estimateShipping,
+  } = useShopper();
 
   const [shippingAddress, setShippingAddress] = useState<Address>({
     FirstName: "",
@@ -100,23 +100,15 @@ export const ShoppingCart = (): JSX.Element => {
   };
 
   const handleSaveShippingAddress = async () => {
-    const orderID = orderWorksheet?.Order?.ID;
-    if (!orderID) return;
-
-    handleNextTab();
+    if (!orderWorksheet?.Order?.ID) return;
 
     try {
-      await Orders.SetShippingAddress("Outgoing", orderID, shippingAddress);
-      await IntegrationEvents.EstimateShipping("Outgoing", orderID);
-
-      const updatedWorksheet = await IntegrationEvents.GetWorksheet(
-        "Outgoing",
-        orderID
-      );
-      console.log("Updated Worksheet:", updatedWorksheet);
+      await setShippingAddress(shippingAddress);
+      await estimateShipping();
     } catch (err) {
       console.error("Failed to save shipping address:", err);
     }
+    handleNextTab();
   };
 
   return (
@@ -190,7 +182,6 @@ export const ShoppingCart = (): JSX.Element => {
                         </TabPanel>
                         <TabPanel>
                           <CartShippingPanel
-                            orderWorksheet={orderWorksheet}
                             shippingAddress={shippingAddress}
                             handleNextTab={handleNextTab}
                             handlePrevTab={handlePrevTab}
@@ -220,9 +211,6 @@ export const ShoppingCart = (): JSX.Element => {
                     ) : (
                       <CartSummary
                         deleteOrder={deleteOrder}
-                        order={orderWorksheet?.Order}
-                        lineItems={orderWorksheet?.LineItems}
-                        promotions={orderWorksheet?.OrderPromotions}
                         onSubmitOrder={submitOrder}
                         tabIndex={tabIndex}
                       />

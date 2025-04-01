@@ -8,8 +8,8 @@ import {
 import { useOrderCloudContext } from "@ordercloud/react-sdk";
 import { FC, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import LoginModal from "../components/login/LoginModal";
-import MainMenu from "./MainMenu";
+import MainMenu from "../Layout/MainMenu";
+import LoginModal from "../components/Login/LoginModal";
 
 const Layout: FC = () => {
   const { pathname } = useLocation();
@@ -37,7 +37,8 @@ const Layout: FC = () => {
         sx={{ "&>*": { width: "full" } }}
         bgColor="chakra-subtle-bg"
       >
-        <Container id="outletWrapper"
+        <Container
+          id="outletWrapper"
           display="flex"
           flexFlow="column nowrap"
           maxW={

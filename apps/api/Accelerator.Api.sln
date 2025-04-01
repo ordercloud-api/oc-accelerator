@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accelerator.Functions", "Ac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accelerator.Core", "Accelerator.Core\Accelerator.Core.csproj", "{2939D108-0390-4AEF-8109-DB2EFA4B5F07}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accelerator.Mocks", "Accelerator.Mocks\Accelerator.Mocks.csproj", "{51421944-78F3-4132-A825-FAB062BF83EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2939D108-0390-4AEF-8109-DB2EFA4B5F07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2939D108-0390-4AEF-8109-DB2EFA4B5F07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2939D108-0390-4AEF-8109-DB2EFA4B5F07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51421944-78F3-4132-A825-FAB062BF83EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51421944-78F3-4132-A825-FAB062BF83EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51421944-78F3-4132-A825-FAB062BF83EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51421944-78F3-4132-A825-FAB062BF83EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
