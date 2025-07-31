@@ -2,9 +2,13 @@ import { FC, useCallback } from 'react'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import { IOrderCloudErrorContext, OrderCloudProvider } from '@ordercloud/react-sdk'
 import {
-  ALLOW_ANONYMOUS,
   BASE_API_URL,
   CLIENT_ID,
+  OPENID_CONNECT_ENABLED,
+  OPENID_CONNECT_CONFIG_ID,
+  OPENIDCONNECT_ACCESS_TOKEN_QUERY_PARAM_NAME,
+  OPENIDCONNECT_REFRESH_TOKEN_QUERY_PARAM_NAME,
+  OPENIDCONNECT_IDP_ACCESS_TOKEN_QUERY_PARAM_NAME
 } from '../constants/constants'
 import { useToast } from '@chakra-ui/react'
 import { OrderCloudError } from 'ordercloud-javascript-sdk'
@@ -42,9 +46,17 @@ const AppProvider: FC = () => {
       clientId={CLIENT_ID}
       scope={[]}
       customScope={[]}
-      allowAnonymous={ALLOW_ANONYMOUS}
+      allowAnonymous={false}
       defaultErrorHandler={defaultErrorHandler}
       xpSchemas={schemaObject}
+      openIdConnect={{
+        enabled: OPENID_CONNECT_ENABLED,
+        autoRedirect: true,
+        configs: [{ id: OPENID_CONNECT_CONFIG_ID}],
+        accessTokenQueryParamName: OPENIDCONNECT_ACCESS_TOKEN_QUERY_PARAM_NAME,
+        refreshTokenQueryParamName: OPENIDCONNECT_REFRESH_TOKEN_QUERY_PARAM_NAME,
+        idpAccessTokenQueryParamName: OPENIDCONNECT_IDP_ACCESS_TOKEN_QUERY_PARAM_NAME
+      }}
     >
       <RouterProvider router={router} />
       <GlobalLoadingIndicator />

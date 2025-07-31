@@ -68,12 +68,25 @@ Resource list and detail views will display all native properties on a resource 
 VITE_APP_ORDERCLOUD_BASE_API_URL="https://sandboxapi.ordercloud.io"
 VITE_APP_ORDERCLOUD_CLIENT_ID="********-****-****-****-************"
 VITE_APP_NAME="OrderCloud Admin Application"
+VITE_APP_ORDERCLOUD_OPENIDCONNECT_ENABLED=false
+VITE_APP_ORDERCLOUD_OPENIDCONNECT_CONFIG_ID=
+VITE_APP_ORDERCLOUD_OPENIDCONNECT_ACCESS_TOKEN_QUERY_PARAM_NAME=
+VITE_APP_ORDERCLOUD_OPENIDCONNECT_REFRESH_TOKEN_QUERY_PARAM_NAME=
+VITE_APP_ORDERCLOUD_OPENIDCONNECT_IDP_ACCESS_TOKEN_QUERY_PARAM_NAME=
 ```
-| Variable                            | Description                                                                                                       |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `VITE_APP_ORDERCLOUD_BASE_API_URL`  | Base OrderCloud API URL                                          |
-| `VITE_APP_ORDERCLOUD_CLIENT_ID`     | Admin Client ID                                                                                                   |
-| `VITE_APP_NAME`                     | Name of the application title                                                                                     |
+
+| Variable                                                              | Description                                                                                                                                                                                                                                                                              |
+|-----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `VITE_APP_ORDERCLOUD_BASE_API_URL`                                    | Base OrderCloud API URL                                                                                                                                                                                                                                                                  |
+| `VITE_APP_ORDERCLOUD_CLIENT_ID`                                       | Admin Client ID                                                                                                                                                                                                                                                                          |
+| `VITE_APP_NAME`                                                       | Name of the application title                                                                                                                                                                                                                                                            |
+| `VITE_APP_ORDERCLOUD_OPENIDCONNECT_ENABLED`                           | Set to `true` to activate single-sign-on via OpenIDConnect in your application                                                                                                                                                                                                           |
+| `VITE_APP_ORDERCLOUD_OPENIDCONNECT_CONFIG_ID`                         | The ID of the [OpenID connect configuration](https://ordercloud.io/api-reference/authentication-and-authorization/open-id-connects/create) that should be targeted for authentication                                                                                                    |
+| `VITE_APP_ORDERCLOUD_OPENIDCONNECT_ACCESS_TOKEN_QUERY_PARAM_NAME`     | Query parameter name where the OrderCloud access token is stored after login. For example, if [AppStartUrl](https://ordercloud.io/api-reference/authentication-and-authorization/open-id-connects/create) is `https://my-application.com/login?token={0}`, use `token`                   |
+| `VITE_APP_ORDERCLOUD_OPENIDCONNECT_REFRESH_TOKEN_QUERY_PARAM_NAME`    | (Optional) Query parameter name for the refresh token after login. Example: if [AppStartUrl](https://ordercloud.io/api-reference/authentication-and-authorization/open-id-connects/create) is `https://my-application.com/login?token={0}&refresh={3}`, use `refresh`                    |
+| `VITE_APP_ORDERCLOUD_OPENIDCONNECT_IDP_ACCESS_TOKEN_QUERY_PARAM_NAME` | (Optional) Query parameter name for the identity provider access token after login. Example: if [AppStartUrl](https://ordercloud.io/api-reference/authentication-and-authorization/open-id-connects/create) is `https://my-application.com/login?token={0}&idptoken={1}`, use `idptoken` |
+
+
 
 2. Run Vite in development mode
 ```bash

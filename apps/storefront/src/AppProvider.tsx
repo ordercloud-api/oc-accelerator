@@ -6,9 +6,12 @@ import {
   ALLOW_ANONYMOUS,
   BASE_API_URL,
   CLIENT_ID,
-  CUSTOM_SCOPE,
-  SCOPE,
-  IS_AUTO_APPLY
+  IS_AUTO_APPLY,
+  OPENID_CONNECT_CONFIG_ID,
+  OPENID_CONNECT_ENABLED,
+  OPENIDCONNECT_ACCESS_TOKEN_QUERY_PARAM_NAME,
+  OPENIDCONNECT_IDP_ACCESS_TOKEN_QUERY_PARAM_NAME,
+  OPENIDCONNECT_REFRESH_TOKEN_QUERY_PARAM_NAME
 } from "./constants";
 import { useToast } from "@chakra-ui/react";
 import { OrderCloudError } from "ordercloud-javascript-sdk";
@@ -35,11 +38,19 @@ const AppProvider: FC = () => {
     <OrderCloudProvider
       baseApiUrl={BASE_API_URL}
       clientId={CLIENT_ID}
-      scope={SCOPE}
-      customScope={CUSTOM_SCOPE}
+      scope={[]}
+      customScope={[]}
       allowAnonymous={ALLOW_ANONYMOUS}
       autoApplyPromotions={IS_AUTO_APPLY}
       defaultErrorHandler={defaultErrorHandler}
+      openIdConnect={{
+        enabled: OPENID_CONNECT_ENABLED,
+        autoRedirect: true,
+        configs: [{ id: OPENID_CONNECT_CONFIG_ID}],
+        accessTokenQueryParamName: OPENIDCONNECT_ACCESS_TOKEN_QUERY_PARAM_NAME,
+        refreshTokenQueryParamName: OPENIDCONNECT_REFRESH_TOKEN_QUERY_PARAM_NAME,
+        idpAccessTokenQueryParamName: OPENIDCONNECT_IDP_ACCESS_TOKEN_QUERY_PARAM_NAME
+      }}
     >
       <RouterProvider router={router} />
       <GlobalLoadingIndicator/>
