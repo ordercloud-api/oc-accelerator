@@ -58,7 +58,7 @@ namespace OC_Accelerator
                 {
                     storefrontDirectory = "storefront";
                     adminDirectory = "admin";
-                    funcDirectory = "functions";
+                    funcDirectory = "api";
                 }
 
                 var bicepFileHelper = provider.GetService<BuildBicepFile>();
